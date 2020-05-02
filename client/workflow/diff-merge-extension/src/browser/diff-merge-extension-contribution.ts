@@ -46,7 +46,7 @@ export class DiffMergeExtensionCommandContribution implements CommandContributio
                     console.log("first file", this.firstComparisonFile.path.toString());
                     let secondComparisonFile = UriSelection.getUri(this.selectionService.selection);
                     console.log("second file", secondComparisonFile!.path.toString());
-                    const comparison = await this.comparisonService.getComparisonResult();
+                    const comparison = await this.comparisonService.getComparisonResult(this.firstComparisonFile.path.toString(), secondComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
                     this.messageService.info(JSON.stringify(comparison));
                 } else {

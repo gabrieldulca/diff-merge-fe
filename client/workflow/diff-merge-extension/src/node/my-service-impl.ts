@@ -4,6 +4,7 @@ import { DefaultWorkspaceServer } from '@theia/workspace/lib/node';
 import * as fs from 'fs-extra';
 import * as url from 'url';
 
+const fetch = require("node-fetch");
 
 @injectable()
 export class MyServiceImpl implements MyService {
@@ -19,13 +20,21 @@ export class MyServiceImpl implements MyService {
         let rootPath = await this.workspaceServer.getMostRecentlyUsedWorkspace();
         //const url = require('url');
 
-        const configPath = url.fileURLToPath(rootPath + '/package.json');
+        const configPath = url.fileURLToPath(rootPath + '/example1.wf');
         console.log("configPath");
 
         const config = await fs.readJson(configPath);
         console.log(config);
 
-        return config;
+        // @ts-ignore
+        let resp = fetch('http://localhost:8080/diff/comparewf/diagram').then(res => res.json());
+        console.log("resp", resp);
+        //return fetch('http://localhost:8080/diff/compare/diagram/inheritance');
+
+
+
+
+        return resp;
 
         /*return new Promise(async function(resole, reject) {
             const url = require('url');

@@ -17,17 +17,17 @@
                   "id": "task0_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
+                    "x": 7.65625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 17.015625,
-                    "height": 22.0
+                    "width": 16.6875,
+                    "height": 22.40625
                   },
                   "text": "M",
                   "alignment": {
                     "x": 8.34375,
-                    "y": 18.0
+                    "y": 18.40625
                   }
                 }
               ],
@@ -51,16 +51,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 48.90625,
-                "height": 22.0
+                "width": 60.03125,
+                "height": 22.40625
               },
-              "text": "Push",
+              "text": "Push1",
               "alignment": {
-                "x": 24.453125,
-                "y": 18.0
+                "x": 30.015625,
+                "y": 18.40625
               }
             }
           ],
@@ -70,7 +70,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 91.90625,
+            "width": 103.03125,
             "height": 42.0
           },
           "layout": "hbox"
@@ -78,11 +78,11 @@
       ],
       "type": "task:manual",
       "position": {
-        "x": 440.01385498046875,
-        "y": 250.00694274902344
+        "x": 440.0,
+        "y": 250.0
       },
       "size": {
-        "width": 101.90625,
+        "width": 113.03125,
         "height": 52.0
       },
       "layout": "vbox"
@@ -103,17 +103,17 @@
                   "id": "task1_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
+                    "x": 7.65625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 17.015625,
-                    "height": 22.0
+                    "width": 16.6875,
+                    "height": 22.40625
                   },
                   "text": "M",
                   "alignment": {
                     "x": 8.34375,
-                    "y": 18.0
+                    "y": 18.40625
                   }
                 }
               ],
@@ -137,16 +137,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 53.5625,
-                "height": 22.0
+                "width": 52.75,
+                "height": 22.40625
               },
               "text": "RflWt",
               "alignment": {
                 "x": 26.109375,
-                "y": 18.0
+                "y": 18.40625
               }
             }
           ],
@@ -156,7 +156,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 96.5625,
+            "width": 95.75,
             "height": 42.0
           },
           "layout": "hbox"
@@ -168,7 +168,7 @@
         "y": 121.00694274902344
       },
       "size": {
-        "width": 106.5625,
+        "width": 105.75,
         "height": 52.0
       },
       "layout": "vbox"
@@ -189,17 +189,17 @@
                   "id": "task2_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
+                    "x": 7.65625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 17.015625,
-                    "height": 22.0
+                    "width": 16.6875,
+                    "height": 22.40625
                   },
                   "text": "M",
                   "alignment": {
                     "x": 8.34375,
-                    "y": 18.0
+                    "y": 18.40625
                   }
                 }
               ],
@@ -223,16 +223,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 64.015625,
-                "height": 22.0
+                "width": 62.21875,
+                "height": 22.40625
               },
               "text": "ChkTp",
               "alignment": {
-                "x": 32.109375,
-                "y": 18.0
+                "x": 31.109375,
+                "y": 18.40625
               }
             }
           ],
@@ -242,7 +242,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 107.015625,
+            "width": 105.21875,
             "height": 42.0
           },
           "layout": "hbox"
@@ -254,7 +254,7 @@
         "y": 320.00694274902344
       },
       "size": {
-        "width": 117.015625,
+        "width": 115.21875,
         "height": 52.0
       },
       "layout": "vbox"
@@ -275,17 +275,17 @@
                   "id": "task3_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
+                    "x": 7.65625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 17.015625,
-                    "height": 22.0
+                    "width": 16.6875,
+                    "height": 22.40625
                   },
                   "text": "M",
                   "alignment": {
                     "x": 8.34375,
-                    "y": 18.0
+                    "y": 18.40625
                   }
                 }
               ],
@@ -309,16 +309,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 76.953125,
-                "height": 22.0
+                "width": 76.15625,
+                "height": 22.40625
               },
               "text": "PreHeat",
               "alignment": {
                 "x": 37.8125,
-                "y": 18.0
+                "y": 18.40625
               }
             }
           ],
@@ -328,7 +328,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 119.953125,
+            "width": 119.15625,
             "height": 42.0
           },
           "layout": "hbox"
@@ -340,7 +340,7 @@
         "y": 448.00694274902344
       },
       "size": {
-        "width": 129.953125,
+        "width": 129.15625,
         "height": 52.0
       },
       "layout": "vbox"
@@ -361,17 +361,17 @@
                   "id": "task4_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
+                    "x": 7.65625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 17.015625,
-                    "height": 22.0
+                    "width": 16.6875,
+                    "height": 22.40625
                   },
                   "text": "M",
                   "alignment": {
                     "x": 8.34375,
-                    "y": 18.0
+                    "y": 18.40625
                   }
                 }
               ],
@@ -395,16 +395,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 50.359375,
-                "height": 22.0
+                "width": 50.15625,
+                "height": 22.40625
               },
               "text": "Brew",
               "alignment": {
                 "x": 24.453125,
-                "y": 18.0
+                "y": 18.40625
               }
             }
           ],
@@ -414,7 +414,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 93.359375,
+            "width": 93.15625,
             "height": 42.0
           },
           "layout": "hbox"
@@ -426,93 +426,7 @@
         "y": 256.00694274902344
       },
       "size": {
-        "width": 103.359375,
-        "height": 52.0
-      },
-      "layout": "vbox"
-    },
-    {
-      "name": "ManualTask6",
-      "taskType": "manual",
-      "id": "task6",
-      "children": [
-        {
-          "id": "task6_header",
-          "children": [
-            {
-              "commandId": "simulate-command",
-              "id": "task6_icon",
-              "children": [
-                {
-                  "id": "task6_ticon",
-                  "type": "label:icon",
-                  "position": {
-                    "x": 7.4921875,
-                    "y": 5.0
-                  },
-                  "size": {
-                    "width": 17.015625,
-                    "height": 22.0
-                  },
-                  "text": "M",
-                  "alignment": {
-                    "x": 8.34375,
-                    "y": 18.0
-                  }
-                }
-              ],
-              "type": "icon",
-              "position": {
-                "x": 5.0,
-                "y": 5.0
-              },
-              "size": {
-                "width": 32.0,
-                "height": 32.0
-              },
-              "layout": "stack",
-              "layoutOptions": {
-                "resizeContainer": false,
-                "hAlign": "center"
-              }
-            },
-            {
-              "id": "task6_classname",
-              "type": "label:heading",
-              "position": {
-                "x": 38.0,
-                "y": 10.0
-              },
-              "size": {
-                "width": 74.125,
-                "height": 22.0
-              },
-              "text": "KeepTp",
-              "alignment": {
-                "x": 36.671875,
-                "y": 18.0
-              }
-            }
-          ],
-          "type": "comp:header",
-          "position": {
-            "x": 5.0,
-            "y": 5.0
-          },
-          "size": {
-            "width": 117.125,
-            "height": 42.0
-          },
-          "layout": "hbox"
-        }
-      ],
-      "type": "task:manual",
-      "position": {
-        "x": 921.0138549804688,
-        "y": 325.00694274902344
-      },
-      "size": {
-        "width": 127.125,
+        "width": 103.15625,
         "height": 52.0
       },
       "layout": "vbox"
@@ -533,17 +447,17 @@
                   "id": "task8_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.9921875,
-                    "y": 5.0
+                    "x": 8.7890625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 16.015625,
-                    "height": 22.0
+                    "width": 14.421875,
+                    "height": 22.40625
                   },
                   "text": "A",
                   "alignment": {
-                    "x": 7.671875,
-                    "y": 18.0
+                    "x": 7.484375,
+                    "y": 18.40625
                   }
                 }
               ],
@@ -567,16 +481,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 65.671875,
-                "height": 22.0
+                "width": 63.875,
+                "height": 22.40625
               },
               "text": "ChkWt",
               "alignment": {
-                "x": 32.671875,
-                "y": 18.0
+                "x": 31.671875,
+                "y": 18.40625
               }
             }
           ],
@@ -586,7 +500,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 108.671875,
+            "width": 106.875,
             "height": 42.0
           },
           "layout": "hbox"
@@ -598,7 +512,7 @@
         "y": 185.00694274902344
       },
       "size": {
-        "width": 118.671875,
+        "width": 116.875,
         "height": 52.0
       },
       "layout": "vbox"
@@ -619,17 +533,17 @@
                   "id": "task9_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.9921875,
-                    "y": 5.0
+                    "x": 8.7890625,
+                    "y": 4.796875
                   },
                   "size": {
-                    "width": 16.015625,
-                    "height": 22.0
+                    "width": 14.421875,
+                    "height": 22.40625
                   },
                   "text": "A",
                   "alignment": {
-                    "x": 7.671875,
-                    "y": 18.0
+                    "x": 7.484375,
+                    "y": 18.40625
                   }
                 }
               ],
@@ -653,16 +567,16 @@
               "type": "label:heading",
               "position": {
                 "x": 38.0,
-                "y": 10.0
+                "y": 9.796875
               },
               "size": {
-                "width": 58.109375,
-                "height": 22.0
+                "width": 57.109375,
+                "height": 22.40625
               },
               "text": "WtOK",
               "alignment": {
-                "x": 28.78125,
-                "y": 18.0
+                "x": 28.578125,
+                "y": 18.40625
               }
             }
           ],
@@ -672,7 +586,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 101.109375,
+            "width": 100.109375,
             "height": 42.0
           },
           "layout": "hbox"
@@ -680,11 +594,11 @@
       ],
       "type": "task:automated",
       "position": {
-        "x": 932.0138549804688,
-        "y": 246.00694274902344
+        "x": 930.0,
+        "y": 250.0
       },
       "size": {
-        "width": 111.109375,
+        "width": 110.109375,
         "height": 52.0
       },
       "layout": "vbox"
@@ -716,7 +630,7 @@
       "id": "edge5",
       "type": "edge",
       "sourceId": "task9",
-      "targetId": "activityNode1"
+      "targetId": "bd94e44e-19f9-446e-89d4-97ca1a63c17b"
     },
     {
       "nodeType": "decisionNode",
@@ -740,35 +654,6 @@
       "type": "edge",
       "sourceId": "task2",
       "targetId": "activityNode2"
-    },
-    {
-      "nodeType": "mergeNode",
-      "id": "activityNode4",
-      "type": "activityNode:merge",
-      "position": {
-        "x": 1099.0138549804688,
-        "y": 336.00694274902344
-      },
-      "size": {
-        "width": 32.0,
-        "height": 32.0
-      },
-      "layoutOptions": {
-        "minHeight": 32.0,
-        "resizeContainer": false
-      }
-    },
-    {
-      "id": "edge11",
-      "type": "edge",
-      "sourceId": "task6",
-      "targetId": "activityNode4"
-    },
-    {
-      "id": "edge12",
-      "type": "edge",
-      "sourceId": "task3",
-      "targetId": "activityNode4"
     },
     {
       "nodeType": "decisionNode",
@@ -850,12 +735,6 @@
       }
     },
     {
-      "id": "2f57af4e-2960-496e-992d-03c8b021d81a",
-      "type": "edge:weighted",
-      "sourceId": "activityNode2",
-      "targetId": "task6"
-    },
-    {
       "id": "2c7427b0-9743-4bfb-b04c-078ba98f8d7e",
       "type": "edge:weighted",
       "sourceId": "activityNode2",
@@ -868,16 +747,108 @@
       "targetId": "bd94e44e-19f9-446e-89d4-97ca1a63c17b"
     },
     {
-      "id": "0471cae4-c754-4e89-8337-96ed1546dd02",
-      "type": "edge",
-      "sourceId": "activityNode4",
-      "targetId": "bd94e44e-19f9-446e-89d4-97ca1a63c17b"
-    },
-    {
       "id": "2c3ec34b-291c-43ef-bdf9-035afc4764e6",
       "type": "edge",
       "sourceId": "bd94e44e-19f9-446e-89d4-97ca1a63c17b",
       "targetId": "task4"
+    },
+    {
+      "name": "ManualTask10",
+      "taskType": "manual",
+      "id": "8f61d04d-11a9-41ed-a757-d0dffa32b191",
+      "children": [
+        {
+          "id": "8f61d04d-11a9-41ed-a757-d0dffa32b191_header",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "8f61d04d-11a9-41ed-a757-d0dffa32b191_icon",
+              "children": [
+                {
+                  "id": "8f61d04d-11a9-41ed-a757-d0dffa32b191_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 4.796875
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.40625
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.40625
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "hAlign": "center",
+                "resizeContainer": false
+              }
+            },
+            {
+              "id": "8f61d04d-11a9-41ed-a757-d0dffa32b191_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 9.796875
+              },
+              "size": {
+                "width": 135.328125,
+                "height": 22.40625
+              },
+              "text": "ManualTask10",
+              "alignment": {
+                "x": 67.625,
+                "y": 18.40625
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 178.328125,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 1199.1059429722036,
+        "y": 396.4359872330942
+      },
+      "size": {
+        "width": 188.328125,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "059dc13d-2fef-4b88-a92a-e7d97a159a49",
+      "type": "edge",
+      "sourceId": "task3",
+      "targetId": "8f61d04d-11a9-41ed-a757-d0dffa32b191"
+    },
+    {
+      "id": "793e9079-ad7f-4324-a192-7a569ded91b6",
+      "type": "edge",
+      "sourceId": "8f61d04d-11a9-41ed-a757-d0dffa32b191",
+      "targetId": "bd94e44e-19f9-446e-89d4-97ca1a63c17b"
     }
   ],
   "type": "graph"

@@ -1,2 +1,2 @@
-export * from './my-service-impl';
+export * from './comparison-service-impl';
 export * from './diff-merge-server-module';

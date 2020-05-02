@@ -1,8 +1,8 @@
-export const MyServicePath = '/services/my-service';
+export const ComparisonServicePath = '/services/comparison-service';
 
 
-export const MyService = Symbol('MyService');
-export interface MyService {
-    getEnvVariables(): Promise<Readonly<{ [key:string]: string | undefined }>>
-    getSettingValue(): Promise<Readonly<{ [key:string]: string | undefined }>>
+export const ComparisonService = Symbol('ComparisonService');
+export interface ComparisonService {
+    getComparisonResult(): Promise<Readonly<{ [key:string]: string | undefined }>>
+    getMergeResult(): Promise<Readonly<{ [key:string]: string | undefined }>>
 }

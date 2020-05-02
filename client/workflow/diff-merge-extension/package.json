@@ -9,7 +9,8 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "next"
+    "@theia/core": "next",
+    "@theia/navigator": "next"
   },
   "devDependencies": {
     "rimraf": "2.6.2",

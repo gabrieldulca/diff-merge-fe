@@ -1,12 +1,11 @@
 /* tslint:disable:file-header */
 import { ContainerModule } from 'inversify';
 import { ConnectionHandler, JsonRpcConnectionHandler } from '@theia/core/lib/common';
-import { MyService, MyServicePath } from '../common';
-import {MyServiceImpl} from "./my-service-impl";
+import { ComparisonService, ComparisonServicePath } from '../common';
+import {ComparisonServiceImpl} from "./comparison-service-impl";
 
 export default new ContainerModule(bind => {
-    console.log("binding service")
-    bind(MyServiceImpl).toSelf().inSingletonScope();
-    bind(MyService).toService(MyServiceImpl);
-    bind(ConnectionHandler).toDynamicValue(context => new JsonRpcConnectionHandler(MyServicePath, () => context.container.get(MyService))).inSingletonScope();
+    bind(ComparisonServiceImpl).toSelf().inSingletonScope();
+    bind(ComparisonService).toService(ComparisonServiceImpl);
+    bind(ConnectionHandler).toDynamicValue(context => new JsonRpcConnectionHandler(ComparisonServicePath, () => context.container.get(ComparisonService))).inSingletonScope();
 });

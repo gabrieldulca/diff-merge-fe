@@ -1,4 +1,4 @@
-import {injectable, inject, multiInject} from "inversify";
+import {injectable, inject} from "inversify";
 import {
     CommandContribution,
     CommandRegistry,
@@ -12,15 +12,11 @@ import {NavigatorDiff} from "@theia/navigator/lib/browser/navigator-diff";
 import {SelectionService, UriSelection} from "@theia/core";
 import URI from "@theia/core/lib/common/uri";
 import { EditorManager } from "@theia/editor/lib/browser";
-import {AbstractViewContribution, ApplicationShell, WidgetOpenerOptions} from "@theia/core/lib/browser";
-import {DiffMergeFeWidget} from "./diff-merge-fe-widget";
 import { DiffService } from '@theia/workspace/lib/browser/diff-service';
-import { DiagramManagerProvider, DiagramWidgetOptions, DiagramWidget } from "sprotty-theia";
-import {WorkflowDiagramManager} from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-diagram-manager";
-import {WorkflowLanguage} from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
-import WidgetOptions = ApplicationShell.WidgetOptions;
-
-
+import {WorkflowGLSPClientContribution} from "@eclipse-glsp-examples/workflow-theia/lib/browser/language/workflow-glsp-client-contribution";
+import {OpenerService} from "@theia/core/lib/browser/opener-service";
+import {DiffUris} from "@theia/core/lib/browser";
+import {DiffMergeExtensionManager} from "./diff-merge-extension-manager";
 
 
 export const ComparisonExtensionCommand = {
@@ -33,7 +29,7 @@ export const ComparisonSelectExtensionCommand = {
 };
 
 @injectable()
-export class DiffMergeExtensionCommandContribution extends AbstractViewContribution<DiffMergeFeWidget> implements CommandContribution {
+export class DiffMergeExtensionCommandContribution  extends WorkflowGLSPClientContribution implements CommandContribution {
 
     protected _firstComparisonFile: URI | undefined = undefined;
     protected get firstComparisonFile(): URI | undefined {
@@ -44,21 +40,16 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
     }
 
     constructor(
-        @inject(WorkflowDiagramManager) protected readonly workflowDiagramManager: WorkflowDiagramManager,
+        @inject(OpenerService) protected readonly openerService: OpenerService,
         @inject(EditorManager) protected readonly editorManager: EditorManager,
+        @inject(DiffMergeExtensionManager) protected readonly diffMergeExtensionManager: DiffMergeExtensionManager,
         @inject(DiffService) protected readonly diffService: DiffService,
-        @inject(MessageService) private readonly messageService: MessageService,
+        @inject(MessageService) protected readonly messageService: MessageService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
         @inject(NavigatorDiff) protected readonly navigatorDiff: NavigatorDiff,
         @inject(SelectionService) protected readonly selectionService: SelectionService,
-        @multiInject(DiagramManagerProvider) protected diagramManagerProviders: DiagramManagerProvider[]
 ) {
-        super({
-            widgetId: DiffMergeFeWidget.ID,
-            widgetName: DiffMergeFeWidget.LABEL,
-            defaultWidgetOptions: { area: 'left' },
-            toggleCommandId: ComparisonExtensionCommand.id
-        });
+        super();
     }
 
     registerCommands(registry: CommandRegistry): void {
@@ -70,12 +61,29 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     console.log("second file", secondComparisonFile!.path.toString());
                     const comparison = await this.comparisonService.getComparisonResult(this.firstComparisonFile.path.toString(), secondComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
+
+
+
+                        //openView({ activate: false, reveal: true });
+
                     this.messageService.info(JSON.stringify(comparison));
 
-                    await this.workflowDiagramManager.getOrCreateByUri(new URI(this.firstComparisonFile.path.toString()));
-                    await this.workflowDiagramManager.getOrCreateByUri(new URI(secondComparisonFile!.path.toString()));
+                    if (secondComparisonFile) {
+                        let diffUri:URI = DiffUris.encode(this.firstComparisonFile, secondComparisonFile);
+                        this.diffMergeExtensionManager.open(diffUri);
+                        //this.diffMergeExtensionManager.open(this.firstComparisonFile);
+                        /*this.openerService.getOpener(diffUri).then(function (openHandler: OpenHandler) {
+                            console.log("openHandler", openHandler);
+                            console.log("openHandler", openHandler);
+                            openHandler.open(diffUri);
+                        });*/
+                    }
 
-                    let _this = this;
+
+                    //await this.workflowDiagramManager.getOrCreateByUri(new URI(this.firstComparisonFile.path.toString()));
+                    //await this.workflowDiagramManager.getOrCreateByUri(new URI(secondComparisonFile!.path.toString()));
+
+                    /*let _this = this;
                     let options:DiagramWidgetOptions = {uri: this.firstComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor"};
                     await this.workflowDiagramManager.createWidget(options).then(function (widget: DiagramWidget) { _this.workflowDiagramManager.doOpen(widget);});
                     let options2:DiagramWidgetOptions = {uri: secondComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor"};
@@ -85,8 +93,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         _this.workflowDiagramManager.doOpen(widget,wop);
                         console.log("diagramConfigurationRegistry", widget.diContainer);
                         console.log("diagramConfigurationRegistry", widget.connector);
-                    });
-
+                    });*/
 
 
                 } else {
@@ -104,6 +111,10 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
             }
         });
     }
+
+    readonly fileExtensions: string[];
+    readonly id: string;
+    readonly name: string;
 }
 
 @injectable()

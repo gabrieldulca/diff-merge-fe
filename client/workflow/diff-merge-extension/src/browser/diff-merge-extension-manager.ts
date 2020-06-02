@@ -23,10 +23,12 @@ import { MessageService } from "@theia/core";
 import { WidgetManager } from "@theia/core/lib/browser";
 import { EditorManager } from "@theia/editor/lib/browser";
 import { inject, injectable } from "inversify";
-import { DiagramWidgetOptions, TheiaFileSaver } from "sprotty-theia/lib";
+import { TheiaFileSaver } from "sprotty-theia/lib";
 import {WorkflowGLSPDiagramClient} from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-glsp-diagram-client";
 import {WidgetExtensionWidget} from "./widget-extension-widget";
 import {WorkflowLanguage} from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
+import { MonacoEditorProvider } from "@theia/monaco/lib/browser/monaco-editor-provider";
+import { MonacoEditorService } from "@theia/monaco/lib/browser/monaco-editor-service";
 
 
 @injectable()
@@ -36,6 +38,8 @@ export class DiffMergeExtensionManager extends GLSPDiagramManager {
     readonly label = "Diff Editor";
 
     private _diagramConnector: GLSPTheiaSprottyConnector;
+    private _monacoEditorService: MonacoEditorService;
+    private _monacoEditorProvider:MonacoEditorProvider;
 
     constructor(
         @inject(WorkflowGLSPDiagramClient) diagramClient: WorkflowGLSPDiagramClient,
@@ -43,9 +47,13 @@ export class DiffMergeExtensionManager extends GLSPDiagramManager {
         @inject(WidgetManager) widgetManager: WidgetManager,
         @inject(EditorManager) editorManager: EditorManager,
         @inject(MessageService) messageService: MessageService,
+        @inject(MonacoEditorService) monacoEditorService:MonacoEditorService,
+        @inject(MonacoEditorProvider) monacoEditorProvider:MonacoEditorProvider,
         @inject(GLSPNotificationManager) notificationManager: GLSPNotificationManager) {
         super();
-        this._diagramConnector = new GLSPTheiaSprottyConnector
+        this._monacoEditorService = monacoEditorService;
+        this._monacoEditorProvider = monacoEditorProvider;
+            this._diagramConnector = new GLSPTheiaSprottyConnector
             ({ diagramClient, fileSaver, editorManager, widgetManager, diagramManager: this, messageService, notificationManager });
     }
 
@@ -54,7 +62,7 @@ export class DiffMergeExtensionManager extends GLSPDiagramManager {
             const clientId = this.createClientId();
             const config = this.diagramConfigurationRegistry.get(options.diagramType);
             const diContainer = config.createContainer(clientId);
-            return new WidgetExtensionWidget(options, clientId + '_widget', diContainer, this.editorPreferences, this.diagramConnector, this.editorManager);
+            return new WidgetExtensionWidget(options, clientId + '_widget', diContainer, this.editorPreferences, this.diagramConnector, this.editorManager, this._monacoEditorService, this._monacoEditorProvider);
        // }
        // throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
     }

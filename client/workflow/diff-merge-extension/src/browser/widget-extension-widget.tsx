@@ -1,15 +1,18 @@
 import {Container, injectable} from 'inversify';
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from '@eclipse-glsp/theia-integration/lib/browser';
-import { ModelSource, TYPES, DiagramServer, RequestModelAction } from 'sprotty';
-import { RequestTypeHintsAction, EnableToolPaletteAction } from '@eclipse-glsp/client';
-import {ApplicationShell, DiffUris, ViewContainer, WidgetOpenerOptions} from "@theia/core/lib/browser";
+import { ModelSource, TYPES, DiagramServer } from 'sprotty';
+import { DiffUris } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { DiagramWidgetOptions, TheiaSprottyConnector } from 'sprotty-theia';
-import { EditorPreferences, EditorManager, EditorOpenerOptions } from '@theia/editor/lib/browser';
-import WidgetOptions = ApplicationShell.WidgetOptions;
+import { EditorPreferences, EditorManager } from '@theia/editor/lib/browser';
+import { MonacoEditor } from '@theia/monaco/lib/browser/monaco-editor';
+import { MonacoEditorService } from '@theia/monaco/lib/browser/monaco-editor-service';
+import { MonacoEditorProvider } from '@theia/monaco/lib/browser/monaco-editor-provider';
 
 @injectable()
 export class WidgetExtensionWidget extends GLSPDiagramWidget {
+
+
 
     /*static readonly ID = 'widget-extension:widget';
     static readonly LABEL = 'WidgetExtension Widget';
@@ -40,8 +43,11 @@ export class WidgetExtensionWidget extends GLSPDiagramWidget {
         this.messageService.info('Congratulations: WidgetExtension Widget Successfully Created!');
     }*/
 
+
+
     constructor(options: DiagramWidgetOptions, readonly widgetId: string, readonly diContainer: Container,
-                readonly editorPreferences: EditorPreferences, readonly connector?: TheiaSprottyConnector, readonly editorManager?: EditorManager) {
+                readonly editorPreferences: EditorPreferences, readonly connector?: TheiaSprottyConnector, readonly editorManager?: EditorManager,
+                readonly monacoEditorService?: MonacoEditorService, readonly monacoEditorProvider?: MonacoEditorProvider) {
         super(options, widgetId, diContainer, editorPreferences, connector);
 
     }
@@ -65,12 +71,89 @@ export class WidgetExtensionWidget extends GLSPDiagramWidget {
         console.log("sourceUri2", diffUris[1].toString(true).replace("file://", ""));
 
 
+        /*const [original, modified] = DiffUris.decode(diffUris);
 
-        this.actionDispatcher.dispatch(new RequestModelAction({
+        const [originalModel, modifiedModel] = await Promise.all([this.getModel(original, toDispose), this.getModel(modified, toDispose)]);*/
+
+        /*monacoEditorService.
+
+        const editor = new MonacoDiffEditor(new URI(this.options.uri),
+            document.createElement('div'),
+            originalModel: MonacoEditorModel,
+            modifiedModel: MonacoEditorModel);
+
+        //const options = this.createMonacoDiffEditorOptions(originalModel, modifiedModel);
+        const editor = new MonacoDiffEditor(
+            uri,
+            document.createElement('div'),
+            originalModel, modifiedModel,
+            this.services,
+            this.diffNavigatorFactory,
+            options,
+            override);
+        toDispose.push(this.editorPreferences.onPreferenceChanged(event => {
+            const originalFileUri = original.withoutQuery().withScheme('file').toString();
+            if (event.affects(originalFileUri, editor.document.languageId)) {
+                this.updateMonacoDiffEditorOptions(editor, event, originalFileUri);
+            }
+        }));
+        toDispose.push(editor.onLanguageChanged(() => this.updateMonacoDiffEditorOptions(editor)));
+        return editor;
+        const editor = new WidgetExtensionWidget(
+            uri,
+            document.createElement('div'),
+            originalModel, modifiedModel,
+            this.services,
+            this.diffNavigatorFactory,
+            options,
+            override);
+        toDispose.push(this.editorPreferences.onPreferenceChanged(event => {
+            const originalFileUri = original.withoutQuery().withScheme('file').toString();
+            if (event.affects(originalFileUri, editor.document.languageId)) {
+                this.updateMonacoDiffEditorOptions(editor, event, originalFileUri);
+            }
+        }));
+        toDispose.push(editor.onLanguageChanged(() => this.updateMonacoDiffEditorOptions(editor)));
+        return editor;*/
+console.log("provider", this.monacoEditorProvider);
+console.log("service", this.monacoEditorService);
+        let _this = this;
+
+        /*this.actionDispatcher.dispatch(new RequestModelAction({
             sourceUri: diffUris[0].toString(true).replace("file://", ""),
             needsClientLayout: `${this.viewerOptions.needsClientLayout}`,
             ...this.options
-        }));
+        }));*/
+        this.createContainer();
+        this.createContainer();
+        this.diContainer.createChild();
+        this.diContainer.createChild();
+
+        let div = document.createElement('div');
+        this.monacoEditorProvider!.createInline(new URI(this.options.uri), div)
+            .then((function (editor: MonacoEditor) {
+            div.title="TEST";
+            console.log("editor", editor);
+
+                    editor.dispose();
+                    _this.toDispose.dispose();
+                }
+            ));
+        /*this.monacoEditorProvider!.createInline(new URI(diffUris[1].toString(true).replace("file://", "")), document.createElement('div'))
+            .then((function (editor: MonacoEditor) {
+                    _this.toDispose.push(editor);
+                }
+            ));*/
+
+
+
+
+
+        /*this.actionDispatcher.dispatch(new RequestModelAction({
+            sourceUri: diffUris[0].toString(true).replace("file://", ""),
+            needsClientLayout: `${this.viewerOptions.needsClientLayout}`,
+            ...this.options
+        }));*/
         //let options2:DiagramWidgetOptions = {uri: secondComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor"};
         //let widgetOptions: WidgetOptions = {mode: 'split-right'};
         //let wop: EditorOpenerOptions = {widgetOptions: widgetOptions};
@@ -82,10 +165,9 @@ export class WidgetExtensionWidget extends GLSPDiagramWidget {
             console.log("diagramConfigurationRegistry", widget.connector);
         });*/
 
-        const bodyDiv = document.createElement("div");
-        bodyDiv.classList.add("palette-body");
 
-        this.actionDispatcher.dispatch(new RequestModelAction({
+
+        /*this.actionDispatcher.dispatch(new RequestModelAction({
             sourceUri: diffUris[1].toString(true).replace("file://", ""),
             needsClientLayout: `${this.viewerOptions}`,
             popupDiv:  'sprotty-popup',
@@ -94,8 +176,8 @@ export class WidgetExtensionWidget extends GLSPDiagramWidget {
 
 
 
-        this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
-        this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));*/
+        //this.actionDispatcher.dispatch(new EnableToolPaletteAction());
 
     }
 

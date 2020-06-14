@@ -186,5 +186,13 @@ g .movement-not-allowed>.sprotty-node {
 }
 
 .error>.sprotty-node {
-    stroke: darkred!important;
+    stroke: var(--stm-error-foreground)!important;
+}
+
+.warning>.sprotty-node {
+    stroke: var(--stm-warning-foreground)!important;
+}
+
+.info>.sprotty-node {
+    stroke: var(--stm-info-foreground)!important;
 }

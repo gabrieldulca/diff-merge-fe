@@ -10,6 +10,8 @@ import { ContainerModule } from "inversify";
 import { DiagramManager, DiagramManagerProvider } from "sprotty-theia";
 
 import { ComparisonService, ComparisonServicePath } from "../common";
+import { DiffMergeDiagManager } from "./diff-merge-diag-manager";
+import { DiffMergeDiagWidget } from "./diff-merge-diag-widget";
 import {
     DiffMergeExtensionCommandContribution,
     DiffMergeExtensionMenuContribution
@@ -38,5 +40,16 @@ export default new ContainerModule(bind => {
             });
         };
     });
+
+
+
+    bind(DiffMergeDiagWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        createWidget: () => ctx.container.get<DiffMergeDiagWidget>(DiffMergeDiagWidget)
+    })).inSingletonScope();
+    bind(DiffMergeDiagManager).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(DiffMergeDiagManager);
+    bind(OpenHandler).toService(DiffMergeDiagManager);
+    bind(WidgetFactory).toService(DiffMergeDiagManager);
 
 });

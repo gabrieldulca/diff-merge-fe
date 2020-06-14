@@ -18,12 +18,12 @@ import { inject, injectable, multiInject } from "inversify";
 import { DiagramManagerProvider, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
 import { ComparisonService } from "../common";
+import { DiffMergeDiagManager } from "./diff-merge-diag-manager";
 import { DiffMergeFeWidget } from "./diff-merge-fe-widget";
 import { SplitPanelManager } from "./split-panel-manager";
 import { DiffPanel } from "./test-split-panel";
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
-
 
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
@@ -59,6 +59,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
     constructor(
         @inject(SplitPanelManager) protected readonly splitPanelManager: SplitPanelManager,
         @inject(WorkflowDiagramManager) protected readonly workflowDiagramManager: WorkflowDiagramManager,
+        @inject(DiffMergeDiagManager) protected readonly diffMergeDiagManager: DiffMergeDiagManager,
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(DiffService) protected readonly diffService: DiffService,
         @inject(MessageService) private readonly messageService: MessageService,
@@ -88,15 +89,12 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     const _this = this;
                     const options: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const widget1 = await this.workflowDiagramManager.createWidget(options);
+                    const widget1 = await this.diffMergeDiagManager.createWidget(options);
                     const options2: DiagramWidgetOptions = { uri: firstComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
                     const widgetOptions: WidgetOptions = { mode: 'split-right' };
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
-
-
-
-                    const widget2 = await this.workflowDiagramManager.createWidget(options2);
+                    const widget2 = await this.diffMergeDiagManager.createWidget(options2);
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         splitPanel.initDiffPanel(widget1, widget2);

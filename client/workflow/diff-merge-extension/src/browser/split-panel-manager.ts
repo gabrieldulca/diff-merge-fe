@@ -1,4 +1,4 @@
-import { ApplicationShell, SplitPanel, WidgetOpenerOptions } from "@theia/core/lib/browser";
+import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
@@ -11,7 +11,7 @@ export class SplitPanelManager extends DiagramManager {
     readonly iconClass = "fa fa-project-diagram";
     readonly label = "Workflow diagram Editor";
 
-    async createSplitPanel(options?: any): Promise<SplitPanel> {
+    async createSplitPanel(options?: any): Promise<DiffPanel> {
         if (DiagramWidgetOptions.is(options)) {
             // const clientId = this.createClientId();
             // const config = this.diagramConfigurationRegistry.get(options.diagramType);
@@ -24,7 +24,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: SplitPanel, options?: WidgetOpenerOptions) {
+    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffPanel, options?: WidgetOpenerOptions) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options

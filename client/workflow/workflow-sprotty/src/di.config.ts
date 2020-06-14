@@ -25,7 +25,6 @@ import {
     ConsoleLogger,
     contextMenuModule,
     copyPasteContextMenuModule,
-    decorationModule,
     defaultGLSPModule,
     defaultModule,
     DeleteElementContextMenuItemProvider,
@@ -83,6 +82,7 @@ import {
 } from "@eclipse-glsp/client";
 import { Container, ContainerModule } from "inversify";
 
+import diffMergeDecorationModule from "./decoration/di.config";
 import { ActivityNode, Icon, TaskNode, WeightedEdge } from "./model";
 import { ForkOrJoinNodeView, IconView, TaskNodeView, WeightedEdgeView, WorkflowEdgeView } from "./workflow-views";
 
@@ -118,10 +118,11 @@ const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
 export default function createContainer(widgetId: string): Container {
     const container = new Container();
 
-    container.load(decorationModule, validationModule, defaultModule, glspMouseToolModule, defaultGLSPModule, glspSelectModule, boundsModule, viewportModule, toolsModule,
+    container.load(validationModule, defaultModule, glspMouseToolModule, defaultGLSPModule, glspSelectModule, boundsModule, viewportModule, toolsModule,
         glspHoverModule, fadeModule, exportModule, expandModule, openModule, buttonModule, modelSourceModule, labelEditModule, labelEditUiModule, glspEditLabelValidationModule,
         workflowDiagramModule, saveModule, executeCommandModule, toolFeedbackModule, modelHintsModule, contextMenuModule, glspContextMenuModule, glspServerCopyPasteModule,
-        copyPasteContextMenuModule, commandPaletteModule, glspCommandPaletteModule, paletteModule, requestResponseModule, routingModule, edgeLayoutModule, zorderModule,
+        copyPasteContextMenuModule, commandPaletteModule, glspCommandPaletteModule, paletteModule, requestResponseModule,
+        routingModule, diffMergeDecorationModule, edgeLayoutModule, zorderModule,
         layoutCommandsModule);
 
     overrideViewerOptions(container, {

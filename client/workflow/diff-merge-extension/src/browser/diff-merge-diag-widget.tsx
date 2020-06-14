@@ -1,8 +1,8 @@
-import { EnableToolPaletteAction, RequestTypeHintsAction } from "@eclipse-glsp/client";
+import { RequestTypeHintsAction } from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
-import { DiagramServer, ModelSource, RequestModelAction, TYPES } from "sprotty";
+import { DiagramServer, ModelSource, RequestModelAction, TYPES, CenterAction, InitializeCanvasBoundsAction } from "sprotty";
 import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
 
 
@@ -35,9 +35,6 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
             ...this.options
         }, '123')).then(function (resp) {
             console.log('setmodelaction', resp);
-        }).finally(function () {
-            console.log('setmodelaction2', setModelAction);
-
         });
         console.log('setmodelaction3', setModelAction);
 
@@ -46,8 +43,13 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         // modelElement.cssClasses = [maxSeverityCSSClass];
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
-        this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        //this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        const newBounds = this.getBoundsInPage(this.node as Element);
+        this.actionDispatcher.dispatch(new InitializeCanvasBoundsAction(newBounds));
+        this.actionDispatcher.dispatch(new CenterAction([], false));
 
     }
+
+
 
 }

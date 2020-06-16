@@ -1,9 +1,24 @@
+/********************************************************************************
+ * Copyright (c) 2020 EclipseSource and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is available at
+ * https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
 import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
+import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffPanel } from "./test-split-panel";
-import {FileNavigatorWidget} from "@theia/navigator/lib/browser";
 
 
 @injectable()
@@ -19,7 +34,7 @@ export class SplitPanelManager extends DiagramManager {
             // const config = this.diagramConfigurationRegistry.get(options.diagramType);
             // const diContainer = config.createContainer(clientId);
             this.prevOpts = options;
-            const diffPanel = new DiffPanel({orientation: 'horizontal'});
+            const diffPanel = new DiffPanel({ orientation: 'horizontal' });
             // diffPanel.initDiffPanel();
             return diffPanel;
         }
@@ -43,7 +58,7 @@ export class SplitPanelManager extends DiagramManager {
                 widgetOptions.mode = options && options.widgetOptions && options.widgetOptions.mode ? options.widgetOptions.mode : 'open-to-right';
             }
 
-            const split2 =  new DiffPanel({orientation: 'vertical'});
+            const split2 = new DiffPanel({ orientation: 'vertical' });
             split2.setNavigator(fileNavigatorWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);

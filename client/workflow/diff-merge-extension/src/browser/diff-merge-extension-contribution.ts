@@ -1,7 +1,23 @@
+/********************************************************************************
+ * Copyright (c) 2020 EclipseSource and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is available at
+ * https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
+import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
 import { WorkflowDiagramManager } from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-diagram-manager";
 import { WorkflowLanguage } from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
 import { SelectionService, UriSelection } from "@theia/core";
-import {AbstractViewContribution, ApplicationShell, DiffUris, WidgetOpenerOptions} from "@theia/core/lib/browser";
+import { AbstractViewContribution, ApplicationShell, DiffUris, WidgetOpenerOptions } from "@theia/core/lib/browser";
 import {
     CommandContribution,
     CommandRegistry,
@@ -11,6 +27,7 @@ import {
 } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { EditorManager } from "@theia/editor/lib/browser";
+import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { NavigatorContextMenu } from "@theia/navigator/lib/browser/navigator-contribution";
 import { NavigatorDiff } from "@theia/navigator/lib/browser/navigator-diff";
 import { DiffService } from "@theia/workspace/lib/browser/diff-service";
@@ -24,8 +41,6 @@ import { SplitPanelManager } from "./split-panel-manager";
 import { DiffPanel } from "./test-split-panel";
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
-import {FileNavigatorWidget} from "@theia/navigator/lib/browser";
-
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -97,11 +112,11 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
                     const widget2 = await this.diffMergeDiagManager.createWidget(options2);
-
-                    let diffUri:URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
+                    widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
+                    const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
-                        //splitPanel.setNavigator(_this.fileNavigatorWidget);
+                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(widget1, widget2, diffUri);
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, wop, _this.fileNavigatorWidget);
 
@@ -134,10 +149,10 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const secondWidget = await this.workflowDiagramManager.createWidget(options2);
 
                     const _this = this;
-                    let diffUri:URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);
+                    const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
-                        //splitPanel.setNavigator(_this.fileNavigatorWidget);
+                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, wop, _this.fileNavigatorWidget);
 
                     });

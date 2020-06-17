@@ -21,6 +21,7 @@ import {
     boundsModule,
     buttonModule,
     commandPaletteModule,
+    configureCommand,
     configureModelElement,
     ConsoleLogger,
     contextMenuModule,
@@ -84,6 +85,7 @@ import { Container, ContainerModule } from "inversify";
 
 import diffMergeDecorationModule from "./decoration/di.config";
 import { ActivityNode, Icon, TaskNode, WeightedEdge } from "./model";
+import { ApplyDiffCommand } from "./testaction";
 import { ForkOrJoinNodeView, IconView, TaskNodeView, WeightedEdgeView, WorkflowEdgeView } from "./workflow-views";
 
 const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -94,6 +96,7 @@ const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     bind(TYPES.ICommandPaletteActionProvider).to(RevealNamedElementActionProvider);
     bind(TYPES.IContextMenuItemProvider).to(DeleteElementContextMenuItemProvider);
     const context = { bind, unbind, isBound, rebind };
+    configureCommand(context, ApplyDiffCommand);
     configureModelElement(context, 'graph', GLSPGraph, SGraphView);
     configureModelElement(context, 'task:automated', TaskNode, TaskNodeView);
     configureModelElement(context, 'task:manual', TaskNode, TaskNodeView);

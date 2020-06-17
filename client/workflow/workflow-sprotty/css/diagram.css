@@ -196,3 +196,11 @@ g .movement-not-allowed>.sprotty-node {
 .info>.sprotty-node {
     stroke: var(--stm-info-foreground)!important;
 }
+
+.newly-added-node {
+    fill: green !important;
+}
+
+.newly-added-edge {
+    stroke: green !important;
+}

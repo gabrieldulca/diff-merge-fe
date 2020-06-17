@@ -112,7 +112,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
                     const widget2 = await this.diffMergeDiagManager.createWidget(options2);
-                    widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
+                    // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
+
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
@@ -121,7 +122,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, wop, _this.fileNavigatorWidget);
 
                     });
-
+                    widget2.actionDispatcher.dispatch(new ApplyDiffAction());
 
 
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {

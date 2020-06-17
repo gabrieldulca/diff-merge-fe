@@ -17,6 +17,7 @@
     "@theia/typescript": "next",
     "@theia/workspace": "next",
     "@eclipse-glsp-examples/workflow-theia": "0.7.1",
+    "@eclipse-glsp-examples/workflow-sprotty": "0.7.0",
     "diff-merge-extension": "0.0.0"
   },
   "devDependencies": {

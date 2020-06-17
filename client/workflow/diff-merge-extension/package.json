@@ -10,7 +10,9 @@
   ],
   "dependencies": {
     "@theia/core": "next",
-    "@theia/navigator": "next"
+    "@theia/navigator": "next",
+    "@eclipse-glsp-examples/workflow-sprotty": "0.7.0",
+    "@eclipse-glsp-examples/workflow-theia": "0.7.1"
   },
   "devDependencies": {
     "rimraf": "2.6.2",

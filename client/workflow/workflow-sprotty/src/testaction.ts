@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand } from "@eclipse-glsp/client";
+import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, TYPES } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -22,9 +22,17 @@ export class ApplyDiffAction implements Action {
 }
 
 export class ApplyDiffCommand extends FeedbackCommand {
-    constructor(@inject(ApplyDiffAction) public readonly action: ApplyDiffAction) { super(); }
+    constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
-        context.root.index.getById("test");
+        console.log("Applying diff command");
+        const newTask = context.root.index.getById("511d1376-2052-4890-b939-e609978f9eb9");
+        if (newTask && newTask.cssClasses) {
+            newTask.cssClasses.concat(["newly-added-node"]);
+        }
+        const newEdge = context.root.index.getById("00e8fe5f-7825-4f57-97d0-26e833b7bbeb");
+        if (newEdge && newEdge.cssClasses) {
+            newEdge.cssClasses.concat(["newly-added-edge"]);
+        }
         return context.root;
     }
     static readonly KIND = "applyDiff";

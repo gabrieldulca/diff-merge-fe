@@ -41,6 +41,7 @@ import { SplitPanelManager } from "./split-panel-manager";
 import { DiffPanel } from "./test-split-panel";
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
+import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/model";
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -100,7 +101,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     console.log("first file", this.baseComparisonFile.path.toString());
                     const firstComparisonFile = UriSelection.getUri(this.selectionService.selection);
                     console.log("second file", firstComparisonFile!.path.toString());
-                    const comparison = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
+                    let comparison: ComparisonDto = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
                     this.messageService.info(JSON.stringify(comparison));
 

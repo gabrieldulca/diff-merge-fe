@@ -197,6 +197,14 @@ g .movement-not-allowed>.sprotty-node {
     stroke: var(--stm-info-foreground)!important;
 }
 
+.newly-deleted-node {
+    fill: darkred !important;
+}
+
+.newly-deleted-edge {
+    stroke: darkred !important;
+}
+
 .newly-added-node {
     fill: green !important;
 }

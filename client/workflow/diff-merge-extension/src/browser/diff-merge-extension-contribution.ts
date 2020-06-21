@@ -122,7 +122,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, wop, _this.fileNavigatorWidget);
 
                     });
-                    widget2.actionDispatcher.dispatch(new ApplyDiffAction());
+                    widget1.actionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                    widget2.actionDispatcher.dispatch(new ApplyDiffAction(comparison));
 
 
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {

@@ -212,3 +212,10 @@ g .movement-not-allowed>.sprotty-node {
 .newly-added-edge {
     stroke: green !important;
 }
+
+.diff-panel-handle {
+    border-bottom: solid !important;
+    border-bottom-width: thin !important;
+    border-left: solid !important;
+    border-left-width: thin !important;
+}

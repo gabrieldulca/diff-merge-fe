@@ -1,4 +1,4 @@
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/model";
+import { ComparisonDto } from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 
 export const ComparisonServicePath = '/services/comparison-service';
 

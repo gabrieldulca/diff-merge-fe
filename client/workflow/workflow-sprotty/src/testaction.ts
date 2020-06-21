@@ -15,7 +15,8 @@
  ********************************************************************************/
 import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, TYPES, SEdge } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
-import {ComparisonDto, MatchDto, TaskNode} from "./model";
+import {ComparisonDto, MatchDto} from "./diffmerge";
+import {TaskNode} from "./model";
 
 @injectable()
 export class ApplyDiffAction implements Action {

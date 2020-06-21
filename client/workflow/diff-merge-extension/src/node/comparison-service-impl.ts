@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 
 import { ComparisonService } from "../common";
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/model";
+import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 
 const fetch = require("node-fetch");
 

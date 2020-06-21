@@ -28,6 +28,14 @@ export class DiffPanel extends SplitPanel implements StatefulWidget, Navigatable
         rightWidget.actionDispatcher.dispatch(new FitToScreenAction([]));
         rightWidget.actionDispatcher.dispatch(new CenterAction([], false));
 
+        for(let handle of this.handles) {
+            handle.classList.add("diff-panel-handle");
+        }
+
+        this.uri = uri;
+    }
+
+    setURI(uri:URI) {
         this.uri = uri;
     }
 

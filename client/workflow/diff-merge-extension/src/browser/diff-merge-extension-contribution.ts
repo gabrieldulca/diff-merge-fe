@@ -41,7 +41,7 @@ import { SplitPanelManager } from "./split-panel-manager";
 import { DiffPanel } from "./test-split-panel";
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/model";
+import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -120,7 +120,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(widget1, widget2, diffUri);
-                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, wop, _this.fileNavigatorWidget);
+                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
 
                     });
                     widget1.actionDispatcher.dispatch(new ApplyDiffAction(comparison));
@@ -156,7 +156,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
                         // splitPanel.setNavigator(_this.fileNavigatorWidget);
-                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, wop, _this.fileNavigatorWidget);
+                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
 
                     });
 

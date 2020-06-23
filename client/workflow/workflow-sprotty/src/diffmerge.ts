@@ -13,8 +13,40 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import createWorkflowDiagramContainer from "./di.config";
 
-export { createWorkflowDiagramContainer };
-export * from "./testaction";
+export class ComparisonDto  {
 
+    matches: MatchDto[];
+    threeWay: boolean;
+
+}
+
+export class MatchDto  {
+
+    subMatches: MatchDto[];
+    left: DiagElementDto;
+    origin: DiagElementDto;
+    right: DiagElementDto;
+    diff: DiffDto[];
+
+}
+
+export class DiagElementDto  {
+
+    id: string;
+    name: string;
+    target: string;
+    type: string;
+}
+
+export class DiffDto  {
+
+    attribute: string;
+    conflict: string;
+    kind: string;
+    parent: string;
+    referenceDto: string;
+    referenceType: string;
+    type: string;
+    value: string;
+}

@@ -79,6 +79,42 @@ export class ActivityNode extends DiamondNode {
     strokeWidth = 1;
 }
 
+export class ComparisonDto  {
+
+    matches: MatchDto[];
+    threeWay: boolean;
+
+}
+
+export class MatchDto  {
+
+    subMatches: MatchDto[];
+    left: DiagElementDto;
+    origin: DiagElementDto;
+    right: DiagElementDto;
+    diff: DiffDto[];
+
+}
+
+export class DiagElementDto  {
+
+    id: string;
+    name: string;
+    target: string;
+    type: string;
+}
+
+export class DiffDto  {
+
+    attribute: string;
+    conflict: string;
+    kind: string;
+    parent: string;
+    referenceDto: string;
+    referenceType: string;
+    type: string;
+    value: string;
+}
 
 export class Icon extends SShapeElement implements LayoutContainer, CommandExecutor {
     static readonly DEFAULT_FEATURES = [boundsFeature, layoutContainerFeature, layoutableChildFeature, fadeFeature, executeCommandFeature];

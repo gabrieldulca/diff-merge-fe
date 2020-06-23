@@ -1,0 +1,33 @@
+{
+  "name": "diff-merge-extension",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "next",
+    "@theia/navigator": "next",
+    "@eclipse-glsp-examples/workflow-sprotty": "0.7.0",
+    "@eclipse-glsp-examples/workflow-theia": "0.7.1"
+  },
+  "devDependencies": {
+    "rimraf": "2.6.2",
+    "typescript": "3.6.4"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/diff-merge-extension-frontend-module",
+      "backend": "lib/node/diff-merge-server-module"
+    }
+  ]
+}

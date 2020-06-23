@@ -13,8 +13,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import createWorkflowDiagramContainer from "./di.config";
+import { configureModelElement, IssueMarkerView, SIssueMarker, TYPES } from "@eclipse-glsp/client";
+import { ContainerModule } from "inversify";
 
-export { createWorkflowDiagramContainer };
-export * from "./testaction";
+import { DiffMergeDecorationPlacer } from "./decoration-placer";
 
+
+const diffMergeDecorationModule = new ContainerModule((bind, _unbind, isBound) => {
+    configureModelElement({ bind, isBound }, 'marker', SIssueMarker, IssueMarkerView);
+    bind(DiffMergeDecorationPlacer).toSelf().inSingletonScope();
+    bind(TYPES.IVNodePostprocessor).toService(DiffMergeDecorationPlacer);
+});
+
+export default diffMergeDecorationModule;

@@ -196,3 +196,26 @@ g .movement-not-allowed>.sprotty-node {
 .info>.sprotty-node {
     stroke: var(--glsp-info-foreground)!important;
 }
+
+.newly-deleted-node {
+    fill: darkred !important;
+}
+
+.newly-deleted-edge {
+    stroke: darkred !important;
+}
+
+.newly-added-node {
+    fill: green !important;
+}
+
+.newly-added-edge {
+    stroke: green !important;
+}
+
+.diff-panel-handle {
+    border-bottom: solid !important;
+    border-bottom-width: thin !important;
+    border-left: solid !important;
+    border-left-width: thin !important;
+}

@@ -13,8 +13,30 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import createWorkflowDiagramContainer from "./di.config";
+import {
+    Decoration,
+    DecorationPlacer,
+    isSizeable,
+    ORIGIN_POINT,
+    Point,
+    SChildElement,
+    SModelElement,
+    SRoutableElement
+} from "@eclipse-glsp/client";
+import { injectable } from "inversify";
 
-export { createWorkflowDiagramContainer };
-export * from "./testaction";
+@injectable()
+export class DiffMergeDecorationPlacer extends DecorationPlacer {
 
+    protected getPosition(element: SModelElement & Decoration): Point {
+        if (element instanceof SChildElement && element.parent instanceof SRoutableElement) {
+            return super.getPosition(element);
+        }
+        if (isSizeable(element))
+            return {
+                x: 10 * element.bounds.width,
+                y: 10 * element.bounds.height
+            };
+        return ORIGIN_POINT;
+    }
+}

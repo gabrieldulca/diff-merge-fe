@@ -32,6 +32,7 @@ import { NavigatorContextMenu } from "@theia/navigator/lib/browser/navigator-con
 import { NavigatorDiff } from "@theia/navigator/lib/browser/navigator-diff";
 import { DiffService } from "@theia/workspace/lib/browser/diff-service";
 import { inject, injectable, multiInject } from "inversify";
+import { CenterAction } from "sprotty";
 import { DiagramManagerProvider, DiagramWidgetOptions } from "sprotty-theia";
 
 import { ComparisonService } from "../common";
@@ -40,8 +41,8 @@ import { DiffMergeFeWidget } from "./diff-merge-fe-widget";
 import { SplitPanelManager } from "./split-panel-manager";
 import { DiffPanel } from "./test-split-panel";
 
+
 import WidgetOptions = ApplicationShell.WidgetOptions;
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -94,6 +95,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         });
     }
 
+
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(ComparisonExtensionCommand, {
             execute: async () => {
@@ -101,7 +103,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     console.log("first file", this.baseComparisonFile.path.toString());
                     const firstComparisonFile = UriSelection.getUri(this.selectionService.selection);
                     console.log("second file", firstComparisonFile!.path.toString());
-                    let comparison: ComparisonDto = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
+                    const comparison = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
                     this.messageService.info(JSON.stringify(comparison));
 
@@ -123,8 +125,19 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
 
                     });
-                    widget1.actionDispatcher.dispatch(new ApplyDiffAction(comparison));
-                    widget2.actionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                    delay(1000).then(() => {
+                        console.log("Calling this shit");
+                        widget1.glspActionDispatcher.onceModelInitialized().then(function () {
+                            widget1.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            widget1.glspActionDispatcher.dispatch(new CenterAction([]));
+
+                        });
+                        widget2.glspActionDispatcher.onceModelInitialized().then(function () {
+                            widget2.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            widget2.glspActionDispatcher.dispatch(new CenterAction([]));
+                        });
+
+                    });
 
 
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {
@@ -204,4 +217,8 @@ export class DiffMergeExtensionMenuContribution implements MenuContribution {
         });
     }
 
+}
+
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

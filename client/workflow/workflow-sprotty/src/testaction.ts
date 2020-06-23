@@ -13,10 +13,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, TYPES, SEdge } from "@eclipse-glsp/client";
+import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, SEdge, TYPES } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
-import {ComparisonDto, MatchDto} from "./diffmerge";
-import {TaskNode} from "./model";
+
+import { ComparisonDto, MatchDto } from "./diffmerge";
+import { TaskNode } from "./model";
 
 @injectable()
 export class ApplyDiffAction implements Action {
@@ -38,41 +39,51 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Applying diff command", context);
         console.log("on", this.action.comparison);
 
-        let deletions : string[] = this.getDeletions(this.action.comparison);
+        const deletions: string[] = this.getDeletions(this.action.comparison);
         console.log("deletions", deletions);
         this.markDeletions(context, deletions);
 
-        let additions : string[] = this.getAdditions(this.action.comparison);
+        const additions: string[] = this.getAdditions(this.action.comparison);
         console.log("additions", additions);
         this.markAdditions(context, additions);
         return context.root;
     }
 
     markDeletions(context: CommandExecutionContext, deletions: string[]): void {
-        for(let del of deletions) {
+        for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
-            if(oldElem && oldElem instanceof TaskNode) {
+            if (oldElem && oldElem instanceof TaskNode) {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-node"]);
+                } else {
+                    oldElem.cssClasses = ["newly-deleted-node"];
                 }
-            } else if(oldElem && oldElem instanceof SEdge) {
+            } else if (oldElem && oldElem instanceof SEdge) {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-edge"]);
+                } else {
+                    oldElem.cssClasses = ["newly-deleted-edge"];
                 }
             }
         }
     }
 
     markAdditions(context: CommandExecutionContext, aditions: string[]): void {
-        for(let add of aditions) {
-            const oldElem = context.root.index.getById(add);
-            if(oldElem && oldElem instanceof TaskNode) {
-                if (oldElem.cssClasses) {
-                    oldElem.cssClasses.concat(["newly-added-node"]);
+        for (const add of aditions) {
+            const newElem = context.root.index.getById(add);
+            console.log("element found", newElem);
+            if (newElem && newElem instanceof TaskNode) {
+                console.log("going in");
+                if (newElem.cssClasses) {
+                    newElem.cssClasses.concat(["newly-added-node"]);
+                } else {
+                    newElem.cssClasses = ["newly-added-node"];
                 }
-            } else if(oldElem && oldElem instanceof SEdge) {
-                if (oldElem.cssClasses) {
-                    oldElem.cssClasses.concat(["newly-added-edge"]);
+            } else if (newElem && newElem instanceof SEdge) {
+                if (newElem.cssClasses) {
+                    newElem.cssClasses.concat(["newly-added-edge"]);
+                } else {
+                    newElem.cssClasses = ["newly-added-edge"];
                 }
             }
         }
@@ -80,8 +91,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getDeletions(comparison: ComparisonDto): string[] {
         let deletions: string[] = [];
-        if(comparison.matches != null) {
-            for (let match of comparison.matches) {
+        if (comparison.matches != null) {
+            for (const match of comparison.matches) {
                 deletions = deletions.concat(this.getSubMatchDeletions(match, comparison.threeWay));
             }
         }
@@ -90,25 +101,25 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getSubMatchDeletions(match: MatchDto, threeWay: boolean): string[] {
         let deletions: string[] = [];
-        if(threeWay == false) {
-            if((match.right == null) && (match.left != null)) {
-                    deletions.push(match.left.id);
+        if (threeWay == false) {
+            if ((match.right == null) && (match.left != null)) {
+                deletions.push(match.left.id);
             }
-            if(match.subMatches != null) {
-                for (let subMatch of match.subMatches) {
+            if (match.subMatches != null) {
+                for (const subMatch of match.subMatches) {
                     deletions = deletions.concat(this.getSubMatchDeletions(subMatch, threeWay));
                 }
             }
         } else {
-            //TODO threeway :)
+            // TODO threeway :)
         }
         return deletions;
     }
 
     getAdditions(comparison: ComparisonDto): string[] {
         let additions: string[] = [];
-        if(comparison.matches != null) {
-            for (let match of comparison.matches) {
+        if (comparison.matches != null) {
+            for (const match of comparison.matches) {
                 additions = additions.concat(this.getSubMatchAdditions(match, comparison.threeWay));
             }
         }
@@ -117,17 +128,17 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getSubMatchAdditions(match: MatchDto, threeWay: boolean): string[] {
         let additions: string[] = [];
-        if(threeWay == false) {
-            if((match.left == null) && (match.right != null)) {
+        if (threeWay == false) {
+            if ((match.left == null) && (match.right != null)) {
                 additions.push(match.right.id);
             }
-            if(match.subMatches != null) {
-                for (let subMatch of match.subMatches) {
+            if (match.subMatches != null) {
+                for (const subMatch of match.subMatches) {
                     additions = additions.concat(this.getSubMatchAdditions(subMatch, threeWay));
                 }
             }
         } else {
-            //TODO threeway :)
+            // TODO threeway :)
         }
         return additions;
     }

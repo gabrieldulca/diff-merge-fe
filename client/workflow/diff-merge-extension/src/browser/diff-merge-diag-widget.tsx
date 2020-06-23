@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { RequestTypeHintsAction } from "@eclipse-glsp/client";
+import { GLSPActionDispatcher, RequestTypeHintsAction } from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
@@ -44,25 +44,31 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         });
 
 
-        const setModelAction = this.actionDispatcher.request(new RequestModelAction({
+        this.actionDispatcher.dispatch(new RequestModelAction({
             sourceUri: this.options.uri.replace("file://", ""),
-            needsClientLayout: `${this.viewerOptions.needsClientLayout}`,
+            needsClientLayout: 'true',
+            needsServerLayout: 'true',
             ...this.options
-        }, '123')).then(function (resp) {
-            console.log('setmodelaction', resp);
-        });
-        console.log('setmodelaction3', setModelAction);
+        }));
 
         // const modelElement: SModelElement | undefined = context.root.index.getById('task0');
         // const maxSeverityCSSClass = 'error';
         // modelElement.cssClasses = [maxSeverityCSSClass];
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
-        //this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        // this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        const _this = this;
         const newBounds = this.getBoundsInPage(this.node as Element);
         this.actionDispatcher.dispatch(new InitializeCanvasBoundsAction(newBounds));
-        this.actionDispatcher.dispatch(new CenterAction([], false));
+        this.glspActionDispatcher.onceModelInitialized().then(function () {
+            _this.glspActionDispatcher.dispatch(new CenterAction([], false));
+        });
+        this.glspActionDispatcher.onceModelInitialized().then(() => _this.glspActionDispatcher.dispatch(new CenterAction([])));
 
+    }
+
+    get glspActionDispatcher(): GLSPActionDispatcher {
+        return this.diContainer.get(TYPES.IActionDispatcher) as GLSPActionDispatcher;
     }
 
 

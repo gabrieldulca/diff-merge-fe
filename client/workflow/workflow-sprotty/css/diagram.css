@@ -219,3 +219,12 @@ g .movement-not-allowed>.sprotty-node {
     border-left: solid !important;
     border-left-width: thin !important;
 }
+
+.sprotty-edge .newly-added-edge {
+    stroke: green;
+    stroke: green;
+}
+
+sprotty-node.task.manual.newly-added-node {
+    fill: green;
+}

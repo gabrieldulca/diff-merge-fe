@@ -125,8 +125,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
 
                     });
-                    delay(1000).then(() => {
-                        console.log("Calling this shit");
+                    delay(300).then(() => {
+                        console.log("Calling this");
                         widget1.glspActionDispatcher.onceModelInitialized().then(function () {
                             widget1.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
                             widget1.glspActionDispatcher.dispatch(new CenterAction([]));

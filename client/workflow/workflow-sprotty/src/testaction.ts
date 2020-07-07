@@ -53,10 +53,15 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                if (oldElem.cssClasses) {
-                    oldElem.cssClasses.concat(["newly-deleted-node"]);
-                } else {
-                    oldElem.cssClasses = ["newly-deleted-node"];
+                const child = document.getElementById("workflow-diagram_0_" + oldElem.id);
+                if (child) {
+                    const rect = child.childNodes[0] as HTMLElement;
+
+                    console.log("New elem children:", oldElem.children);
+                    // console.log("going in");
+                    if (rect!.classList) {
+                        rect!.classList.add("newly-deleted-node");
+                    }
                 }
             } else if (oldElem && oldElem instanceof SEdge) {
                 if (oldElem.cssClasses) {
@@ -72,12 +77,17 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const add of aditions) {
             const newElem = context.root.index.getById(add);
             console.log("element found", newElem);
+
             if (newElem && newElem instanceof TaskNode) {
-                console.log("going in");
-                if (newElem.cssClasses) {
-                    newElem.cssClasses.concat(["newly-added-node"]);
-                } else {
-                    newElem.cssClasses = ["newly-added-node"];
+                const child = document.getElementById("workflow-diagram_1_" + newElem.id);
+                if (child) {
+                    const rect = child.childNodes[0] as HTMLElement;
+
+                    console.log("New elem children:", newElem.children);
+                    // console.log("going in");
+                    if (rect!.classList) {
+                        rect!.classList.add("newly-added-node");
+                    }
                 }
             } else if (newElem && newElem instanceof SEdge) {
                 if (newElem.cssClasses) {

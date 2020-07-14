@@ -53,12 +53,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
+                console.log("oldElemCh",oldElem.children);
+                console.log("oldElemCh",oldElem.parent);
                 const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
-
-                    console.log("New elem children:", oldElem.children);
-                    // console.log("going in");
                     if (rect!.classList) {
                         rect!.classList.add("newly-deleted-node");
                     }
@@ -74,6 +73,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 } else {
                     oldElem.cssClasses = ["newly-deleted-edge"];
                     const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                    console.log("child", child);
                     const arrow = child!.childNodes[1] as HTMLElement;
                     if (arrow!.classList) {
                         arrow!.classList.add("newly-deleted-arrow");

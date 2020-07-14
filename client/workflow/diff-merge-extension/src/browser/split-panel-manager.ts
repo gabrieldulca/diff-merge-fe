@@ -43,7 +43,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffPanel, uri: URI,options?: WidgetOpenerOptions, fileNavigatorWidget?: FileNavigatorWidget) {
+    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffPanel, uri: URI,options: WidgetOpenerOptions, fileNavigatorWidget: FileNavigatorWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -63,7 +63,11 @@ export class SplitPanelManager extends DiagramManager {
             split2.setNavigator(fileNavigatorWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);
-            split2.setURI(uri);
+            //split2.setURI(uri);
+
+            split2.title.label = title;
+            split2.title.closable = true;
+            console.log("split2", split2);
             for(let handle of split2.handles) {
                 handle.classList.add("diff-panel-handle");
             }

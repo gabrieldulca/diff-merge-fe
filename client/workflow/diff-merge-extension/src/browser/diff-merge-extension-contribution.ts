@@ -118,11 +118,12 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
+                    const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(widget1, widget2, diffUri);
-                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
+                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget, title);
 
                     });
                     delay(300).then(() => {
@@ -166,10 +167,12 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     const _this = this;
                     const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);
+                    const title = "diff:[" + this.firstComparisonFile!.path.base + "," +this.baseComparisonFile.path.base + "," + secondComparisonFile!.path.base + "]";
+
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
                         // splitPanel.setNavigator(_this.fileNavigatorWidget);
-                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, _this.fileNavigatorWidget);
+                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, _this.fileNavigatorWidget, title);
 
                     });
 

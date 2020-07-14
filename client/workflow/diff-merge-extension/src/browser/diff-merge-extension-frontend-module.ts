@@ -1,3 +1,4 @@
+import { configureActionHandler, GetViewportAction } from "@eclipse-glsp/client";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
     FrontendApplicationContribution,
@@ -16,9 +17,10 @@ import {
     DiffMergeExtensionCommandContribution,
     DiffMergeExtensionMenuContribution
 } from "./diff-merge-extension-contribution";
+import { ViewPortChangeHandler } from "./handler";
 import { SplitPanelManager } from "./split-panel-manager";
 
-export default new ContainerModule(bind => {
+export default new ContainerModule((bind, _unbind, isBound) => {
     bind(CommandContribution).to(DiffMergeExtensionCommandContribution);
     bind(MenuContribution).to(DiffMergeExtensionMenuContribution);
     bind(ComparisonService).toDynamicValue(context => WebSocketConnectionProvider.createProxy(context.container, ComparisonServicePath)).inSingletonScope();
@@ -32,6 +34,7 @@ export default new ContainerModule(bind => {
     bind(FrontendApplicationContribution).toService(SplitPanelManager);
     bind(OpenHandler).toService(SplitPanelManager);
     bind(WidgetFactory).toService(SplitPanelManager);
+    configureActionHandler({ bind, isBound }, GetViewportAction.KIND, ViewPortChangeHandler);
     bind(DiagramManagerProvider).toProvider<DiagramManager>((context) => {
         return () => {
             return new Promise<DiagramManager>((resolve) => {

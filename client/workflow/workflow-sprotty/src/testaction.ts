@@ -36,15 +36,15 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
-        console.log("Applying diff command", context);
-        console.log("on", this.action.comparison);
+        // console.log("Applying diff command", context);
+        // console.log("on", this.action.comparison);
 
         const deletions: string[] = this.getDeletions(this.action.comparison);
-        console.log("deletions", deletions);
+        // console.log("deletions", deletions);
         this.markDeletions(context, deletions);
 
         const additions: string[] = this.getAdditions(this.action.comparison);
-        console.log("additions", additions);
+        // console.log("additions", additions);
         this.markAdditions(context, additions);
         return context.root;
     }
@@ -57,7 +57,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
 
-                    console.log("New elem children:", oldElem.children);
+                    // console.log("New elem children:", oldElem.children);
                     // console.log("going in");
                     if (rect!.classList) {
                         rect!.classList.add("newly-deleted-node");
@@ -76,14 +76,14 @@ export class ApplyDiffCommand extends FeedbackCommand {
     markAdditions(context: CommandExecutionContext, aditions: string[]): void {
         for (const add of aditions) {
             const newElem = context.root.index.getById(add);
-            console.log("element found", newElem);
+            // console.log("element found", newElem);
 
             if (newElem && newElem instanceof TaskNode) {
                 const child = document.getElementById("workflow-diagram_1_" + newElem.id);
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
 
-                    console.log("New elem children:", newElem.children);
+                    // console.log("New elem children:", newElem.children);
                     // console.log("going in");
                     if (rect!.classList) {
                         rect!.classList.add("newly-added-node");

@@ -198,20 +198,66 @@ g .movement-not-allowed>.sprotty-node {
 }
 
 .newly-deleted-node {
-    fill: darkred !important;
+    fill: lightcoral !important;
+    stroke: darkred!important;
+    opacity: 0.5!important;
 }
 
 .newly-deleted-edge {
-    stroke: darkred !important;
+    stroke: lightcoral !important;
+    opacity: 0.5!important;
+}
+.newly-deleted-edge.mouseover {
+    opacity: 1!important;
+}
+.newly-added-edge.mouseover {
+    opacity: 1!important;
 }
 
 .newly-added-node {
-    fill: green !important;
+    fill: lightgreen !important;
+    stroke: darkgreen!important;
+    opacity: 0.5!important;
+}
+
+.newly-deleted-node.mouseover {
+     stroke: darkred !important;
+     opacity: 1!important;
+ }
+
+.newly-added-node.mouseover {
+    fill: #00c662 !important;
+    stroke: darkgreen !important;
+    opacity: 1!important;
 }
 
 .newly-added-edge {
-    stroke: green !important;
+    stroke: lightgreen !important;
+    opacity: 0.5!important;
 }
+
+.newly-added-arrow {
+    fill: lightgreen !important;
+    stroke: lightgreen !important;
+    opacity: 0.5!important;
+}
+
+.newly-deleted-arrow {
+    fill: lightcoral !important;
+    stroke: lightcoral !important;
+    opacity: 0.5!important;
+}
+
+.newly-deleted-arrow.mouseover {
+    opacity: 1!important;
+}
+
+.newly-added-arrow.mouseover {
+    fill: #1bcd67 !important;
+    stroke: #1bcd67 !important;
+    opacity: 1!important;
+}
+
 
 .diff-panel-handle {
     border-bottom: solid !important;
@@ -222,9 +268,10 @@ g .movement-not-allowed>.sprotty-node {
 
 .sprotty-edge .newly-added-edge {
     stroke: green;
-    stroke: green;
+    opacity: 0.5;
 }
 
 sprotty-node.task.manual.newly-added-node {
     fill: green;
+    opacity: 0.5;
 }

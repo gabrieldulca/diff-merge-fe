@@ -53,7 +53,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                const child = document.getElementById("workflow-diagram_0_" + oldElem.id);
+                const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
 
@@ -66,8 +66,18 @@ export class ApplyDiffCommand extends FeedbackCommand {
             } else if (oldElem && oldElem instanceof SEdge) {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-edge"]);
+                    const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-deleted-arrow");
+                    }
                 } else {
                     oldElem.cssClasses = ["newly-deleted-edge"];
+                    const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-deleted-arrow");
+                    }
                 }
             }
         }
@@ -76,15 +86,12 @@ export class ApplyDiffCommand extends FeedbackCommand {
     markAdditions(context: CommandExecutionContext, aditions: string[]): void {
         for (const add of aditions) {
             const newElem = context.root.index.getById(add);
-            console.log("element found", newElem);
-
             if (newElem && newElem instanceof TaskNode) {
-                const child = document.getElementById("workflow-diagram_1_" + newElem.id);
+                const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
+
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
 
-                    console.log("New elem children:", newElem.children);
-                    // console.log("going in");
                     if (rect!.classList) {
                         rect!.classList.add("newly-added-node");
                     }
@@ -92,8 +99,18 @@ export class ApplyDiffCommand extends FeedbackCommand {
             } else if (newElem && newElem instanceof SEdge) {
                 if (newElem.cssClasses) {
                     newElem.cssClasses.concat(["newly-added-edge"]);
+                    const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-added-arrow");
+                    }
                 } else {
                     newElem.cssClasses = ["newly-added-edge"];
+                    const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-added-arrow");
+                    }
                 }
             }
         }

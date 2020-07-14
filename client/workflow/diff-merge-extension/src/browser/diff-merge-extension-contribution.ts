@@ -43,6 +43,7 @@ import { DiffPanel } from "./test-split-panel";
 
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
+import {ResourceTreeEditorWidget} from "theia-tree-editor";
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -81,7 +82,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(DiffService) protected readonly diffService: DiffService,
         @inject(FileNavigatorWidget) protected readonly fileNavigatorWidget: FileNavigatorWidget,
-        //@inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
+        @inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
         @inject(MessageService) private readonly messageService: MessageService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
         @inject(NavigatorDiff) protected readonly navigatorDiff: NavigatorDiff,

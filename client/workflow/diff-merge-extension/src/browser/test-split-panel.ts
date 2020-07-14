@@ -1,8 +1,8 @@
-import {Navigatable, SplitPanel, StatefulWidget} from "@theia/core/lib/browser";
-import { DiagramWidget } from "sprotty-theia";
+import { Navigatable, SplitPanel, StatefulWidget } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
-import {FileNavigatorWidget} from "@theia/navigator/lib/browser";
-import { FitToScreenAction, CenterAction } from "sprotty";
+import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
+import { CenterAction, FitToScreenAction } from "sprotty";
+import { DiagramWidget } from "sprotty-theia";
 
 
 
@@ -28,14 +28,14 @@ export class DiffPanel extends SplitPanel implements StatefulWidget, Navigatable
         rightWidget.actionDispatcher.dispatch(new FitToScreenAction([]));
         rightWidget.actionDispatcher.dispatch(new CenterAction([], false));
 
-        for(let handle of this.handles) {
+        for (const handle of this.handles) {
             handle.classList.add("diff-panel-handle");
         }
 
         this.uri = uri;
     }
 
-    setURI(uri:URI) {
+    setURI(uri: URI) {
         this.uri = uri;
     }
 

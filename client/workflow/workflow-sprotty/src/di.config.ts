@@ -101,6 +101,7 @@ const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     bind(TYPES.IContextMenuItemProvider).to(GotoContextMenuItemProvider);
     const context = { bind, unbind, isBound, rebind };
     configureCommand(context, ApplyDiffCommand);
+    // configureActionHandler({ bind, isBound }, SetViewportAction.KIND, ViewPortChangeHandler);
     configureModelElement(context, 'graph', GLSPGraph, SGraphView);
     configureModelElement(context, 'task:automated', TaskNode, TaskNodeView);
     configureModelElement(context, 'task:manual', TaskNode, TaskNodeView);

@@ -40,10 +40,9 @@ import { DiffMergeDiagManager } from "./diff-merge-diag-manager";
 import { UnusedWidget } from "./unused-widget";
 import { SplitPanelManager } from "./split-panel-manager";
 import { DiffSplitPanel } from "./diff-split-panel";
-
-
 import WidgetOptions = ApplicationShell.WidgetOptions;
-//import {ResourceTreeEditorWidget} from "theia-tree-editor";
+import {DiffTreeNavWidget} from "./diff-tree-nav-widget";
+
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
     label: "Compares two diagrams"
@@ -82,7 +81,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(DiffService) protected readonly diffService: DiffService,
         @inject(FileNavigatorWidget) protected readonly fileNavigatorWidget: FileNavigatorWidget,
-        //@inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
+        @inject(DiffTreeNavWidget) protected readonly diffTreeNavWidget: DiffTreeNavWidget,
         @inject(MessageService) private readonly messageService: MessageService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
         @inject(NavigatorDiff) protected readonly navigatorDiff: NavigatorDiff,
@@ -117,19 +116,16 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
                     const widget2 = await this.diffMergeDiagManager.createWidget(options2);
-                    // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
-                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(widget1, widget2, diffUri);
                         _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget, title);
 
                     });
                     delay(300).then(() => {
-
                         widget1.glspActionDispatcher.onceModelInitialized().then(function () {
                             widget1.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
                             widget1.glspActionDispatcher.dispatch(new CenterAction([]));

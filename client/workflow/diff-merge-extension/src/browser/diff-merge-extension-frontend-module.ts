@@ -1,8 +1,9 @@
 import { configureActionHandler, GetViewportAction } from "@eclipse-glsp/client";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
+    defaultTreeProps,
     FrontendApplicationContribution,
-    OpenHandler,
+    OpenHandler, TreeDecoratorService, TreeImpl, TreeProps, TreeSearch,
     WebSocketConnectionProvider,
     WidgetFactory
 } from "@theia/core/lib/browser";
@@ -19,8 +20,23 @@ import {
 } from "./diff-merge-extension-contribution";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
 import { SplitPanelManager } from "./split-panel-manager";
+import {DiffTreeNavWidget} from "./diff-tree-nav-widget";
+import {DetailFormWidget, MasterTreeWidget, TreeEditor} from "theia-tree-editor";
+import {TreeModel} from "@theia/core/lib/browser/tree/tree-model";
+import {DiffTreeModel} from "./diff-tree-model";
+import NodeFactory = TreeEditor.NodeFactory;
+import {DiffTreeDecoratorService} from "./diff-tree-decorator-service";
+import {Tree} from "@theia/core/lib/browser/tree/tree";
+import { FuzzySearch } from "@theia/core/lib/browser/tree/fuzzy-search";
+import {SearchBox, SearchBoxFactory, SearchBoxProps} from "@theia/core/lib/browser/tree/search-box";
 
-export default new ContainerModule((bind, _unbind, isBound) => {
+export const FILE_NAVIGATOR_PROPS = <TreeProps>{
+    ...defaultTreeProps,
+    contextMenuPath: ['navigator-context-menu'],
+    multiSelect: false
+};
+
+export default new ContainerModule((bind, _unbind, isBound, rebind) => {
     bind(CommandContribution).to(DiffMergeExtensionCommandContribution);
     bind(MenuContribution).to(DiffMergeExtensionMenuContribution);
     bind(ComparisonService).toDynamicValue(context => WebSocketConnectionProvider.createProxy(context.container, ComparisonServicePath)).inSingletonScope();
@@ -51,8 +67,30 @@ export default new ContainerModule((bind, _unbind, isBound) => {
         createWidget: () => ctx.container.get<DiffMergeDiagWidget>(DiffMergeDiagWidget)
     })).inSingletonScope();
     bind(DiffMergeDiagManager).toSelf().inSingletonScope();
+
+    bind(DiffTreeNavWidget).toSelf();
+    bind(MasterTreeWidget).toSelf();
+    bind(DetailFormWidget).toSelf();
+    bind(NodeFactory).toService(SplitPanelManager);
+    bind(TreeProps).toConstantValue(FILE_NAVIGATOR_PROPS);
+
+    bind(DiffTreeModel).toSelf();
+    bind(TreeSearch).toSelf();
+    bind(FuzzySearch).toSelf();
+    bind(TreeModel).toService(DiffTreeModel);
+    bind(DiffTreeDecoratorService).toSelf().inSingletonScope();
+    bind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffTreeDecoratorService)).inSingletonScope();
+    bind(Tree).toDynamicValue(ctx => ctx.container.get(TreeImpl));
+    bind(SearchBoxFactory).toFactory(context =>
+        (props: SearchBoxProps) => {
+            const { container } = context;
+            return container.get(SearchBox);
+        }
+    );
+
     bind(FrontendApplicationContribution).toService(DiffMergeDiagManager);
     bind(OpenHandler).toService(DiffMergeDiagManager);
     bind(WidgetFactory).toService(DiffMergeDiagManager);
 
 });
+

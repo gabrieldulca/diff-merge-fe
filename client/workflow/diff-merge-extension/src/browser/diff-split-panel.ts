@@ -27,8 +27,8 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
         this.addWidget(leftWidget);
         this.addWidget(rightWidget);
 
-        leftWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
-        rightWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
+        leftWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(rightWidget));
+        rightWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(leftWidget));
 
         for (const handle of this.handles) {
             handle.classList.add("diff-panel-handle");

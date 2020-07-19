@@ -14,14 +14,29 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 import { injectable } from "inversify";
-import { Action, IActionHandler, ICommand } from "sprotty";
+import {Action, IActionHandler, ICommand, SetViewportAction} from "sprotty";
+import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 
 @injectable()
 export class ViewPortChangeHandler implements IActionHandler {
 
-    handle(action: Action): ICommand | Action | void {
-        console.log("Action ", action);
+    readonly otherWidget: DiffMergeDiagWidget;
+
+    constructor(otherWidget: DiffMergeDiagWidget) {
+        this.otherWidget = otherWidget;
     }
 
+    handle(action: SetViewportAction): ICommand | Action | void {
+        if (!(action instanceof ForwardedAction)) {
+            this.otherWidget.actionDispatcher.dispatch(new ForwardedAction(action));
+        }
+    }
+}
 
+export class ForwardedAction extends SetViewportAction {
+    readonly kind: string = "viewport";
+
+    constructor(public readonly setViewportAction: SetViewportAction) {
+        super(setViewportAction.elementId, setViewportAction.newViewport, setViewportAction.animate);
+    }
 }

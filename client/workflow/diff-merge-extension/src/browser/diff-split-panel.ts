@@ -1,9 +1,10 @@
 import { Navigatable, SplitPanel, StatefulWidget } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
-import { CenterAction, FitToScreenAction } from "sprotty";
+import {SetViewportAction} from "sprotty";
 import { DiagramWidget } from "sprotty-theia";
 import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
+import {ViewPortChangeHandler} from "./viewport-change-handler";
 
 
 
@@ -23,14 +24,11 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
 
     public initDiffPanel(leftWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
 
-        leftWidget.actionDispatcher.dispatch(new FitToScreenAction([]));
-        leftWidget.actionDispatcher.dispatch(new CenterAction([], false));
-
-        //leftWidget.actionHandlerRegistry.register(GetViewportAction.KIND, new ViewPortChangeHandler());
         this.addWidget(leftWidget);
         this.addWidget(rightWidget);
-        rightWidget.actionDispatcher.dispatch(new FitToScreenAction([]));
-        rightWidget.actionDispatcher.dispatch(new CenterAction([], false));
+
+        leftWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
+        rightWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
 
         for (const handle of this.handles) {
             handle.classList.add("diff-panel-handle");

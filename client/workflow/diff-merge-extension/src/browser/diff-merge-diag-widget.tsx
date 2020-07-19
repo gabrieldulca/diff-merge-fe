@@ -24,11 +24,9 @@ import {
     ModelSource,
     RequestModelAction,
     TYPES,
-    ActionHandlerRegistry,
-    SetViewportAction
+    ActionHandlerRegistry
 } from "sprotty";
 import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
-import {ViewPortChangeHandler} from "./viewport-change-handler";
 
 
 
@@ -75,7 +73,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
             _this.glspActionDispatcher.dispatch(new CenterAction([], false));
         });
         this.glspActionDispatcher.onceModelInitialized().then(() => _this.glspActionDispatcher.dispatch(new CenterAction([])));
-        this.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
+
     }
 
     get glspActionDispatcher(): GLSPActionDispatcher {

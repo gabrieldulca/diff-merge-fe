@@ -17,7 +17,7 @@ import {
     DiffMergeExtensionCommandContribution,
     DiffMergeExtensionMenuContribution
 } from "./diff-merge-extension-contribution";
-import { ViewPortChangeHandler } from "./handler";
+import { ViewPortChangeHandler } from "./viewport-change-handler";
 import { SplitPanelManager } from "./split-panel-manager";
 
 export default new ContainerModule((bind, _unbind, isBound) => {

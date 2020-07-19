@@ -18,7 +18,7 @@ import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
-import { DiffPanel } from "./test-split-panel";
+import { DiffSplitPanel } from "./diff-split-panel";
 import URI from "@theia/core/lib/common/uri";
 
 
@@ -29,13 +29,13 @@ export class SplitPanelManager extends DiagramManager {
     readonly label = "Workflow diagram Editor";
     public prevOpts: DiagramWidgetOptions;
 
-    async createSplitPanel(options?: any): Promise<DiffPanel> {
+    async createSplitPanel(options?: any): Promise<DiffSplitPanel> {
         if (DiagramWidgetOptions.is(options)) {
             // const clientId = this.createClientId();
             // const config = this.diagramConfigurationRegistry.get(options.diagramType);
             // const diContainer = config.createContainer(clientId);
             this.prevOpts = options;
-            const diffPanel = new DiffPanel({ orientation: 'horizontal' });
+            const diffPanel = new DiffSplitPanel({ orientation: 'horizontal' });
             // diffPanel.initDiffPanel();
             return diffPanel;
         }
@@ -43,7 +43,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffPanel, uri: URI,options: WidgetOpenerOptions, fileNavigatorWidget: FileNavigatorWidget, title: string) {
+    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, fileNavigatorWidget: FileNavigatorWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -59,7 +59,7 @@ export class SplitPanelManager extends DiagramManager {
                 widgetOptions.mode = options && options.widgetOptions && options.widgetOptions.mode ? options.widgetOptions.mode : 'open-to-right';
             }
 
-            const split2 = new DiffPanel({ orientation: 'vertical' });
+            const split2 = new DiffSplitPanel({ orientation: 'vertical' });
             split2.setNavigator(fileNavigatorWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);

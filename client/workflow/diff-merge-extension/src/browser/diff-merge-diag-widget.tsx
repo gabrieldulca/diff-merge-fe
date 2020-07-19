@@ -13,12 +13,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { GLSPActionDispatcher, RequestTypeHintsAction } from "@eclipse-glsp/client";
+import {GLSPActionDispatcher, RequestTypeHintsAction} from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
-import { CenterAction, DiagramServer, InitializeCanvasBoundsAction, ModelSource, RequestModelAction, TYPES } from "sprotty";
+import {
+    CenterAction,
+    DiagramServer,
+    InitializeCanvasBoundsAction,
+    ModelSource,
+    RequestModelAction,
+    TYPES,
+    ActionHandlerRegistry,
+    SetViewportAction
+} from "sprotty";
 import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
+import {ViewPortChangeHandler} from "./viewport-change-handler";
+
 
 
 @injectable()
@@ -64,11 +75,16 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
             _this.glspActionDispatcher.dispatch(new CenterAction([], false));
         });
         this.glspActionDispatcher.onceModelInitialized().then(() => _this.glspActionDispatcher.dispatch(new CenterAction([])));
-
+        this.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler());
     }
 
     get glspActionDispatcher(): GLSPActionDispatcher {
         return this.diContainer.get(TYPES.IActionDispatcher) as GLSPActionDispatcher;
+    }
+
+
+    get actionHandlerRegistry(): ActionHandlerRegistry {
+        return this.diContainer.get<ActionHandlerRegistry>(ActionHandlerRegistry) as ActionHandlerRegistry;
     }
 
 

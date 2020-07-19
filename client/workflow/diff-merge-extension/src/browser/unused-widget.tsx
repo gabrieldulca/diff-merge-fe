@@ -8,7 +8,7 @@ import { MessageService } from '@theia/core';
 import { DiffService } from '@theia/workspace/lib/browser/diff-service';
 
 @injectable()
-export class DiffMergeFeWidget extends EditorWidget {
+export class UnusedWidget extends EditorWidget {
 
     static readonly ID = 'diff-merge-fe:widget';
     static readonly LABEL = 'DiffMergeFe Widget';
@@ -20,9 +20,9 @@ export class DiffMergeFeWidget extends EditorWidget {
 
     @postConstruct()
     protected async init(): Promise < void> {
-        this.id = DiffMergeFeWidget.ID;
-        this.title.label = DiffMergeFeWidget.LABEL;
-        this.title.caption = DiffMergeFeWidget.LABEL;
+        this.id = UnusedWidget.ID;
+        this.title.label = UnusedWidget.LABEL;
+        this.title.caption = UnusedWidget.LABEL;
         this.title.closable = true;
         this.title.iconClass = 'fa fa-window-maximize'; // example widget icon.
         this.update();

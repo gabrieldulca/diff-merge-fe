@@ -3,10 +3,12 @@ import URI from "@theia/core/lib/common/uri";
 import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { CenterAction, FitToScreenAction } from "sprotty";
 import { DiagramWidget } from "sprotty-theia";
+import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 
 
 
-export class DiffPanel extends SplitPanel implements StatefulWidget, Navigatable {
+
+export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Navigatable {
 
     public widgetId = 'testasdas';
     public uri: URI;
@@ -15,14 +17,16 @@ export class DiffPanel extends SplitPanel implements StatefulWidget, Navigatable
         this.addWidget(fileNavigatorWidget);
     }
 
-    public setSplitPanel(splitPanel: DiffPanel) {
+    public setSplitPanel(splitPanel: DiffSplitPanel) {
         this.addWidget(splitPanel);
     }
 
-    public initDiffPanel(leftWidget: DiagramWidget, rightWidget: DiagramWidget, uri: URI) {
+    public initDiffPanel(leftWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
 
         leftWidget.actionDispatcher.dispatch(new FitToScreenAction([]));
         leftWidget.actionDispatcher.dispatch(new CenterAction([], false));
+
+        //leftWidget.actionHandlerRegistry.register(GetViewportAction.KIND, new ViewPortChangeHandler());
         this.addWidget(leftWidget);
         this.addWidget(rightWidget);
         rightWidget.actionDispatcher.dispatch(new FitToScreenAction([]));

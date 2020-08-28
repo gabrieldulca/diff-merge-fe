@@ -1,13 +1,13 @@
 import { configureActionHandler, GetViewportAction } from "@eclipse-glsp/client";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
-    FrontendApplicationContribution, NavigatableWidgetOptions,
+    FrontendApplicationContribution,
     OpenHandler,
     WebSocketConnectionProvider,
     WidgetFactory
 } from "@theia/core/lib/browser";
 import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
-import { ContainerModule } from "inversify";
+import {ContainerModule, interfaces} from "inversify";
 import { DiagramManager, DiagramManagerProvider } from "sprotty-theia";
 
 import { ComparisonService, ComparisonServicePath } from "../common";
@@ -27,6 +27,11 @@ import { DiffTreeNodeFactory} from "./diff-tree/diff-node-factory";
 import {DiffModelService} from "./diff-tree/diff-model-service";
 import {DiffTreeLabelProvider} from "./diff-tree/diff-tree-label-provider-contribution";
 import {LabelProviderContribution} from "@theia/core/lib/browser/label-provider";
+import {TreeEditor} from "theia-tree-editor/lib/browser/interfaces";
+import {DetailFormWidget} from "theia-tree-editor/lib/browser/detail-form-widget";
+import {MasterTreeWidget} from "theia-tree-editor/lib/browser/master-tree-widget";
+import {createTreeContainer, TreeProps, TreeWidget as TheiaTreeWidget} from "@theia/core/lib/browser/tree";
+import {TREE_PROPS} from "theia-tree-editor/lib/browser/util";
 
 
 export default new ContainerModule((bind, _unbind, isBound) => {
@@ -62,7 +67,7 @@ export default new ContainerModule((bind, _unbind, isBound) => {
 
     bind<WidgetFactory>(WidgetFactory).toDynamicValue(context => ({
         id: DiffTreeEditorWidget.WIDGET_ID,
-        createWidget: (options: NavigatableWidgetOptions) => {
+        createWidget: () => {
 
             const treeContainer = createBasicTreeContainter(
                 context.container,
@@ -72,12 +77,20 @@ export default new ContainerModule((bind, _unbind, isBound) => {
             );
 
             // Bind options
-            const uri = new URI(options.uri);
+            const uri = new URI();
             treeContainer.bind(NavigatableTreeEditorOptions).toConstantValue({ uri });
 
             return treeContainer.get(DiffTreeEditorWidget);
         }
     }));
+
+    bind(TreeEditor.ModelService).to(DiffModelService);
+    bind(TreeEditor.NodeFactory).to(DiffTreeNodeFactory);
+    bind(DetailFormWidget).toSelf();
+    bind(MasterTreeWidget).toDynamicValue(context => createTreeWidget(context.container));
+    const uri = new URI();
+    bind(NavigatableTreeEditorOptions).toConstantValue({ uri });
+    bind(DiffTreeEditorWidget).toSelf();
 
 
     bind(DiffMergeDiagWidget).toSelf();
@@ -90,3 +103,13 @@ export default new ContainerModule((bind, _unbind, isBound) => {
     bind(WidgetFactory).toService(DiffMergeDiagManager);
 
 });
+function createTreeWidget(
+    parent: interfaces.Container
+): MasterTreeWidget {
+    const treeContainer = createTreeContainer(parent);
+
+    treeContainer.unbind(TheiaTreeWidget);
+    treeContainer.bind(MasterTreeWidget).toSelf();
+    treeContainer.rebind(TreeProps).toConstantValue(TREE_PROPS);
+    return treeContainer.get(MasterTreeWidget);
+}

@@ -295,9 +295,12 @@ export class DiffTreeEditorWidget extends NavigatableTreeEditorWidget {
     }
 
     private getModelIDToRequest(): string {
-        const rootUriLength = this.workspaceService
-            .getWorkspaceRootUri(this.options.uri)!
-            .toString().length;
+        let rootUriLength = 0;
+        if (this.workspaceService.getWorkspaceRootUri(this.options.uri)) {
+            rootUriLength = this.workspaceService
+                .getWorkspaceRootUri(this.options.uri)!
+                .toString().length;
+        }
         return this.options.uri.toString().substring(rootUriLength + 1);
     }
 

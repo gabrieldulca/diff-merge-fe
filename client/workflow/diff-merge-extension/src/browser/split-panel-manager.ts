@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
-import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffSplitPanel } from "./diff-split-panel";
 import URI from "@theia/core/lib/common/uri";
+import {DiffTreeEditorWidget} from "./diff-tree/diff-tree-editor-widget";
 
 
 @injectable()
@@ -43,7 +43,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, fileNavigatorWidget: FileNavigatorWidget, title: string) {
+    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffTreeEditorWidget: DiffTreeEditorWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -60,7 +60,7 @@ export class SplitPanelManager extends DiagramManager {
             }
 
             const split2 = new DiffSplitPanel({ orientation: 'vertical' });
-            split2.setNavigator(fileNavigatorWidget!);
+            split2.setNavigator(diffTreeEditorWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);
 

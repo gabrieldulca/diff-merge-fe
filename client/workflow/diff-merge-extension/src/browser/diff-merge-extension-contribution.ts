@@ -27,7 +27,6 @@ import {
 } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { EditorManager } from "@theia/editor/lib/browser";
-import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import { NavigatorContextMenu } from "@theia/navigator/lib/browser/navigator-contribution";
 import { NavigatorDiff } from "@theia/navigator/lib/browser/navigator-diff";
 import { DiffService } from "@theia/workspace/lib/browser/diff-service";
@@ -43,6 +42,7 @@ import { DiffSplitPanel } from "./diff-split-panel";
 
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
+import {DiffTreeEditorWidget} from "./diff-tree/diff-tree-editor-widget";
 //import {ResourceTreeEditorWidget} from "theia-tree-editor";
 export const ComparisonExtensionCommand = {
     id: 'Comparison.command',
@@ -81,7 +81,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         @inject(DiffMergeDiagManager) protected readonly diffMergeDiagManager: DiffMergeDiagManager,
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(DiffService) protected readonly diffService: DiffService,
-        @inject(FileNavigatorWidget) protected readonly fileNavigatorWidget: FileNavigatorWidget,
+        @inject(DiffTreeEditorWidget) protected readonly diffTreeEditorWidget: DiffTreeEditorWidget,
         //@inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
         @inject(MessageService) private readonly messageService: MessageService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
@@ -123,9 +123,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
-                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(widget1, widget2, diffUri);
-                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.fileNavigatorWidget, title);
+                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, _this.diffTreeEditorWidget, title);
 
                     });
                     delay(300).then(() => {
@@ -173,8 +172,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
-                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
-                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, _this.fileNavigatorWidget, title);
+                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, _this.diffTreeEditorWidget, title);
 
                     });
 

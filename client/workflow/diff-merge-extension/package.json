@@ -11,9 +11,10 @@
   "dependencies": {
     "@eclipse-glsp-examples/workflow-sprotty": "0.7.0",
     "@eclipse-glsp-examples/workflow-theia": "0.7.1",
-    "@theia/core": "next",
+    "@eclipse-emfcloud/modelserver-theia": "next",
+    "@theia/core": "latest",
     "@theia/navigator": "next",
-    "theia-tree-editor": "^0.7.0-next.c6fd059"
+    "theia-tree-editor": "latest"
   },
   "devDependencies": {
     "rimraf": "2.6.2",

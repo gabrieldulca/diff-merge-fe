@@ -1,10 +1,10 @@
 import { Navigatable, SplitPanel, StatefulWidget } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
-import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
 import {SetViewportAction} from "sprotty";
 import { DiagramWidget } from "sprotty-theia";
 import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 import {ViewPortChangeHandler} from "./viewport-change-handler";
+import {DiffTreeEditorWidget} from "./diff-tree/diff-tree-editor-widget";
 
 
 
@@ -14,8 +14,8 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
     public widgetId = 'testasdas';
     public uri: URI;
 
-    public setNavigator(fileNavigatorWidget: FileNavigatorWidget) {
-        this.addWidget(fileNavigatorWidget);
+    public setNavigator(diffTreeEditorWidget: DiffTreeEditorWidget) {
+        this.addWidget(diffTreeEditorWidget);
     }
 
     public setSplitPanel(splitPanel: DiffSplitPanel) {

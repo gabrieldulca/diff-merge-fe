@@ -1,13 +1,20 @@
 import { configureActionHandler, GetViewportAction } from "@eclipse-glsp/client";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
+    createTreeContainer,
+    defaultTreeProps,
     FrontendApplicationContribution,
     OpenHandler,
+    TreeDecoratorService,
+    TreeModel,
+    TreeModelImpl,
+    TreeProps,
+    TreeWidget,
     WebSocketConnectionProvider,
     WidgetFactory
 } from "@theia/core/lib/browser";
-import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
-import { ContainerModule } from "inversify";
+import { bindContributionProvider, CommandContribution, MenuContribution } from "@theia/core/lib/common";
+import { ContainerModule, interfaces } from "inversify";
 import { DiagramManager, DiagramManagerProvider } from "sprotty-theia";
 
 import { ComparisonService, ComparisonServicePath } from "../common";
@@ -17,8 +24,12 @@ import {
     DiffMergeExtensionCommandContribution,
     DiffMergeExtensionMenuContribution
 } from "./diff-merge-extension-contribution";
-import { ViewPortChangeHandler } from "./viewport-change-handler";
+import { DiffDecoratorService, DiffTreeDecorator } from "./diff-tree/diff-decorator-service";
+import { DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
+import { DiffViewService } from "./diff-tree/diff-view-service";
+import { DiffViewTreeModel } from "./diff-tree/diff-view-tree";
 import { SplitPanelManager } from "./split-panel-manager";
+import { ViewPortChangeHandler } from "./viewport-change-handler";
 
 export default new ContainerModule((bind, _unbind, isBound) => {
     bind(CommandContribution).to(DiffMergeExtensionCommandContribution);
@@ -55,4 +66,39 @@ export default new ContainerModule((bind, _unbind, isBound) => {
     bind(OpenHandler).toService(DiffMergeDiagManager);
     bind(WidgetFactory).toService(DiffMergeDiagManager);
 
+    bind(DiffViewWidgetFactory).toFactory(ctx =>
+        () => createDiffViewWidget(ctx.container)
+    );
+
+    bind(DiffViewService).toSelf().inSingletonScope();
+    bind(WidgetFactory).toService(DiffViewService);
+
 });
+
+/**
+ * Create an `DiffViewWidget`.
+ * - The creation of the `DiffViewWidget` includes:
+ *  - The creation of the tree widget itself with it's own customized props.
+ *  - The binding of necessary components into the container.
+ * @param parent the Inversify container.
+ *
+ * @returns the `OutlineViewWidget`.
+ */
+function createDiffViewWidget(parent: interfaces.Container): DiffViewWidget {
+    const child = createTreeContainer(parent);
+
+    child.rebind(TreeProps).toConstantValue({ ...defaultTreeProps, search: true });
+
+    child.unbind(TreeWidget);
+    child.bind(DiffViewWidget).toSelf();
+
+    child.unbind(TreeModelImpl);
+    child.bind(DiffViewTreeModel).toSelf();
+    child.rebind(TreeModel).toService(DiffViewTreeModel);
+
+    child.bind(DiffDecoratorService).toSelf().inSingletonScope();
+    child.rebind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffDecoratorService)).inSingletonScope();
+    bindContributionProvider(child, DiffTreeDecorator);
+
+    return child.get(DiffViewWidget);
+}

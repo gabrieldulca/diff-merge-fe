@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
-import { FileNavigatorWidget } from "@theia/navigator/lib/browser";
+import URI from "@theia/core/lib/common/uri";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffSplitPanel } from "./diff-split-panel";
-import URI from "@theia/core/lib/common/uri";
+import { DiffViewWidget } from "./diff-tree/diff-tree-widget";
 
 
 @injectable()
@@ -43,7 +43,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, fileNavigatorWidget: FileNavigatorWidget, title: string) {
+    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffViewWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -60,7 +60,8 @@ export class SplitPanelManager extends DiagramManager {
             }
 
             const split2 = new DiffSplitPanel({ orientation: 'vertical' });
-            split2.setNavigator(fileNavigatorWidget!);
+
+            split2.setNavigator(diffViewWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);
 
@@ -68,7 +69,7 @@ export class SplitPanelManager extends DiagramManager {
             split2.title.iconClass = 'fa navigator-tab-icon';
             split2.title.closable = true;
 
-            for(let handle of split2.handles) {
+            for (const handle of split2.handles) {
                 handle.classList.add("diff-panel-handle");
             }
 

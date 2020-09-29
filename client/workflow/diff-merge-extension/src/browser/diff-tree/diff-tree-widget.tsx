@@ -64,6 +64,47 @@ export class DiffViewWidget extends TreeWidget {
         this.addClass('theia-outline-view');
     }
 
+    public setRoot() {
+        this.model.root = {
+            id: 'diff-tree-view-root',
+            name: 'DIFF TREE Root',
+            visible: true,
+            children: [{
+                id: 'diff-tree-view-child1',
+                name: 'DIFF TREE Child1',
+                visible: true,
+                parent: undefined
+
+            }],
+            parent: undefined
+        } as CompositeTreeNode;
+        console.log("setting root node to", this.model.root);
+    }
+
+    public setChanges(additions: CompositeTreeNode[], deletions: CompositeTreeNode[]) {
+        this.model.root = this.model.root = {
+            id: 'diff-tree-view-changes',
+            name: 'DIFF TREE Changes',
+            visible: true,
+            children: [{
+                id: 'diff-tree-view-additions',
+                name: 'DIFF TREE Additions',
+                visible: true,
+                children: additions,
+                parent: undefined
+            } as CompositeTreeNode,
+            {
+                id: 'diff-tree-view-deletions',
+                name: 'DIFF TREE Deletions',
+                visible: true,
+                children: deletions,
+                parent: undefined
+            } as CompositeTreeNode],
+            parent: undefined
+        } as CompositeTreeNode;
+    }
+
+
     /**
      * Set the outline tree with the list of `DiffSymbolInformationNode`.
      * @param roots the list of `DiffSymbolInformationNode`.
@@ -75,7 +116,7 @@ export class DiffViewWidget extends TreeWidget {
         this.model.root = {
             id: 'diff-tree-view-root',
             name: 'DIFF TREE Root',
-            visible: false,
+            visible: true,
             children: nodes,
             parent: undefined
         } as CompositeTreeNode;

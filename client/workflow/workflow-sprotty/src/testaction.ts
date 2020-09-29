@@ -16,19 +16,24 @@
 import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, SEdge, TYPES } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
 
-import { ComparisonDto, MatchDto } from "./diffmerge";
+import { ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
 
 @injectable()
 export class ApplyDiffAction implements Action {
     public requestId: string | undefined;
     public comparison: ComparisonDto;
+    public additionsTree: DiffTreeNode[];
+    public deletionsTree: DiffTreeNode[];
 
     constructor(comparison: ComparisonDto, requestId?: string) {
         this.requestId = requestId;
         this.comparison = comparison;
+        this.additionsTree = [];
+        this.deletionsTree = [];
     }
     readonly kind = ApplyDiffCommand.KIND;
+
 }
 
 export class ApplyDiffCommand extends FeedbackCommand {
@@ -46,6 +51,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
         const additions: string[] = this.getAdditions(this.action.comparison);
         console.log("additions", additions);
         this.markAdditions(context, additions);
+        this.getAdditionsTree(context, additions);
+        this.getDeletionsTree(context, deletions);
+
         return context.root;
     }
 
@@ -53,8 +61,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                console.log("oldElemCh",oldElem.children);
-                console.log("oldElemCh",oldElem.parent);
+                console.log("oldElemCh", oldElem.children);
+                console.log("oldElemCh", oldElem.parent);
                 const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
@@ -113,6 +121,38 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     }
                 }
             }
+        }
+    }
+
+    getAdditionsTree(context: CommandExecutionContext, additions: string[]): void {
+        for (const add of additions) {
+            const node: DiffTreeNode = new DiffTreeNode();
+            node.id = add;
+            const newElem = context.root.index.getById(add);
+            if (newElem && newElem instanceof TaskNode) {
+                node.name = "[TaskNode] " + add;
+            } else if (newElem && newElem instanceof SEdge) {
+                node.name = "[SEdge] " + add;
+            } else {
+                node.name = "[ElemType] " + add;
+            }
+            this.action.additionsTree.push(node);
+        }
+    }
+
+    getDeletionsTree(context: CommandExecutionContext, deletions: string[]): void {
+        for (const del of deletions) {
+            const node: DiffTreeNode = new DiffTreeNode();
+            node.id = del;
+            const newElem = context.root.index.getById(del);
+            if (newElem && newElem instanceof TaskNode) {
+                node.name = "[TaskNode] " + del;
+            } else if (newElem && newElem instanceof SEdge) {
+                node.name = "[SEdge] " + del;
+            } else {
+                node.name = "[ElemType] " + del;
+            }
+            this.action.deletionsTree.push(node);
         }
     }
 

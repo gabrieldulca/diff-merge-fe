@@ -14,14 +14,23 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export class ComparisonDto  {
+export class DiffTreeNode {
+
+    id: string;
+    name: string;
+    visible: boolean = true;
+    parent: DiffTreeNode | undefined = undefined;
+
+}
+
+export class ComparisonDto {
 
     matches: MatchDto[];
     threeWay: boolean;
 
 }
 
-export class MatchDto  {
+export class MatchDto {
 
     subMatches: MatchDto[];
     left: DiagElementDto;
@@ -31,7 +40,7 @@ export class MatchDto  {
 
 }
 
-export class DiagElementDto  {
+export class DiagElementDto {
 
     id: string;
     name: string;
@@ -39,7 +48,7 @@ export class DiagElementDto  {
     type: string;
 }
 
-export class DiffDto  {
+export class DiffDto {
 
     attribute: string;
     conflict: string;

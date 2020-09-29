@@ -17,7 +17,13 @@ import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
 import { WorkflowDiagramManager } from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-diagram-manager";
 import { WorkflowLanguage } from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
 import { SelectionService, UriSelection } from "@theia/core";
-import { AbstractViewContribution, ApplicationShell, DiffUris, WidgetOpenerOptions } from "@theia/core/lib/browser";
+import {
+    AbstractViewContribution,
+    ApplicationShell,
+    CompositeTreeNode,
+    DiffUris,
+    WidgetOpenerOptions
+} from "@theia/core/lib/browser";
 import {
     CommandContribution,
     CommandRegistry,
@@ -132,15 +138,32 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     });
                     delay(300).then(() => {
-
+                        let additions: CompositeTreeNode[] = [];
+                        let deletions: CompositeTreeNode[] = [];
                         widget1.glspActionDispatcher.onceModelInitialized().then(function () {
-                            widget1.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            const diffAction = new ApplyDiffAction(comparison);
+
+                            widget1.glspActionDispatcher.dispatch(diffAction);
+                            delay(300).then(() => {
+                                console.log("additions for tree", diffAction.additionsTree);
+
+                                additions = diffAction.additionsTree as CompositeTreeNode[];
+                            });
                             widget1.glspActionDispatcher.dispatch(new CenterAction([]));
 
                         });
                         widget2.glspActionDispatcher.onceModelInitialized().then(function () {
-                            widget2.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            const diffAction = new ApplyDiffAction(comparison);
+
+                            widget2.glspActionDispatcher.dispatch(diffAction);
+                            delay(300).then(() => {
+                                console.log("deltions for tree", diffAction.deletionsTree);
+                                deletions = diffAction.deletionsTree as CompositeTreeNode[];
+                            });
                             widget2.glspActionDispatcher.dispatch(new CenterAction([]));
+                        });
+                        delay(400).then(() => {
+                            diffViewWidget.setChanges(additions, deletions);
                         });
 
                     });
@@ -184,7 +207,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     delay(300).then(() => {
                         firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            firstWidget.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            const diffAction = new ApplyDiffAction(comparison);
+                            firstWidget.glspActionDispatcher.dispatch(diffAction);
                             firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));
 
                         });

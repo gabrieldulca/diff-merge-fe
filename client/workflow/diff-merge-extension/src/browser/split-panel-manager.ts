@@ -61,6 +61,7 @@ export class SplitPanelManager extends DiagramManager {
 
             const split2 = new DiffSplitPanel({ orientation: 'vertical' });
 
+            diffViewWidget.setRoot();
             split2.setNavigator(diffViewWidget!);
             split2.setSplitPanel(splitPanel);
             split2.setRelativeSizes([0.2, 1.0]);

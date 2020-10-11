@@ -13,7 +13,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { Action, CommandExecutionContext, CommandReturn, FeedbackCommand, SEdge, TYPES } from "@eclipse-glsp/client";
+import {
+    Action,
+    CommandExecutionContext,
+    CommandReturn,
+    FeedbackCommand,
+    GLSPGraph,
+    SEdge,
+    TYPES
+} from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
 
 import { ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
@@ -69,13 +77,10 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                console.log("oldElemCh", oldElem.children);
-                console.log("oldElemParent", oldElem.parent);
-                console.log("oldElemId", oldElem!.id);
-                console.log("oldElemId", oldElem!.id);
                 const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
                 console.log("oldElemHtmlChild", child);
                 console.log("oldElemHtmlChildId", document.getElementById(oldElem!.id));
+                console.log("oldElemHtmlChildParentId", document.getElementById(oldElem!.parent.id));
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
                     if (rect!.classList) {
@@ -187,9 +192,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[SEdge] " + add;
             } else {
                 node.name = "[ElemType] " + add;
-                console.log("elementtype of addition: context", context.root);
-                console.log("elementtype of addition: context index", context.root.index);
-                console.log("elementtype of addition", add);
             }
             this.action.additionsTree.push(node);
         }
@@ -206,9 +208,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[SEdge] " + del;
             } else {
                 node.name = "[ElemType] " + del;
-                console.log("elementtype of deletion: context", context.root);
-                console.log("elementtype of deletion: context index", context.root.index);
-                console.log("elementtype of deletion", del);
             }
             this.action.deletionsTree.push(node);
         }
@@ -223,6 +222,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[TaskNode] " + change;
             } else if (changedElem && changedElem instanceof SEdge) {
                 node.name = "[SEdge] " + change;
+            } else if (changedElem && changedElem instanceof GLSPGraph) {
+                node.name = "[GLSPGraph] " + change;
             } else {
                 node.name = "[ElemType] " + change;
             }

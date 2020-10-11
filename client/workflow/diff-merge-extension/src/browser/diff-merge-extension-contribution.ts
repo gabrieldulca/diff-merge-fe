@@ -140,6 +140,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     delay(300).then(() => {
                         let additions: CompositeTreeNode[] = [];
                         let deletions: CompositeTreeNode[] = [];
+                        let changes: CompositeTreeNode[] = [];
                         widget1.glspActionDispatcher.onceModelInitialized().then(function () {
                             const diffAction = new ApplyDiffAction(comparison);
 
@@ -148,6 +149,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                                 console.log("additions for tree", diffAction.additionsTree);
 
                                 additions = diffAction.additionsTree as CompositeTreeNode[];
+                                changes = diffAction.changesTree as CompositeTreeNode[];
                             });
                             widget1.glspActionDispatcher.dispatch(new CenterAction([]));
 
@@ -163,7 +165,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             widget2.glspActionDispatcher.dispatch(new CenterAction([]));
                         });
                         delay(400).then(() => {
-                            diffViewWidget.setChanges(additions, deletions);
+                            diffViewWidget.setChanges(additions, deletions, changes);
                         });
 
                     });

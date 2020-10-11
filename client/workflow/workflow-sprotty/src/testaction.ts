@@ -24,12 +24,14 @@ export class ApplyDiffAction implements Action {
     public requestId: string | undefined;
     public comparison: ComparisonDto;
     public additionsTree: DiffTreeNode[];
+    public changesTree: DiffTreeNode[];
     public deletionsTree: DiffTreeNode[];
 
     constructor(comparison: ComparisonDto, requestId?: string) {
         this.requestId = requestId;
         this.comparison = comparison;
         this.additionsTree = [];
+        this.changesTree = [];
         this.deletionsTree = [];
     }
     readonly kind = ApplyDiffCommand.KIND;
@@ -41,18 +43,24 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
-        console.log("Applying diff command", context);
-        console.log("on", this.action.comparison);
-
-        const deletions: string[] = this.getDeletions(this.action.comparison);
-        console.log("deletions", deletions);
-        this.markDeletions(context, deletions);
+        console.log("Applying diff command: context", context);
+        console.log("Applying diff command: comparison", this.action.comparison);
 
         const additions: string[] = this.getAdditions(this.action.comparison);
-        console.log("additions", additions);
+        console.log("Applying diff command: additions", additions);
+        const deletions: string[] = this.getDeletions(this.action.comparison);
+        console.log("Applying diff command: deletions", deletions);
+        const changes: string[] = this.getChanges(this.action.comparison);
+        console.log("Applying diff command: changes", changes);
+
         this.markAdditions(context, additions);
         this.getAdditionsTree(context, additions);
+
+        this.markDeletions(context, deletions);
         this.getDeletionsTree(context, deletions);
+
+        this.markChanges(context, changes);
+        this.getChangesTree(context, changes);
 
         return context.root;
     }
@@ -62,8 +70,12 @@ export class ApplyDiffCommand extends FeedbackCommand {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
                 console.log("oldElemCh", oldElem.children);
-                console.log("oldElemCh", oldElem.parent);
+                console.log("oldElemParent", oldElem.parent);
+                console.log("oldElemId", oldElem!.id);
+                console.log("oldElemId", oldElem!.id);
                 const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                console.log("oldElemHtmlChild", child);
+                console.log("oldElemHtmlChildId", document.getElementById(oldElem!.id));
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
                     if (rect!.classList) {
@@ -91,8 +103,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
         }
     }
 
-    markAdditions(context: CommandExecutionContext, aditions: string[]): void {
-        for (const add of aditions) {
+    markAdditions(context: CommandExecutionContext, additions: string[]): void {
+        for (const add of additions) {
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
                 const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
@@ -124,6 +136,38 @@ export class ApplyDiffCommand extends FeedbackCommand {
         }
     }
 
+    markChanges(context: CommandExecutionContext, changes: string[]): void {
+        for (const change of changes) {
+            const changedElem = context.root.index.getById(change);
+            if (changedElem && changedElem instanceof TaskNode) {
+                const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
+                if (child) {
+                    const rect = child.childNodes[0] as HTMLElement;
+
+                    if (rect!.classList) {
+                        rect!.classList.add("newly-changed-node");
+                    }
+                }
+            } else if (changedElem && changedElem instanceof SEdge) {
+                if (changedElem.cssClasses) {
+                    changedElem.cssClasses.concat(["newly-changed-edge"]);
+                    const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-changed-arrow");
+                    }
+                } else {
+                    changedElem.cssClasses = ["newly-changed-edge"];
+                    const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-changed-arrow");
+                    }
+                }
+            }
+        }
+    }
+
     getAdditionsTree(context: CommandExecutionContext, additions: string[]): void {
         for (const add of additions) {
             const node: DiffTreeNode = new DiffTreeNode();
@@ -144,15 +188,31 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const node: DiffTreeNode = new DiffTreeNode();
             node.id = del;
-            const newElem = context.root.index.getById(del);
-            if (newElem && newElem instanceof TaskNode) {
+            const oldElem = context.root.index.getById(del);
+            if (oldElem && oldElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + del;
-            } else if (newElem && newElem instanceof SEdge) {
+            } else if (oldElem && oldElem instanceof SEdge) {
                 node.name = "[SEdge] " + del;
             } else {
                 node.name = "[ElemType] " + del;
             }
             this.action.deletionsTree.push(node);
+        }
+    }
+
+    getChangesTree(context: CommandExecutionContext, changes: string[]): void {
+        for (const change of changes) {
+            const node: DiffTreeNode = new DiffTreeNode();
+            node.id = change;
+            const changedElem = context.root.index.getById(change);
+            if (changedElem && changedElem instanceof TaskNode) {
+                node.name = "[TaskNode] " + change;
+            } else if (changedElem && changedElem instanceof SEdge) {
+                node.name = "[SEdge] " + change;
+            } else {
+                node.name = "[ElemType] " + change;
+            }
+            this.action.changesTree.push(node);
         }
     }
 
@@ -208,5 +268,36 @@ export class ApplyDiffCommand extends FeedbackCommand {
             // TODO threeway :)
         }
         return additions;
+    }
+
+    getChanges(comparison: ComparisonDto): string[] {
+        let changes: string[] = [];
+        if (comparison.matches != null) {
+            for (const match of comparison.matches) {
+                changes = changes.concat(this.getSubMatchChanges(match, comparison.threeWay));
+            }
+        }
+        return changes;
+    }
+
+    getSubMatchChanges(match: MatchDto, threeWay: boolean): string[] {
+        let changes: string[] = [];
+        if (threeWay == false) {
+            if ((match.left != null) && (match.right != null) && (match.diffs != null)) {
+                if(match.diffs.length > 0) {
+                    if(match.diffs[0].type.includes("CHANGE")) {
+                        changes.push(match.right.id);
+                    }
+                }
+            }
+            if (match.subMatches != null) {
+                for (const subMatch of match.subMatches) {
+                    changes = changes.concat(this.getSubMatchChanges(subMatch, threeWay));
+                }
+            }
+        } else {
+            // TODO threeway :)
+        }
+        return changes;
     }
 }

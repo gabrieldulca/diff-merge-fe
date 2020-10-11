@@ -36,7 +36,7 @@ export class MatchDto {
     left: DiagElementDto;
     origin: DiagElementDto;
     right: DiagElementDto;
-    diff: DiffDto[];
+    diffs: DiffDto[];
 
 }
 

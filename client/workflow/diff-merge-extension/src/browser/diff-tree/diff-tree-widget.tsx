@@ -81,10 +81,10 @@ export class DiffViewWidget extends TreeWidget {
         console.log("setting root node to", this.model.root);
     }
 
-    public setChanges(additions: CompositeTreeNode[], deletions: CompositeTreeNode[]) {
+    public setChanges(additions: CompositeTreeNode[], deletions: CompositeTreeNode[], changes: CompositeTreeNode[]) {
         this.model.root = this.model.root = {
-            id: 'diff-tree-view-changes',
-            name: 'DIFF TREE Changes',
+            id: 'diff-tree-view-differences',
+            name: 'DIFF TREE',
             visible: true,
             children: [{
                 id: 'diff-tree-view-additions',
@@ -98,6 +98,13 @@ export class DiffViewWidget extends TreeWidget {
                 name: 'DIFF TREE Deletions',
                 visible: true,
                 children: deletions,
+                parent: undefined
+            } as CompositeTreeNode,
+            {
+                id: 'diff-tree-view-changes',
+                name: 'DIFF TREE Changes',
+                visible: true,
+                children: changes,
                 parent: undefined
             } as CompositeTreeNode],
             parent: undefined

@@ -1,0 +1,276 @@
+{
+  "id": "sprotty",
+  "children": [
+    {
+      "name": "ManualTask0",
+      "taskType": "manual",
+      "id": "task0",
+      "children": [
+        {
+          "id": "task0_header",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "task0_icon",
+              "children": [
+                {
+                  "id": "task0_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 4.796875
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.40625
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.40625
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task0_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 9.796875
+              },
+              "size": {
+                "width": 60.03125,
+                "height": 22.40625
+              },
+              "text": "Push1",
+              "alignment": {
+                "x": 30.015625,
+                "y": 18.40625
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 103.03125,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 930.0,
+        "y": 290.0
+      },
+      "size": {
+        "width": 113.03125,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "name": "ManualTask3",
+      "taskType": "manual",
+      "id": "task3",
+      "children": [
+        {
+          "id": "task3_header",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "task3_icon",
+              "children": [
+                {
+                  "id": "task3_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 4.796875
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.40625
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.40625
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task3_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 9.796875
+              },
+              "size": {
+                "width": 76.15625,
+                "height": 22.40625
+              },
+              "text": "PreHeat",
+              "alignment": {
+                "x": 37.8125,
+                "y": 18.40625
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 119.15625,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 919.0138549804688,
+        "y": 448.00694274902344
+      },
+      "size": {
+        "width": 129.15625,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "name": "ManualTask44",
+      "taskType": "manual",
+      "id": "task44",
+      "children": [
+        {
+          "id": "task44_header",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "task44_icon",
+              "children": [
+                {
+                  "id": "task44_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 4.796875
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.40625
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.40625
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task44_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 9.796875
+              },
+              "size": {
+                "width": 50.15625,
+                "height": 22.40625
+              },
+              "text": "Cook",
+              "alignment": {
+                "x": 24.453125,
+                "y": 18.40625
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 93.15625,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 1278.0138549804688,
+        "y": 256.00694274902344
+      },
+      "size": {
+        "width": 103.15625,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "bcd52a1c-534b-4478-992a-76a57675660a",
+      "type": "edge",
+      "sourceId": "task0",
+      "targetId": "task3"
+    },
+    {
+      "id": "12db11af-716e-4e37-8e88-692068ce6f33",
+      "type": "edge",
+      "sourceId": "task3",
+      "targetId": "task44"
+    }
+  ],
+  "type": "graph"
+}

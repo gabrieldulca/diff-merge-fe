@@ -197,19 +197,6 @@ g .movement-not-allowed>.sprotty-node {
     stroke: var(--glsp-info-foreground)!important;
 }
 
-.newly-deleted-node {
-    fill: lightcoral !important;
-    stroke: darkred!important;
-    opacity: 0.5!important;
-}
-
-.newly-deleted-edge {
-    stroke: lightcoral !important;
-    opacity: 0.5!important;
-}
-.newly-deleted-edge.mouseover {
-    opacity: 1!important;
-}
 .newly-added-edge.mouseover {
     opacity: 1!important;
 }
@@ -219,11 +206,6 @@ g .movement-not-allowed>.sprotty-node {
     stroke: darkgreen!important;
     opacity: 0.5!important;
 }
-
-.newly-deleted-node.mouseover {
-     stroke: darkred !important;
-     opacity: 1!important;
- }
 
 .newly-added-node.mouseover {
     fill: #00c662 !important;
@@ -241,6 +223,39 @@ g .movement-not-allowed>.sprotty-node {
     stroke: lightgreen !important;
     opacity: 0.5!important;
 }
+.newly-added-arrow.mouseover {
+    fill: #1bcd67 !important;
+    stroke: #1bcd67 !important;
+    opacity: 1!important;
+}
+.sprotty-edge .newly-added-edge {
+    stroke: green;
+    opacity: 0.5;
+}
+
+sprotty-node.task.manual.newly-added-node {
+    fill: green;
+    opacity: 0.5;
+}
+
+.newly-deleted-node {
+    fill: lightcoral !important;
+    stroke: darkred!important;
+    opacity: 0.5!important;
+}
+
+.newly-deleted-edge {
+    stroke: lightcoral !important;
+    opacity: 0.5!important;
+}
+.newly-deleted-edge.mouseover {
+    opacity: 1!important;
+}
+
+.newly-deleted-node.mouseover {
+    stroke: darkred !important;
+    opacity: 1!important;
+}
 
 .newly-deleted-arrow {
     fill: lightcoral !important;
@@ -252,13 +267,6 @@ g .movement-not-allowed>.sprotty-node {
     opacity: 1!important;
 }
 
-.newly-added-arrow.mouseover {
-    fill: #1bcd67 !important;
-    stroke: #1bcd67 !important;
-    opacity: 1!important;
-}
-
-
 .diff-panel-handle {
     border-bottom: solid !important;
     border-bottom-width: thin !important;
@@ -266,12 +274,45 @@ g .movement-not-allowed>.sprotty-node {
     border-left-width: thin !important;
 }
 
-.sprotty-edge .newly-added-edge {
-    stroke: green;
+.newly-changed-node {
+    fill: #fdff78 !important;
+    stroke: bisque!important;
+    opacity: 0.5!important;
+}
+
+.newly-changed-node.mouseover {
+    fill: #ffe64d !important;
+    stroke: bisque !important;
+    opacity: 1!important;
+}
+
+.newly-changed-edge {
+    stroke: #fdff78 !important;
+    opacity: 0.5!important;
+}
+
+.newly-changed-edge.mouseover {
+    opacity: 1!important;
+}
+
+.newly-changed-arrow {
+    fill: #fdff78 !important;
+    stroke: #fdff78 !important;
+    opacity: 0.5!important;
+}
+.newly-changed-arrow.mouseover {
+    fill: #ffe64d !important;
+    stroke: #ffe64d !important;
+    opacity: 1!important;
+}
+.sprotty-edge .newly-changed-edge {
+    stroke: #fdff78;
     opacity: 0.5;
 }
 
-sprotty-node.task.manual.newly-added-node {
-    fill: green;
+sprotty-node.task.manual.newly-changed-node {
+    fill: #fdff78;
     opacity: 0.5;
 }
+
+

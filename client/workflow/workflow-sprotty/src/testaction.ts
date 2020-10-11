@@ -148,21 +148,29 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         rect!.classList.add("newly-changed-node");
                     }
                 }
+                const child2 = document.getElementById("workflow-diagram_1_" + changedElem!.id);
+                if (child2) {
+                    const rect = child2.childNodes[0] as HTMLElement;
+
+                    if (rect!.classList) {
+                        rect!.classList.add("newly-changed-node");
+                    }
+                }
             } else if (changedElem && changedElem instanceof SEdge) {
+                const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
+                const arrow = child!.childNodes[1] as HTMLElement;
+                const child2 = document.getElementById("workflow-diagram_1_" + changedElem!.id);
+                const arrow2 = child2!.childNodes[1] as HTMLElement;
                 if (changedElem.cssClasses) {
                     changedElem.cssClasses.concat(["newly-changed-edge"]);
-                    const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-changed-arrow");
-                    }
                 } else {
                     changedElem.cssClasses = ["newly-changed-edge"];
-                    const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-changed-arrow");
-                    }
+                }
+                if (arrow!.classList) {
+                    arrow!.classList.add("newly-changed-arrow");
+                }
+                if (arrow2!.classList) {
+                    arrow2!.classList.add("newly-changed-arrow");
                 }
             }
         }
@@ -179,6 +187,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[SEdge] " + add;
             } else {
                 node.name = "[ElemType] " + add;
+                console.log("elementtype of addition: context", context.root);
+                console.log("elementtype of addition: context index", context.root.index);
+                console.log("elementtype of addition", add);
             }
             this.action.additionsTree.push(node);
         }
@@ -195,6 +206,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[SEdge] " + del;
             } else {
                 node.name = "[ElemType] " + del;
+                console.log("elementtype of deletion: context", context.root);
+                console.log("elementtype of deletion: context index", context.root.index);
+                console.log("elementtype of deletion", del);
             }
             this.action.deletionsTree.push(node);
         }
@@ -228,8 +242,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getSubMatchDeletions(match: MatchDto, threeWay: boolean): string[] {
         let deletions: string[] = [];
-        if (threeWay == false) {
-            if ((match.right == null) && (match.left != null)) {
+        if (threeWay === false) {
+            if ((match.right === null) && (match.left != null)) {
                 deletions.push(match.left.id);
             }
             if (match.subMatches != null) {
@@ -255,8 +269,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getSubMatchAdditions(match: MatchDto, threeWay: boolean): string[] {
         let additions: string[] = [];
-        if (threeWay == false) {
-            if ((match.left == null) && (match.right != null)) {
+        if (threeWay === false) {
+            if ((match.left === null) && (match.right != null)) {
                 additions.push(match.right.id);
             }
             if (match.subMatches != null) {
@@ -282,10 +296,10 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getSubMatchChanges(match: MatchDto, threeWay: boolean): string[] {
         let changes: string[] = [];
-        if (threeWay == false) {
+        if (threeWay === false) {
             if ((match.left != null) && (match.right != null) && (match.diffs != null)) {
-                if(match.diffs.length > 0) {
-                    if(match.diffs[0].type.includes("CHANGE")) {
+                if (match.diffs.length > 0) {
+                    if (match.diffs[0].type.includes("CHANGE")) {
                         changes.push(match.right.id);
                     }
                 }

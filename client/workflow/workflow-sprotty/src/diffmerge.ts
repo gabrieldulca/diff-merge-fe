@@ -24,6 +24,19 @@ export class DiffTreeNode {
 
 }
 
+export class ChangedElem {
+
+    id: string;
+    name: string;
+    changeType: string;
+
+    constructor(id: string, name: string, changeType: string) {
+        this.id = id;
+        this.name = name;
+        this.changeType = changeType;
+    }
+}
+
 export class ComparisonDto {
 
     matches: MatchDto[];

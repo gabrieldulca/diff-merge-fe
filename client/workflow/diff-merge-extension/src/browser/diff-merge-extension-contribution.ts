@@ -209,17 +209,17 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     delay(300).then(() => {
                         firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison);
+                            const diffAction = new ApplyDiffAction(comparison, firstWidget.id);
                             firstWidget.glspActionDispatcher.dispatch(diffAction);
                             firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));
 
                         });
                         baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            baseWidget.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            baseWidget.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison, baseWidget.id));
                             baseWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                         });
                         secondWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            secondWidget.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison));
+                            secondWidget.glspActionDispatcher.dispatch(new ApplyDiffAction(comparison, secondWidget.id));
                             secondWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                         });
 

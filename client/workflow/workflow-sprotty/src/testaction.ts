@@ -24,7 +24,7 @@ import {
 } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
 
-import { ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
+import { ChangedElem, ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
 
 @injectable()
@@ -51,17 +51,21 @@ export class ApplyDiffAction implements Action {
 export class ApplyDiffCommand extends FeedbackCommand {
     static readonly KIND = "applyDiff";
 
+    private changedElems: Map<string, ChangedElem>;
+
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
+        this.changedElems = new Map();
         console.log("Applying diff command: context", context);
         console.log("Applying diff command: comparison", this.action.comparison);
 
-        const additions: string[] = this.getAdditions(this.action.comparison);
+        const additions: string[] = this.getAdditions(context, this.action.comparison);
         console.log("Applying diff command: additions for " + this.action.widgetId, additions);
-        const deletions: string[] = this.getDeletions(this.action.comparison);
+        const deletions: string[] = this.getDeletions(context, this.action.comparison);
         console.log("Applying diff command: deletions", deletions);
-        const changes: string[] = this.getChanges(this.action.comparison);
+        const changes: string[] = this.getChanges(context, this.action.comparison);
         console.log("Applying diff command: changes", changes);
+        console.log("Applying diff command: all diffs", this.changedElems);
 
         this.markAdditions(context, additions);
         this.getAdditionsTree(context, additions);
@@ -199,11 +203,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             node.id = add;
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
-                node.name = "[TaskNode] " + add;
+                node.name = "[TaskNode] " + this.changedElems.get(add)!.name;
             } else if (newElem && newElem instanceof SEdge) {
-                node.name = "[SEdge] " + add;
+                node.name = "[SEdge] " + this.changedElems.get(add)!.name;
             } else {
-                node.name = "[ElemType] " + add;
+                node.name = "[ElemType] " + this.changedElems.get(add)!.name;
             }
             this.action.additionsTree.push(node);
         }
@@ -215,11 +219,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             node.id = del;
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                node.name = "[TaskNode] " + del;
+                node.name = "[TaskNode] " + this.changedElems.get(del)!.name;
             } else if (oldElem && oldElem instanceof SEdge) {
-                node.name = "[SEdge] " + del;
+                node.name = "[SEdge] " + this.changedElems.get(del)!.name;
             } else {
-                node.name = "[ElemType] " + del;
+                node.name = "[ElemType] " + this.changedElems.get(del)!.name;
             }
             this.action.deletionsTree.push(node);
         }
@@ -231,11 +235,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             node.id = change;
             const changedElem = context.root.index.getById(change);
             if (changedElem && changedElem instanceof TaskNode) {
-                node.name = "[TaskNode] " + change;
+                node.name = "[TaskNode] " + this.changedElems.get(change)!.name;
             } else if (changedElem && changedElem instanceof SEdge) {
-                node.name = "[SEdge] " + change;
+                node.name = "[SEdge] " + this.changedElems.get(change)!.name;
             } else if (changedElem && changedElem instanceof GLSPGraph) {
-                node.name = "[GLSPGraph] " + change;
+                node.name = "[GLSPGraph] " + this.changedElems.get(change)!.name;
             } else {
                 node.name = "[ElemType] " + change;
             }
@@ -243,25 +247,39 @@ export class ApplyDiffCommand extends FeedbackCommand {
         }
     }
 
-    getDeletions(comparison: ComparisonDto): string[] {
+    getDeletions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
         let deletions: string[] = [];
         if (comparison.matches != null) {
             for (const match of comparison.matches) {
-                deletions = deletions.concat(this.getSubMatchDeletions(match, comparison.threeWay));
+                deletions = deletions.concat(this.getSubMatchDeletions(context, match, comparison.threeWay));
             }
         }
         return deletions;
     }
 
-    getSubMatchDeletions(match: MatchDto, threeWay: boolean): string[] {
+    getSubMatchDeletions(context: CommandExecutionContext, match: MatchDto, threeWay: boolean): string[] {
         let deletions: string[] = [];
         if (threeWay === false) {
             if ((match.right === null) && (match.left != null)) {
                 deletions.push(match.left.id);
+                let name: string = "";
+                const modelElem = context.root.index.getById(match.left.id);
+                if (modelElem && modelElem instanceof TaskNode) {
+                    name = modelElem.editableLabel!.text;
+                } else if (modelElem && modelElem instanceof SEdge) {
+                    if (modelElem.source && modelElem.source instanceof TaskNode) {
+                        name = modelElem.source.editableLabel!.text;
+                    }
+                    name = name + "->";
+                    if (modelElem.target && modelElem.target instanceof TaskNode) {
+                        name += modelElem.target.editableLabel!.text;
+                    }
+                }
+                this.changedElems.set(match.left.id, new ChangedElem(match.left.id, name, "delete"));
             }
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    deletions = deletions.concat(this.getSubMatchDeletions(subMatch, threeWay));
+                    deletions = deletions.concat(this.getSubMatchDeletions(context, subMatch, threeWay));
                 }
             }
         } else {
@@ -270,25 +288,39 @@ export class ApplyDiffCommand extends FeedbackCommand {
         return deletions;
     }
 
-    getAdditions(comparison: ComparisonDto): string[] {
+    getAdditions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
         let additions: string[] = [];
         if (comparison.matches != null) {
             for (const match of comparison.matches) {
-                additions = additions.concat(this.getSubMatchAdditions(match, comparison.threeWay));
+                additions = additions.concat(this.getSubMatchAdditions(context, match, comparison.threeWay));
             }
         }
         return additions;
     }
 
-    getSubMatchAdditions(match: MatchDto, threeWay: boolean): string[] {
+    getSubMatchAdditions(context: CommandExecutionContext, match: MatchDto, threeWay: boolean): string[] {
         let additions: string[] = [];
         if (threeWay === false) {
             if ((match.left === null) && (match.right != null)) {
                 additions.push(match.right.id);
+                let name: string = "";
+                const modelElem = context.root.index.getById(match.right.id);
+                if (modelElem && modelElem instanceof TaskNode) {
+                    name = modelElem.editableLabel!.text;
+                } else if (modelElem && modelElem instanceof SEdge) {
+                    if (modelElem.source && modelElem.source instanceof TaskNode) {
+                        name = modelElem.source.editableLabel!.text;
+                    }
+                    name = name + "->";
+                    if (modelElem.target && modelElem.target instanceof TaskNode) {
+                        name += modelElem.target.editableLabel!.text;
+                    }
+                }
+                this.changedElems.set(match.right.id, new ChangedElem(match.right.id, name, "add"));
             }
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    additions = additions.concat(this.getSubMatchAdditions(subMatch, threeWay));
+                    additions = additions.concat(this.getSubMatchAdditions(context, subMatch, threeWay));
                 }
             }
         } else {
@@ -297,29 +329,45 @@ export class ApplyDiffCommand extends FeedbackCommand {
         return additions;
     }
 
-    getChanges(comparison: ComparisonDto): string[] {
+    getChanges(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
         let changes: string[] = [];
         if (comparison.matches != null) {
             for (const match of comparison.matches) {
-                changes = changes.concat(this.getSubMatchChanges(match, comparison.threeWay));
+                changes = changes.concat(this.getSubMatchChanges(context, match, comparison.threeWay));
             }
         }
         return changes;
     }
 
-    getSubMatchChanges(match: MatchDto, threeWay: boolean): string[] {
+    getSubMatchChanges(context: CommandExecutionContext, match: MatchDto, threeWay: boolean): string[] {
         let changes: string[] = [];
         if (threeWay === false) {
             if ((match.left != null) && (match.right != null) && (match.diffs != null)) {
                 if (match.diffs.length > 0) {
                     if (match.diffs[0].type.includes("CHANGE")) {
                         changes.push(match.right.id);
+                        let name: string = "";
+                        const modelElem = context.root.index.getById(match.right.id);
+                        if (modelElem && modelElem instanceof GLSPGraph) {
+                            name = "GLSP Model";
+                        } else if (modelElem && modelElem instanceof TaskNode) {
+                            name = modelElem.editableLabel!.text;
+                        } else if (modelElem && modelElem instanceof SEdge) {
+                            if (modelElem.source && modelElem.source instanceof TaskNode) {
+                                name = modelElem.source.editableLabel!.text;
+                            }
+                            name = name + "->";
+                            if (modelElem.target && modelElem.target instanceof TaskNode) {
+                                name += modelElem.target.editableLabel!.text;
+                            }
+                        }
+                        this.changedElems.set(match.right.id, new ChangedElem(match.right.id, name, "change"));
                     }
                 }
             }
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    changes = changes.concat(this.getSubMatchChanges(subMatch, threeWay));
+                    changes = changes.concat(this.getSubMatchChanges(context, subMatch, threeWay));
                 }
             }
         } else {

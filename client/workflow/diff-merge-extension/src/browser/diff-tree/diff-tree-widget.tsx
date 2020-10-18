@@ -3,14 +3,18 @@ import {
     CompositeTreeNode,
     ContextMenuRenderer,
     ExpandableTreeNode,
+    NodeProps,
     SelectableTreeNode,
     TreeNode,
     TreeWidget
 } from "@theia/core/lib/browser";
 import { inject, injectable } from "inversify";
+import React = require("react");
 import { CenterAction } from "sprotty";
 
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
+import { DiffTreeDecorator } from "./diff-decorator-service";
+import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
@@ -66,6 +70,8 @@ export class DiffViewWidget extends TreeWidget {
     readonly onDidChangeOpenStateEmitter = new Emitter<boolean>();
 
     constructor(
+        @inject(DiffLabelProvider) protected diffLabelProvider: DiffLabelProvider,
+        @inject(DiffTreeDecorator) protected readonly decorator: DiffTreeDecorator,
         @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
         @inject(DiffViewTreeModel) model: DiffViewTreeModel,
         @inject(ContextMenuRenderer) protected readonly contextMenuRenderer: ContextMenuRenderer
@@ -88,15 +94,9 @@ export class DiffViewWidget extends TreeWidget {
     public setRoot() {
         this.model.root = {
             id: 'diff-tree-view-root',
-            name: 'DIFF TREE Root',
+            name: 'Model differences',
             visible: true,
-            children: [{
-                id: 'diff-tree-view-child1',
-                name: 'DIFF TREE Child1',
-                visible: true,
-                parent: undefined
-
-            }],
+            children: [],
             parent: undefined
         } as CompositeTreeNode;
         console.log("setting root node to", this.model.root);
@@ -153,12 +153,28 @@ export class DiffViewWidget extends TreeWidget {
         const nodeId = event.currentTarget.getAttribute('data-node-id');
         console.log("clicked on nodeId", nodeId);
         if (nodeId) {
-            const node = this.model.getNode(nodeId);
+            const node: DiffTreeNode = this.model.getNode(nodeId) as DiffTreeNode;
             console.log("clicked on", node);
-            this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
-            this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+            if (node.changeType !== "add") {
+                if (node.elementType !== "SEdge") {
+                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                } else {
+                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
+            }
+            if (node.changeType !== "delete") {
+                if (node.elementType !== "SEdge") {
+                    this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                } else {
+                    this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
+            }
             if (this.secondWidget) {
-                this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                if (node.elementType !== "SEdge") {
+                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                } else {
+                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
             }
         }
         event.stopPropagation();
@@ -178,35 +194,63 @@ export class DiffViewWidget extends TreeWidget {
     public setChanges(additions: DiffTreeNode[], deletions: DiffTreeNode[], changes: DiffTreeNode[]) {
         this.model.root = this.model.root = {
             id: 'diff-tree-view-differences',
-            name: 'DIFF TREE',
+            name: 'Model differences',
             visible: true,
             selected: false,
+            changeType: "change",
+            elementType: "root",
             children: [{
                 id: 'diff-tree-view-additions',
                 name: 'DIFF TREE Additions',
-                visible: true,
+                visible: false,
                 children: additions,
+                changeType: "add",
                 parent: undefined,
                 selected: false
             } as DiffTreeNode,
             {
                 id: 'diff-tree-view-deletions',
                 name: 'DIFF TREE Deletions',
-                visible: true,
+                visible: false,
                 children: deletions,
+                changeType: "delete",
                 parent: undefined,
                 selected: false
             } as DiffTreeNode,
             {
                 id: 'diff-tree-view-changes',
                 name: 'DIFF TREE Changes',
-                visible: true,
+                visible: false,
                 children: changes,
+                changeType: "change",
                 parent: undefined,
                 selected: false
             } as DiffTreeNode],
             parent: undefined
         } as DiffTreeNode;
+
+    }
+
+    /**
+     * Render the tree node given the node properties.
+     * @param node the tree node.
+     * @param props the node properties.
+     */
+    protected renderIcon(node: DiffTreeNode, props: NodeProps): React.ReactNode {
+        let classNameIcon = 'fas fa-question';
+
+        if (node.elementType === 'root') {
+            return <div></div>;
+        } else if (node.elementType === 'TaskNode') {
+            classNameIcon = "fas fa-genderless";
+
+        } else if (node.elementType === 'SEdge') {
+            classNameIcon = "fas fa-arrows-alt-h";
+        } else if (node.elementType === 'GLSPGraph') {
+            classNameIcon = 'fas fa-project-diagram';
+        }
+        return <div style={{ width: "20px" }} className={classNameIcon}></div>;
+
     }
 
 

@@ -5,4 +5,10 @@ import { CompositeTreeNode, SelectableTreeNode } from "@theia/core/lib/browser";
  */
 export interface DiffTreeNode extends SelectableTreeNode, CompositeTreeNode {
 
+    changeType?: string | undefined;
+    elementType?: string | undefined;
+    source?: string | undefined;
+    target?: string | undefined;
+    icon?: string | undefined;
+
 }

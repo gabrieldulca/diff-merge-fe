@@ -12,7 +12,7 @@ import {
     WebSocketConnectionProvider,
     WidgetFactory
 } from "@theia/core/lib/browser";
-import { bindContributionProvider, CommandContribution, MenuContribution } from "@theia/core/lib/common";
+import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
 import { ContainerModule, interfaces } from "inversify";
 import { DiagramManager, DiagramManagerProvider } from "sprotty-theia";
 
@@ -24,6 +24,7 @@ import {
     DiffMergeExtensionMenuContribution
 } from "./diff-merge-extension-contribution";
 import { DiffDecoratorService, DiffTreeDecorator } from "./diff-tree/diff-decorator-service";
+import { DiffLabelProvider } from "./diff-tree/diff-label-provider";
 import { DiffTreeProps } from "./diff-tree/diff-tree-props";
 import { DiffTreeService } from "./diff-tree/diff-tree-service";
 import { DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
@@ -96,9 +97,18 @@ function createDiffViewWidget(parent: interfaces.Container): DiffViewWidget {
     child.bind(DiffViewTreeModel).toSelf();
     child.rebind(TreeModel).toService(DiffViewTreeModel);
 
-    child.bind(DiffDecoratorService).toSelf().inSingletonScope();
-    child.rebind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffDecoratorService)).inSingletonScope();
-    bindContributionProvider(child, DiffTreeDecorator);
+    // child.bind(DiffDecoratorService).toSelf().inSingletonScope();
+    // child.rebind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffDecoratorService)).inSingletonScope();
+    bindDiffTreeDecorator(child);
 
     return child.get(DiffViewWidget);
+}
+
+
+function bindDiffTreeDecorator(parent: interfaces.Container): void {
+    parent.bind(DiffTreeDecorator).toSelf().inSingletonScope();
+    parent.bind(DiffLabelProvider).toSelf().inSingletonScope();
+    parent.bind(DiffDecoratorService).toSelf().inSingletonScope();
+    parent.rebind(TreeDecoratorService).toService(DiffDecoratorService);
+
 }

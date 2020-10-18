@@ -64,7 +64,7 @@ export class SplitPanelManager extends DiagramManager {
             diffViewWidget.setRoot();
             split2.setNavigator(diffViewWidget!);
             split2.setSplitPanel(splitPanel);
-            split2.setRelativeSizes([0.2, 1.0]);
+            split2.setRelativeSizes([0.3, 1.0]);
 
             split2.title.label = title;
             split2.title.iconClass = 'fa navigator-tab-icon';

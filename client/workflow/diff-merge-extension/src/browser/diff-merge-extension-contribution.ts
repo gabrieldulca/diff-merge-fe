@@ -121,6 +121,10 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const rightWidget = await this.diffMergeDiagManager.createWidget(rightWidgetOptions);
                     // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
+                    // Naming diagram widgets
+                    leftWidget.title.caption = "asd";
+                    leftWidget.title.iconClass = 'fa navigator-tab-icon';
+                    console.log("Left widget ", leftWidget);
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
                     const diffTreeWidget = await this.diffTreeService.createWidget();
@@ -138,7 +142,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         let deletions: DiffTreeNode[] = [];
                         let changes: DiffTreeNode[] = [];
                         leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison);
+                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
 
                             leftWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
@@ -151,7 +155,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                         });
                         rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison);
+                            const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
 
                             rightWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {

@@ -29,13 +29,15 @@ import { TaskNode } from "./model";
 
 @injectable()
 export class ApplyDiffAction implements Action {
+    public widgetId: string;
     public requestId: string | undefined;
     public comparison: ComparisonDto;
     public additionsTree: DiffTreeNode[];
     public changesTree: DiffTreeNode[];
     public deletionsTree: DiffTreeNode[];
 
-    constructor(comparison: ComparisonDto, requestId?: string) {
+    constructor(comparison: ComparisonDto, widgetId: string, requestId?: string) {
+        this.widgetId = widgetId.replace("widget", "");
         this.requestId = requestId;
         this.comparison = comparison;
         this.additionsTree = [];
@@ -55,7 +57,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Applying diff command: comparison", this.action.comparison);
 
         const additions: string[] = this.getAdditions(this.action.comparison);
-        console.log("Applying diff command: additions", additions);
+        console.log("Applying diff command: additions for " + this.action.widgetId, additions);
         const deletions: string[] = this.getDeletions(this.action.comparison);
         console.log("Applying diff command: deletions", deletions);
         const changes: string[] = this.getChanges(this.action.comparison);
@@ -77,7 +79,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
-                const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 console.log("oldElemHtmlChild", child);
                 console.log("oldElemHtmlChildId", document.getElementById(oldElem!.id));
                 console.log("oldElemHtmlChildParentId", document.getElementById(oldElem!.parent.id));
@@ -90,18 +92,22 @@ export class ApplyDiffCommand extends FeedbackCommand {
             } else if (oldElem && oldElem instanceof SEdge) {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-edge"]);
-                    const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-deleted-arrow");
+                    const child = document.getElementById(this.action.widgetId + oldElem!.id);
+                    if (child) {
+                        const arrow = child!.childNodes[1] as HTMLElement;
+                        if (arrow!.classList) {
+                            arrow!.classList.add("newly-deleted-arrow");
+                        }
                     }
                 } else {
                     oldElem.cssClasses = ["newly-deleted-edge"];
-                    const child = document.getElementById("workflow-diagram_0_" + oldElem!.id);
+                    const child = document.getElementById(this.action.widgetId + oldElem!.id);
                     console.log("child", child);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-deleted-arrow");
+                    if (child) {
+                        const arrow = child!.childNodes[1] as HTMLElement;
+                        if (arrow!.classList) {
+                            arrow!.classList.add("newly-deleted-arrow");
+                        }
                     }
                 }
             }
@@ -112,7 +118,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const add of additions) {
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
-                const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
+                const child = document.getElementById(this.action.widgetId + newElem!.id);
 
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
@@ -124,17 +130,21 @@ export class ApplyDiffCommand extends FeedbackCommand {
             } else if (newElem && newElem instanceof SEdge) {
                 if (newElem.cssClasses) {
                     newElem.cssClasses.concat(["newly-added-edge"]);
-                    const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-added-arrow");
+                    const child = document.getElementById(this.action.widgetId + newElem!.id);
+                    if (child) {
+                        const arrow = child!.childNodes[1] as HTMLElement;
+                        if (arrow!.classList) {
+                            arrow!.classList.add("newly-added-arrow");
+                        }
                     }
                 } else {
                     newElem.cssClasses = ["newly-added-edge"];
-                    const child = document.getElementById("workflow-diagram_1_" + newElem!.id);
-                    const arrow = child!.childNodes[1] as HTMLElement;
-                    if (arrow!.classList) {
-                        arrow!.classList.add("newly-added-arrow");
+                    const child = document.getElementById(this.action.widgetId + newElem!.id);
+                    if (child) {
+                        const arrow = child!.childNodes[1] as HTMLElement;
+                        if (arrow!.classList) {
+                            arrow!.classList.add("newly-added-arrow");
+                        }
                     }
                 }
             }
@@ -145,7 +155,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const change of changes) {
             const changedElem = context.root.index.getById(change);
             if (changedElem && changedElem instanceof TaskNode) {
-                const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
+                const child = document.getElementById(this.action.widgetId + changedElem!.id);
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
 
@@ -153,29 +163,31 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         rect!.classList.add("newly-changed-node");
                     }
                 }
-                const child2 = document.getElementById("workflow-diagram_1_" + changedElem!.id);
+                /*const child2 = document.getElementById(this.action.widgetId + changedElem!.id);
                 if (child2) {
                     const rect = child2.childNodes[0] as HTMLElement;
 
                     if (rect!.classList) {
                         rect!.classList.add("newly-changed-node");
                     }
-                }
+                }*/
             } else if (changedElem && changedElem instanceof SEdge) {
-                const child = document.getElementById("workflow-diagram_0_" + changedElem!.id);
-                const arrow = child!.childNodes[1] as HTMLElement;
-                const child2 = document.getElementById("workflow-diagram_1_" + changedElem!.id);
-                const arrow2 = child2!.childNodes[1] as HTMLElement;
-                if (changedElem.cssClasses) {
-                    changedElem.cssClasses.concat(["newly-changed-edge"]);
-                } else {
-                    changedElem.cssClasses = ["newly-changed-edge"];
-                }
-                if (arrow!.classList) {
-                    arrow!.classList.add("newly-changed-arrow");
-                }
-                if (arrow2!.classList) {
-                    arrow2!.classList.add("newly-changed-arrow");
+                const child = document.getElementById(this.action.widgetId + changedElem!.id);
+                if (child) {
+                    const arrow = child!.childNodes[1] as HTMLElement;
+                    // const child2 = document.getElementById(this.action.widgetId + changedElem!.id);
+                    // const arrow2 = child2!.childNodes[1] as HTMLElement;
+                    if (changedElem.cssClasses) {
+                        changedElem.cssClasses.concat(["newly-changed-edge"]);
+                    } else {
+                        changedElem.cssClasses = ["newly-changed-edge"];
+                    }
+                    if (arrow!.classList) {
+                        arrow!.classList.add("newly-changed-arrow");
+                    }
+                    /*if (arrow2!.classList) {
+                        arrow2!.classList.add("newly-changed-arrow");
+                    }*/
                 }
             }
         }

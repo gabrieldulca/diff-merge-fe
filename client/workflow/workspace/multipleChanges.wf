@@ -2,92 +2,6 @@
   "id": "sprotty",
   "children": [
     {
-      "name": "ManualTask0",
-      "taskType": "manual",
-      "id": "task0",
-      "children": [
-        {
-          "id": "task0_header",
-          "children": [
-            {
-              "commandId": "simulate-command",
-              "id": "task0_icon",
-              "children": [
-                {
-                  "id": "task0_ticon",
-                  "type": "label:icon",
-                  "position": {
-                    "x": 7.65625,
-                    "y": 5.0
-                  },
-                  "size": {
-                    "width": 16.6875,
-                    "height": 22.0
-                  },
-                  "text": "M",
-                  "alignment": {
-                    "x": 8.34375,
-                    "y": 18.0
-                  }
-                }
-              ],
-              "type": "icon",
-              "position": {
-                "x": 5.0,
-                "y": 5.0
-              },
-              "size": {
-                "width": 32.0,
-                "height": 32.0
-              },
-              "layout": "stack",
-              "layoutOptions": {
-                "resizeContainer": false,
-                "hAlign": "center"
-              }
-            },
-            {
-              "id": "task0_classname",
-              "type": "label:heading",
-              "position": {
-                "x": 38.0,
-                "y": 10.0
-              },
-              "size": {
-                "width": 60.03125,
-                "height": 22.0
-              },
-              "text": "Push1",
-              "alignment": {
-                "x": 30.015625,
-                "y": 18.0
-              }
-            }
-          ],
-          "type": "comp:header",
-          "position": {
-            "x": 5.0,
-            "y": 5.0
-          },
-          "size": {
-            "width": 103.03125,
-            "height": 42.0
-          },
-          "layout": "hbox"
-        }
-      ],
-      "type": "task:manual",
-      "position": {
-        "x": 930.0,
-        "y": 290.0
-      },
-      "size": {
-        "width": 113.03125,
-        "height": 52.0
-      },
-      "layout": "vbox"
-    },
-    {
       "name": "ManualTask3",
       "taskType": "manual",
       "id": "task3",
@@ -175,7 +89,7 @@
     },
     {
       "name": "ManualTask4",
-      "taskType": "manual",
+      "taskType": "automated",
       "id": "task4",
       "children": [
         {
@@ -189,16 +103,16 @@
                   "id": "task4_ticon",
                   "type": "label:icon",
                   "position": {
-                    "x": 7.65625,
+                    "x": 8.9921875,
                     "y": 5.0
                   },
                   "size": {
-                    "width": 16.6875,
+                    "width": 14.015625,
                     "height": 22.0
                   },
-                  "text": "M",
+                  "text": "A",
                   "alignment": {
-                    "x": 8.34375,
+                    "x": 6.671875,
                     "y": 18.0
                   }
                 }
@@ -250,8 +164,8 @@
       ],
       "type": "task:manual",
       "position": {
-        "x": 1278.0138549804688,
-        "y": 256.00694274902344
+        "x": 1300.0,
+        "y": 450.0
       },
       "size": {
         "width": 102.359375,
@@ -260,13 +174,197 @@
       "layout": "vbox"
     },
     {
-      "id": "bcd52a1c-534b-4478-992a-76a57675660a",
+      "id": "12db11af-716e-4e37-8e88-692068ce6f33",
       "type": "edge",
-      "sourceId": "task0",
+      "sourceId": "task3",
+      "targetId": "task4"
+    },
+    {
+      "id": "12db11af-716e-4e37-8e88-692068ce6f34",
+      "type": "edge",
+      "sourceId": "64485d47-4350-4d21-8724-cd1ed11b9e70",
+      "targetId": "744444fb-a8c8-4d08-ba9b-2b9ac64107ad"
+    },
+    {
+      "id": "12db11af-716e-4e37-8e88-692068ce6f35",
+      "type": "edge",
+      "sourceId": "744444fb-a8c8-4d08-ba9b-2b9ac64107ad",
       "targetId": "task3"
     },
     {
-      "id": "12db11af-716e-4e37-8e88-692068ce6f33",
+      "name": "ManualTask0",
+      "taskType": "manual",
+      "id": "64485d47-4350-4d21-8724-cd1ed11b9e70",
+      "children": [
+        {
+          "id": "e8a423b8-8a80-4caa-b698-df40b4de65fe",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "59b8c5a6-b078-414d-9934-4677a09dc25d",
+              "children": [
+                {
+                  "id": "eb107553-dcd7-43bd-9aed-1ccd37b72aba",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "71e0c706-f645-4a69-9edb-fdcd7a8c33bb",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 45.921875,
+                "height": 22.0
+              },
+              "text": "Start",
+              "alignment": {
+                "x": 22.796875,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 88.921875,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 550.0,
+        "y": 450.0
+      },
+      "size": {
+        "width": 98.921875,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "name": "ManualTask0",
+      "taskType": "manual",
+      "id": "744444fb-a8c8-4d08-ba9b-2b9ac64107ad",
+      "children": [
+        {
+          "id": "61d8c912-ecd4-458a-ae7b-b980f7658b52",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "194b08d5-34d9-4d0a-8f84-9414a740cabe",
+              "children": [
+                {
+                  "id": "a21ac878-267f-486e-b735-b285a0ebab31",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "a8f30459-c283-4848-b800-46f374416b4a",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 146.75,
+                "height": 22.0
+              },
+              "text": "Select Program",
+              "alignment": {
+                "x": 73.375,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 189.75,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 690.0,
+        "y": 450.0
+      },
+      "size": {
+        "width": 199.75,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "94e95eb8-bd19-469c-9737-c450267097ed",
       "type": "edge",
       "sourceId": "task3",
       "targetId": "task4"

@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { DiffSymbolInformationNode, DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree-widget";
 
 @injectable()
-export class DiffViewService implements WidgetFactory {
+export class DiffTreeService implements WidgetFactory {
 
     id = 'diff-tree-view';
 

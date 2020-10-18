@@ -19,6 +19,7 @@ export class DiffTreeNode {
     id: string;
     name: string;
     visible: boolean = true;
+    selected: boolean = false;
     parent: DiffTreeNode | undefined = undefined;
 
 }

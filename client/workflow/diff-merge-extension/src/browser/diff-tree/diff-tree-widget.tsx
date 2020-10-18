@@ -5,11 +5,14 @@ import {
     ExpandableTreeNode,
     SelectableTreeNode,
     TreeNode,
-    TreeProps,
     TreeWidget
 } from "@theia/core/lib/browser";
 import { inject, injectable } from "inversify";
+import { CenterAction } from "sprotty";
 
+import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
+import { DiffTreeNode } from "./diff-tree-node";
+import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
 
 
@@ -47,10 +50,23 @@ export const DiffViewWidgetFactory = Symbol('DiffViewWidgetFactory');
 
 @injectable()
 export class DiffViewWidget extends TreeWidget {
+
+    setDiagWidgets(baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
+        this.baseWidget = baseWidget;
+        this.firstWidget = firstWidget;
+        if (secondWidget) {
+            this.secondWidget = secondWidget;
+        }
+    }
+
+    private baseWidget: DiffMergeDiagWidget;
+    private firstWidget: DiffMergeDiagWidget;
+    private secondWidget: DiffMergeDiagWidget;
+
     readonly onDidChangeOpenStateEmitter = new Emitter<boolean>();
 
     constructor(
-        @inject(TreeProps) protected readonly treeProps: TreeProps,
+        @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
         @inject(DiffViewTreeModel) model: DiffViewTreeModel,
         @inject(ContextMenuRenderer) protected readonly contextMenuRenderer: ContextMenuRenderer
     ) {
@@ -62,6 +78,11 @@ export class DiffViewWidget extends TreeWidget {
         this.title.closable = true;
         this.title.iconClass = 'fa outline-view-tab-icon';
         this.addClass('theia-outline-view');
+        this.treeProps.multiSelect = false;
+        /*this.selectionService.onSelectionChanged(selection => {
+            console.log("Selection changed ", selection);
+        });*/
+        console.log("Selectionservice", this.selectionService);
     }
 
     public setRoot() {
@@ -81,34 +102,111 @@ export class DiffViewWidget extends TreeWidget {
         console.log("setting root node to", this.model.root);
     }
 
-    public setChanges(additions: CompositeTreeNode[], deletions: CompositeTreeNode[], changes: CompositeTreeNode[]) {
+    /**
+     * Handle the single-click mouse event.
+     * @param node the tree node if available.
+     * @param event the mouse single-click event.
+     */
+    protected handleClickEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+        if (node) {
+
+            if (!!this.props.multiSelect) {
+                const shiftMask = this.hasShiftMask(event);
+                const ctrlCmdMask = this.hasCtrlCmdMask(event);
+                if (SelectableTreeNode.is(node)) {
+                    if (shiftMask) {
+                        this.model.selectRange(node);
+                    } else if (ctrlCmdMask) {
+                        this.model.toggleNode(node);
+                    } else {
+                        this.model.selectNode(node);
+                    }
+                }
+                if (this.isExpandable(node) && !shiftMask && !ctrlCmdMask) {
+                    this.model.toggleNodeExpansion(node);
+                }
+            } else {
+                if (SelectableTreeNode.is(node)) {
+                    console.log("toggeling node", node);
+                    event.currentTarget.setAttribute('data-node-id', node.id);
+                    this.toggle(event);
+                    this.model.selectNode(node);
+                }
+                if (this.isExpandable(node) && !this.hasCtrlCmdMask(event) && !this.hasShiftMask(event)) {
+                    this.model.toggleNodeExpansion(node);
+                }
+            }
+            event.stopPropagation();
+        }
+    }
+
+    /**
+     * Toggle the node.
+     */
+    protected readonly toggle = (event: React.MouseEvent<HTMLElement>) => this.doToggle(event);
+
+    /**
+     * Actually toggle the tree node.
+     * @param event the mouse click event.
+     */
+    protected doToggle(event: React.MouseEvent<HTMLElement>): void {
+        const nodeId = event.currentTarget.getAttribute('data-node-id');
+        console.log("clicked on nodeId", nodeId);
+        if (nodeId) {
+            const node = this.model.getNode(nodeId);
+            console.log("clicked on", node);
+            this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+            this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+            if (this.secondWidget) {
+                this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+            }
+        }
+        event.stopPropagation();
+    }
+
+    /**
+     * Update the global selection for the tree.
+     */
+    protected updateGlobalSelection(): void {
+        console.log("selected nodes", this.model.selectedNodes);
+
+        super.updateGlobalSelection();
+        console.log("selected nodes", this.model.selectedNodes);
+    }
+
+
+    public setChanges(additions: DiffTreeNode[], deletions: DiffTreeNode[], changes: DiffTreeNode[]) {
         this.model.root = this.model.root = {
             id: 'diff-tree-view-differences',
             name: 'DIFF TREE',
             visible: true,
+            selected: false,
             children: [{
                 id: 'diff-tree-view-additions',
                 name: 'DIFF TREE Additions',
                 visible: true,
                 children: additions,
-                parent: undefined
-            } as CompositeTreeNode,
+                parent: undefined,
+                selected: false
+            } as DiffTreeNode,
             {
                 id: 'diff-tree-view-deletions',
                 name: 'DIFF TREE Deletions',
                 visible: true,
                 children: deletions,
-                parent: undefined
-            } as CompositeTreeNode,
+                parent: undefined,
+                selected: false
+            } as DiffTreeNode,
             {
                 id: 'diff-tree-view-changes',
                 name: 'DIFF TREE Changes',
                 visible: true,
                 children: changes,
-                parent: undefined
-            } as CompositeTreeNode],
+                parent: undefined,
+                selected: false
+            } as DiffTreeNode],
             parent: undefined
-        } as CompositeTreeNode;
+        } as DiffTreeNode;
     }
 
 

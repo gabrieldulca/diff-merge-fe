@@ -8,7 +8,6 @@ import {
     TreeDecoratorService,
     TreeModel,
     TreeModelImpl,
-    TreeProps,
     TreeWidget,
     WebSocketConnectionProvider,
     WidgetFactory
@@ -25,8 +24,9 @@ import {
     DiffMergeExtensionMenuContribution
 } from "./diff-merge-extension-contribution";
 import { DiffDecoratorService, DiffTreeDecorator } from "./diff-tree/diff-decorator-service";
+import { DiffTreeProps } from "./diff-tree/diff-tree-props";
+import { DiffTreeService } from "./diff-tree/diff-tree-service";
 import { DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
-import { DiffViewService } from "./diff-tree/diff-view-service";
 import { DiffViewTreeModel } from "./diff-tree/diff-view-tree";
 import { SplitPanelManager } from "./split-panel-manager";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
@@ -70,8 +70,8 @@ export default new ContainerModule((bind, _unbind, isBound) => {
         () => createDiffViewWidget(ctx.container)
     );
 
-    bind(DiffViewService).toSelf().inSingletonScope();
-    bind(WidgetFactory).toService(DiffViewService);
+    bind(DiffTreeService).toSelf().inSingletonScope();
+    bind(WidgetFactory).toService(DiffTreeService);
 
 });
 
@@ -87,7 +87,7 @@ export default new ContainerModule((bind, _unbind, isBound) => {
 function createDiffViewWidget(parent: interfaces.Container): DiffViewWidget {
     const child = createTreeContainer(parent);
 
-    child.rebind(TreeProps).toConstantValue({ ...defaultTreeProps, search: true });
+    child.bind(DiffTreeProps).toConstantValue({ ...defaultTreeProps, search: true });
 
     child.unbind(TreeWidget);
     child.bind(DiffViewWidget).toSelf();

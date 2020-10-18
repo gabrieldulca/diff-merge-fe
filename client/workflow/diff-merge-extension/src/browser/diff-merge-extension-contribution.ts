@@ -17,13 +17,7 @@ import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
 import { WorkflowDiagramManager } from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-diagram-manager";
 import { WorkflowLanguage } from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
 import { SelectionService, UriSelection } from "@theia/core";
-import {
-    AbstractViewContribution,
-    ApplicationShell,
-    CompositeTreeNode,
-    DiffUris,
-    WidgetOpenerOptions
-} from "@theia/core/lib/browser";
+import { AbstractViewContribution, ApplicationShell, DiffUris, WidgetOpenerOptions } from "@theia/core/lib/browser";
 import {
     CommandContribution,
     CommandRegistry,
@@ -43,7 +37,8 @@ import { DiagramManagerProvider, DiagramWidgetOptions } from "sprotty-theia";
 import { ComparisonService } from "../common";
 import { DiffMergeDiagManager } from "./diff-merge-diag-manager";
 import { DiffSplitPanel } from "./diff-split-panel";
-import { DiffViewService } from "./diff-tree/diff-view-service";
+import { DiffTreeNode } from "./diff-tree/diff-tree-node";
+import { DiffTreeService } from "./diff-tree/diff-tree-service";
 import { SplitPanelManager } from "./split-panel-manager";
 import { UnusedWidget } from "./unused-widget";
 
@@ -90,7 +85,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         // @inject(FileNavigatorWidget) protected readonly fileNavigatorWidget: FileNavigatorWidget,
         // @inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
         @inject(MessageService) private readonly messageService: MessageService,
-        @inject(DiffViewService) private readonly diffViewService: DiffViewService,
+        @inject(DiffTreeService) private readonly diffTreeService: DiffTreeService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
         @inject(NavigatorDiff) protected readonly navigatorDiff: NavigatorDiff,
         @inject(SelectionService) protected readonly selectionService: SelectionService,
@@ -117,55 +112,56 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     this.messageService.info(JSON.stringify(comparison));
 
                     const _this = this;
-                    const options: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const widget1 = await this.diffMergeDiagManager.createWidget(options);
-                    const options2: DiagramWidgetOptions = { uri: firstComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
+                    const leftWidgetOptions: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
+                    const leftWidget = await this.diffMergeDiagManager.createWidget(leftWidgetOptions);
+                    const rightWidgetOptions: DiagramWidgetOptions = { uri: firstComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
                     const widgetOptions: WidgetOptions = { mode: 'split-right' };
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
-                    const widget2 = await this.diffMergeDiagManager.createWidget(options2);
+                    const rightWidget = await this.diffMergeDiagManager.createWidget(rightWidgetOptions);
                     // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
-                    const diffViewWidget = await this.diffViewService.createWidget();
+                    const diffTreeWidget = await this.diffTreeService.createWidget();
+                    diffTreeWidget.setDiagWidgets(leftWidget, rightWidget);
 
-                    await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
+                    await this.splitPanelManager.createSplitPanel(rightWidgetOptions).then(function (splitPanel: DiffSplitPanel) {
                         // splitPanel.setNavigator(_this.fileNavigatorWidget);
-                        splitPanel.initDiffPanel(widget1, widget2, diffUri);
+                        splitPanel.initDiffPanel(leftWidget, rightWidget, diffUri);
 
-                        _this.splitPanelManager.doCustomOpen(widget1, splitPanel, diffUri, wop, diffViewWidget, title);
+                        _this.splitPanelManager.doCustomOpen(leftWidget, splitPanel, diffUri, wop, diffTreeWidget, title);
 
                     });
                     delay(300).then(() => {
-                        let additions: CompositeTreeNode[] = [];
-                        let deletions: CompositeTreeNode[] = [];
-                        let changes: CompositeTreeNode[] = [];
-                        widget1.glspActionDispatcher.onceModelInitialized().then(function () {
+                        let additions: DiffTreeNode[] = [];
+                        let deletions: DiffTreeNode[] = [];
+                        let changes: DiffTreeNode[] = [];
+                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
                             const diffAction = new ApplyDiffAction(comparison);
 
-                            widget1.glspActionDispatcher.dispatch(diffAction);
+                            leftWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
 
-                                changes = diffAction.changesTree as CompositeTreeNode[];
+                                changes = diffAction.changesTree as DiffTreeNode[];
                             });
                             console.log("deltions for tree", diffAction.deletionsTree);
-                            widget1.glspActionDispatcher.dispatch(new CenterAction([]));
-                            deletions = diffAction.deletionsTree as CompositeTreeNode[];
+                            leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                            deletions = diffAction.deletionsTree as DiffTreeNode[];
 
                         });
-                        widget2.glspActionDispatcher.onceModelInitialized().then(function () {
+                        rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
                             const diffAction = new ApplyDiffAction(comparison);
 
-                            widget2.glspActionDispatcher.dispatch(diffAction);
+                            rightWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
                                 console.log("additions for tree", diffAction.additionsTree);
-                                additions = diffAction.additionsTree as CompositeTreeNode[];
+                                additions = diffAction.additionsTree as DiffTreeNode[];
                             });
-                            widget2.glspActionDispatcher.dispatch(new CenterAction([]));
+                            rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                         });
                         delay(400).then(() => {
-                            diffViewWidget.setChanges(additions, deletions, changes);
+                            diffTreeWidget.setChanges(additions, deletions, changes);
                         });
 
                     });
@@ -198,7 +194,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const _this = this;
                     const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);
                     const title = "diff:[" + this.firstComparisonFile!.path.base + "," + this.baseComparisonFile.path.base + "," + secondComparisonFile!.path.base + "]";
-                    const diffViewWidget = await this.diffViewService.createWidget();
+                    const diffViewWidget = await this.diffTreeService.createWidget();
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);

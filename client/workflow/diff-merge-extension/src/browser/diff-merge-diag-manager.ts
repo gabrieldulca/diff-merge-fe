@@ -58,7 +58,7 @@ export class DiffMergeDiagManager extends GLSPDiagramManager {
         const clientId = this.createClientId();
         const config = this.diagramConfigurationRegistry.get(options.diagramType);
         const diContainer = config.createContainer(clientId);
-
+        // Create diContainer and modify it here to support everything
         return new DiffMergeDiagWidget(options, clientId + '_widget', diContainer, this.editorPreferences, this.diagramConnector, this.editorManager);
         // }
         // throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));

@@ -21,6 +21,7 @@ import {
     boundsModule,
     buttonModule,
     commandPaletteModule,
+    configureActionHandler,
     configureCommand,
     configureModelElement,
     ConsoleLogger,
@@ -86,6 +87,7 @@ import {
 import { Container, ContainerModule } from "inversify";
 
 import { directTaskEditor } from "./direct-task-editing/di.config";
+import { EnableFileNameAction, FileNameBanner } from "./file-name-component";
 import { ActivityNode, Icon, TaskNode, WeightedEdge } from "./model";
 import { GotoContextMenuItemProvider } from "./navigation";
 import { ApplyDiffCommand } from "./testaction";
@@ -121,6 +123,9 @@ const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     configureModelElement(context, 'activityNode:decision', ActivityNode, DiamondNodeView);
     configureModelElement(context, 'activityNode:fork', ActivityNode, ForkOrJoinNodeView);
     configureModelElement(context, 'activityNode:join', ActivityNode, ForkOrJoinNodeView);
+    bind(FileNameBanner).toSelf().inSingletonScope();
+    bind(TYPES.IUIExtension).toService(FileNameBanner);
+    configureActionHandler({ bind, isBound }, EnableFileNameAction.KIND, FileNameBanner);
 });
 
 export default function createContainer(widgetId: string): Container {

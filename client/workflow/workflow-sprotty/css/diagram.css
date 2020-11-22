@@ -223,11 +223,13 @@ g .movement-not-allowed>.sprotty-node {
     stroke: lightgreen !important;
     opacity: 0.5!important;
 }
+
 .newly-added-arrow.mouseover {
     fill: #1bcd67 !important;
     stroke: #1bcd67 !important;
     opacity: 1!important;
 }
+
 .sprotty-edge .newly-added-edge {
     stroke: green;
     opacity: 0.5;
@@ -248,6 +250,7 @@ sprotty-node.task.manual.newly-added-node {
     stroke: lightcoral !important;
     opacity: 0.5!important;
 }
+
 .newly-deleted-edge.mouseover {
     opacity: 1!important;
 }
@@ -300,11 +303,13 @@ sprotty-node.task.manual.newly-added-node {
     stroke: #fdff78 !important;
     opacity: 0.5!important;
 }
+
 .newly-changed-arrow.mouseover {
     fill: #ffe64d !important;
     stroke: #ffe64d !important;
     opacity: 1!important;
 }
+
 .sprotty-edge .newly-changed-edge {
     stroke: #fdff78;
     opacity: 0.5;
@@ -315,4 +320,13 @@ sprotty-node.task.manual.newly-changed-node {
     opacity: 0.5;
 }
 
-
+.filename-banner {
+    padding-left: 3%;
+    padding-right: 3%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    width: fit-content;
+    position: absolute;
+    opacity: 0.7;
+    background-color: rgb(49, 48, 48);
+}

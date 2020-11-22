@@ -13,18 +13,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import {GLSPActionDispatcher, RequestTypeHintsAction} from "@eclipse-glsp/client";
+import { GLSPActionDispatcher, RequestTypeHintsAction } from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
 import {
+    ActionHandlerRegistry,
     CenterAction,
     DiagramServer,
     InitializeCanvasBoundsAction,
     ModelSource,
     RequestModelAction,
-    TYPES,
-    ActionHandlerRegistry
+    TYPES
 } from "sprotty";
 import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
 
@@ -66,6 +66,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
         // this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+
         const _this = this;
         const newBounds = this.getBoundsInPage(this.node as Element);
         this.actionDispatcher.dispatch(new InitializeCanvasBoundsAction(newBounds));

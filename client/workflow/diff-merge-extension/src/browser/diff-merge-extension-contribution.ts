@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
+import { ApplyDiffAction, EnableFileNameAction } from "@eclipse-glsp-examples/workflow-sprotty";
 import { WorkflowDiagramManager } from "@eclipse-glsp-examples/workflow-theia/lib/browser/diagram/workflow-diagram-manager";
 import { WorkflowLanguage } from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
 import { SelectionService, UriSelection } from "@theia/core";
@@ -109,7 +109,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     console.log("second file", firstComparisonFile!.path.toString());
                     const comparison = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
-                    this.messageService.info(JSON.stringify(comparison));
+                    // this.messageService.info(JSON.stringify(comparison));
 
                     const _this = this;
                     const leftWidgetOptions: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
@@ -151,6 +151,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             });
                             console.log("deltions for tree", diffAction.deletionsTree);
                             leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                            leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
+
                             deletions = diffAction.deletionsTree as DiffTreeNode[];
 
                         });
@@ -163,6 +165,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                                 additions = diffAction.additionsTree as DiffTreeNode[];
                             });
                             rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                            rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
+
                         });
                         delay(400).then(() => {
                             diffTreeWidget.setChanges(additions, deletions, changes);
@@ -179,7 +183,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     // tslint:disable-next-line: max-line-length
                     const comparison = await this.comparisonService.getThreeWayComparisonResult(this.baseComparisonFile.path.toString(), this.firstComparisonFile.path.toString(), secondComparisonFile!.path.toString());
                     console.log("3 way comparison result", comparison);
-                    this.messageService.info(JSON.stringify(comparison));
+                    // this.messageService.info(JSON.stringify(comparison));
 
                     const widgetOptions: WidgetOptions = { mode: 'split-right' };
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };

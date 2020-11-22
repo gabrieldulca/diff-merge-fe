@@ -17,4 +17,5 @@ import createWorkflowDiagramContainer from "./di.config";
 
 export { createWorkflowDiagramContainer };
 export * from "./testaction";
+export * from "./file-name-component";
 

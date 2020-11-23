@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { GLSPActionDispatcher, RequestTypeHintsAction } from "@eclipse-glsp/client";
+import { GLSPActionDispatcher, RequestTypeHintsAction, EnableToolPaletteAction } from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
@@ -30,13 +30,17 @@ import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
 
 
 
+
 @injectable()
 export class DiffMergeDiagWidget extends GLSPDiagramWidget {
+    public hasToolPalette: boolean = true;
 
     constructor(options: DiagramWidgetOptions, readonly widgetId: string, readonly diContainer: Container,
-        readonly editorPreferences: EditorPreferences, readonly connector?: TheiaSprottyConnector, readonly editorManager?: EditorManager) {
+        readonly editorPreferences: EditorPreferences, hasToolPalette?: boolean, readonly connector?: TheiaSprottyConnector, readonly editorManager?: EditorManager) {
         super(options, widgetId, diContainer, editorPreferences, connector);
-
+        if(!hasToolPalette) {
+            this.hasToolPalette = false;
+        }
     }
 
     protected initializeSprotty(): void {
@@ -65,7 +69,10 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         // modelElement.cssClasses = [maxSeverityCSSClass];
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
-        // this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        console.log("Tool Palette", this.hasToolPalette);
+        if(this.hasToolPalette) {
+            this.actionDispatcher.dispatch(new EnableToolPaletteAction());
+        }
 
         const _this = this;
         const newBounds = this.getBoundsInPage(this.node as Element);
@@ -73,7 +80,12 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         this.glspActionDispatcher.onceModelInitialized().then(function () {
             _this.glspActionDispatcher.dispatch(new CenterAction([], false));
         });
-        this.glspActionDispatcher.onceModelInitialized().then(() => _this.glspActionDispatcher.dispatch(new CenterAction([])));
+        this.glspActionDispatcher.onceModelInitialized().then(function () {
+            delay(300).then(() => {
+
+                _this.glspActionDispatcher.dispatch(new CenterAction([]));
+            });
+        });
 
     }
 
@@ -86,6 +98,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         return this.diContainer.get<ActionHandlerRegistry>(ActionHandlerRegistry) as ActionHandlerRegistry;
     }
 
-
-
+}
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -113,12 +113,12 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     const _this = this;
                     const leftWidgetOptions: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const leftWidget = await this.diffMergeDiagManager.createWidget(leftWidgetOptions);
+                    const leftWidget = await this.diffMergeDiagManager.createWidgetNoTP(leftWidgetOptions);
                     const rightWidgetOptions: DiagramWidgetOptions = { uri: firstComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
                     const widgetOptions: WidgetOptions = { mode: 'split-right' };
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
-                    const rightWidget = await this.diffMergeDiagManager.createWidget(rightWidgetOptions);
+                    const rightWidget = await this.diffMergeDiagManager.createWidgetNoTP(rightWidgetOptions);
                     // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
                     // Naming diagram widgets
@@ -160,7 +160,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
 
                             rightWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
+                            delay(200).then(() => {
                                 console.log("additions for tree", diffAction.additionsTree);
                                 additions = diffAction.additionsTree as DiffTreeNode[];
                             });
@@ -168,7 +168,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
 
                         });
-                        delay(400).then(() => {
+                        delay(900).then(() => {
                             diffTreeWidget.setChanges(additions, deletions, changes);
                         });
 
@@ -190,14 +190,14 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     // open first file
                     const options: DiagramWidgetOptions = { uri: this.firstComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const firstWidget = await this.diffMergeDiagManager.createWidget(options);
+                    const firstWidget = await this.diffMergeDiagManager.createWidgetNoTP(options);
                     // open base
                     const optionsBase: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const baseWidget = await this.diffMergeDiagManager.createWidget(optionsBase);
+                    const baseWidget = await this.diffMergeDiagManager.createWidgetNoTP(optionsBase);
 
                     // open second file
                     const options2: DiagramWidgetOptions = { uri: secondComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const secondWidget = await this.diffMergeDiagManager.createWidget(options2);
+                    const secondWidget = await this.diffMergeDiagManager.createWidgetNoTP(options2);
 
                     const _this = this;
                     const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);

@@ -228,7 +228,7 @@ export class DiffViewWidget extends TreeWidget {
             } as DiffTreeNode],
             parent: undefined
         } as DiffTreeNode;
-
+        console.log("additions in tree: ", additions);
     }
 
     /**

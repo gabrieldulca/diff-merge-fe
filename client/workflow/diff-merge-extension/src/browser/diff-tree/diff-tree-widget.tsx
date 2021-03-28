@@ -10,7 +10,7 @@ import {
 } from "@theia/core/lib/browser";
 import { inject, injectable } from "inversify";
 import React = require("react");
-import { CenterAction, GetViewportAction } from "sprotty";
+import { CenterAction, GetViewportAction, SetViewportAction } from "sprotty";
 
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
 import { DiffTreeDecorator } from "./diff-decorator-service";
@@ -158,9 +158,6 @@ export class DiffViewWidget extends TreeWidget {
             if (node.changeType !== "add") {
                 if (node.elementType !== "SEdge") {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
-                    this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                        result.viewport
-                    });
                 } else {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
@@ -171,6 +168,21 @@ export class DiffViewWidget extends TreeWidget {
                 } else {
                     this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
+            }
+            if (node.changeType === "add") {
+                this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                    console.log("setting viewport for added node", result.viewport);
+                    this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
+                        "sprotty", result.viewport, true)); //TODO change sprotty to model root
+                });
+            }
+            if (node.changeType === "delete") {
+                console.log("setting viewport for deleted node", node);
+                this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                    console.log("setting viewport for deleted node", result.viewport);
+                    this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
+                        "sprotty", result.viewport, true));//TODO change sprotty to model root
+                });
             }
             if (this.secondWidget) {
                 if (node.elementType !== "SEdge") {

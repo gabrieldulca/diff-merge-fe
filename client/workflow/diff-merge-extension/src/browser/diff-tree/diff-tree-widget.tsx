@@ -10,7 +10,7 @@ import {
 } from "@theia/core/lib/browser";
 import { inject, injectable } from "inversify";
 import React = require("react");
-import { CenterAction } from "sprotty";
+import { CenterAction, GetViewportAction } from "sprotty";
 
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
 import { DiffTreeDecorator } from "./diff-decorator-service";
@@ -158,6 +158,9 @@ export class DiffViewWidget extends TreeWidget {
             if (node.changeType !== "add") {
                 if (node.elementType !== "SEdge") {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                    this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                        result.viewport
+                    });
                 } else {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }

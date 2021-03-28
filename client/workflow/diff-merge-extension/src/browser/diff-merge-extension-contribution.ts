@@ -57,6 +57,10 @@ export const ComparisonSelectBaseExtensionCommand = {
     id: 'ComparisonSelectBase.command',
     label: "Selects base diagram for comparison"
 };
+export const ComparisonMergeExtensionCommand = {
+    id: 'ComparisonMerge.command',
+    label: "Merges two diagrams"
+};
 
 @injectable()
 export class DiffMergeExtensionCommandContribution extends AbstractViewContribution<DiffSplitPanel> implements CommandContribution {
@@ -253,6 +257,18 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
             }
         });
+        registry.registerCommand(ComparisonMergeExtensionCommand, {
+            execute: async () => {
+                if (this.baseComparisonFile && !this.firstComparisonFile) {
+                    console.log("first merge file", this.baseComparisonFile.path.toString());
+                    const firstComparisonFile = UriSelection.getUri(this.selectionService.selection);
+                    console.log("second merge file", firstComparisonFile!.path.toString());
+                    const merge = await this.comparisonService.getMergeResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
+                    console.log("merge result", merge);
+                }
+
+            }
+        });
     }
 }
 
@@ -266,11 +282,15 @@ export class DiffMergeExtensionMenuContribution implements MenuContribution {
         });
         menus.registerMenuAction(NavigatorContextMenu.COMPARE, {
             commandId: ComparisonSelectExtensionCommand.id,
-            label: 'EMF Select for comparison'
+            label: 'EMF Select for comparison/merge'
         });
         menus.registerMenuAction(NavigatorContextMenu.COMPARE, {
             commandId: ComparisonSelectBaseExtensionCommand.id,
-            label: 'EMF Select Base for comparison'
+            label: 'EMF Select Base for comparison/merge'
+        });
+        menus.registerMenuAction(NavigatorContextMenu.COMPARE, {
+            commandId: ComparisonMergeExtensionCommand.id,
+            label: 'EMF Merge with selected'
         });
     }
 

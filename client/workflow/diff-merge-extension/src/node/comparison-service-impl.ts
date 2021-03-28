@@ -1,7 +1,7 @@
+import { ComparisonDto } from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 import { injectable } from "inversify";
 
 import { ComparisonService } from "../common";
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 
 const fetch = require("node-fetch");
 
@@ -9,7 +9,15 @@ const fetch = require("node-fetch");
 export class ComparisonServiceImpl implements ComparisonService {
 
     async getMergeResult(file1Path: string, file2Path: string): Promise<ComparisonDto> {
-        return new ComparisonDto();
+        console.log("merge link", 'http://localhost:8080/diff/merge/diagram?file1=' + file1Path + '&file2=' + file2Path);
+        const resp = fetch('http://localhost:8080/diff/merge/diagram?file1=' + file1Path + '&file2=' + file2Path)
+            .then((res: { json: () => void; }) => res.json())
+            .catch((error: any) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        console.log("getMergeResult", resp);
+
+        return resp;
     }
 
     async getComparisonResult(file1Path: string, file2Path: string): Promise<ComparisonDto> {

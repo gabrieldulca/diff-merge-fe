@@ -1,4 +1,4 @@
-import { Emitter } from "@theia/core";
+import {Emitter, MenuModelRegistry} from "@theia/core";
 import {
     CompositeTreeNode,
     ContextMenuRenderer,
@@ -18,6 +18,7 @@ import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
+import {TreeContextMenu} from "theia-tree-editor";
 
 
 /**
@@ -62,7 +63,6 @@ export class DiffViewWidget extends TreeWidget {
             this.secondWidget = secondWidget;
         }
     }
-
     private baseWidget: DiffMergeDiagWidget;
     private firstWidget: DiffMergeDiagWidget;
     private secondWidget: DiffMergeDiagWidget;
@@ -70,6 +70,7 @@ export class DiffViewWidget extends TreeWidget {
     readonly onDidChangeOpenStateEmitter = new Emitter<boolean>();
 
     constructor(
+        @inject(MenuModelRegistry) protected menuModelRegistry: MenuModelRegistry,
         @inject(DiffLabelProvider) protected diffLabelProvider: DiffLabelProvider,
         @inject(DiffTreeDecorator) protected readonly decorator: DiffTreeDecorator,
         @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
@@ -89,6 +90,11 @@ export class DiffViewWidget extends TreeWidget {
             console.log("Selection changed ", selection);
         });*/
         console.log("Selectionservice", this.selectionService);
+        //const subMenuPath = [...MAIN_MENU_BAR, 'diff-menu'];
+        this.menuModelRegistry.registerMenuAction(TreeContextMenu.ADD_MENU, {
+            commandId: "command.id",
+            label: "command.label"
+        });
     }
 
     public setRoot() {
@@ -145,6 +151,38 @@ export class DiffViewWidget extends TreeWidget {
      */
     protected readonly toggle = (event: React.MouseEvent<HTMLElement>) => this.doToggle(event);
 
+    protected handleContextMenuEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+        console.log("right clicked on node", node);
+        if (SelectableTreeNode.is(node)) {
+            // Keep the selection for the context menu, if the widget support multi-selection and the right click happens on an already selected node.
+            //TODO multiselect
+            /*if (!this.props.multiSelect || !node.selected) {
+                const type = !!this.props.multiSelect && this.hasCtrlCmdMask(event) ? TreeSelection.SelectionType.TOGGLE : TreeSelection.SelectionType.DEFAULT;
+                this.model.addSelection({ node, type });
+            }*/
+
+            const contextMenuPath = this.props.contextMenuPath;
+            console.log("right clicked on node, cm", contextMenuPath);
+            const { x, y } = event.nativeEvent;
+            //if (contextMenuPath) {
+                //
+                //const args = this.toContextMenuArgs(node);
+            //const addHandler = (property: string, type: string): any => this.onAddEmitter.fire({ node, property, type });
+            /*const renderOptions: RenderContextMenuOptions = {
+                menuPath: TreeContextMenu.ADD_MENU,
+                anchor:  {
+                    x: event.nativeEvent.x,
+                    y: event.nativeEvent.y
+                }
+            };
+            this.contextMenuRenderer.render(renderOptions);*/
+                this.contextMenuRenderer.render({menuPath:['menubar'], anchor:{x:x, y:y}});
+            //}
+            this.doFocus();
+        }
+        event.stopPropagation();
+        event.preventDefault();
+    }
     /**
      * Actually toggle the tree node.
      * @param event the mouse click event.

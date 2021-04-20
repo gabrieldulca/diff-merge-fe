@@ -18,7 +18,7 @@ import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
-import {TreeContextMenu} from "theia-tree-editor";
+import {MergeDiffMenuContribution} from "../merge-diff-menu/merge-diff-menu-contribution";
 
 
 /**
@@ -90,11 +90,7 @@ export class DiffViewWidget extends TreeWidget {
             console.log("Selection changed ", selection);
         });*/
         console.log("Selectionservice", this.selectionService);
-        //const subMenuPath = [...MAIN_MENU_BAR, 'diff-menu'];
-        this.menuModelRegistry.registerMenuAction(TreeContextMenu.ADD_MENU, {
-            commandId: "command.id",
-            label: "command.label"
-        });
+
     }
 
     public setRoot() {
@@ -153,7 +149,9 @@ export class DiffViewWidget extends TreeWidget {
 
     protected handleContextMenuEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
         console.log("right clicked on node", node);
+
         if (SelectableTreeNode.is(node)) {
+            this.model.selectNode(node);
             // Keep the selection for the context menu, if the widget support multi-selection and the right click happens on an already selected node.
             //TODO multiselect
             /*if (!this.props.multiSelect || !node.selected) {
@@ -174,10 +172,13 @@ export class DiffViewWidget extends TreeWidget {
                     x: event.nativeEvent.x,
                     y: event.nativeEvent.y
                 }
-            };
-            this.contextMenuRenderer.render(renderOptions);*/
-                this.contextMenuRenderer.render({menuPath:['menubar'], anchor:{x:x, y:y}});
-            //}
+            };            this.contextMenuRenderer.render(renderOptions);*/
+            console.log("menu1", this.menuModelRegistry.getMenu(MergeDiffMenuContribution.MERGE_DIFF));
+            console.log("menu3", MergeDiffMenuContribution.MERGE_DIFF);
+            //const menu:string[] = [this.menuModelRegistry.getMenu(TheiaSprottyContextMenu.CONTEXT_MENU.concat('merge-diff')).id];
+            //this.contextMenuRenderer.render({menuPath:menu, anchor:{x:x, y:y}});
+
+            this.contextMenuRenderer.render({menuPath: ["menubar", "merge-diff"], anchor:{x:x, y:y}});
             this.doFocus();
         }
         event.stopPropagation();

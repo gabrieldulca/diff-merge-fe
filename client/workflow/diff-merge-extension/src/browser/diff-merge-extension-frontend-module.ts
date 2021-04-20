@@ -31,6 +31,7 @@ import { DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-wid
 import { DiffViewTreeModel } from "./diff-tree/diff-view-tree";
 import { SplitPanelManager } from "./split-panel-manager";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
+import {registerMergeDiffContextMenu} from "./merge-diff-menu/merge-diff-menu-contribution";
 
 export default new ContainerModule((bind, _unbind, isBound) => {
     bind(CommandContribution).to(DiffMergeExtensionCommandContribution);
@@ -73,6 +74,7 @@ export default new ContainerModule((bind, _unbind, isBound) => {
 
     bind(DiffTreeService).toSelf().inSingletonScope();
     bind(WidgetFactory).toService(DiffTreeService);
+    registerMergeDiffContextMenu(bind);
 
 });
 

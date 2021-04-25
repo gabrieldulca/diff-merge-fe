@@ -1,4 +1,10 @@
-import {Emitter, MenuModelRegistry} from "@theia/core";
+import {
+    CommandRegistry,
+    CommandService,
+    ContributionProvider,
+    Emitter,
+    MenuModelRegistry
+} from "@theia/core";
 import {
     CompositeTreeNode,
     ContextMenuRenderer,
@@ -8,7 +14,7 @@ import {
     TreeNode,
     TreeWidget
 } from "@theia/core/lib/browser";
-import { inject, injectable } from "inversify";
+import { inject, injectable, named } from "inversify";
 import React = require("react");
 import { CenterAction, GetViewportAction, SetViewportAction } from "sprotty";
 
@@ -19,6 +25,7 @@ import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
 import {MergeDiffMenuContribution} from "../merge-diff-menu/merge-diff-menu-contribution";
+import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 
 
 /**
@@ -75,6 +82,9 @@ export class DiffViewWidget extends TreeWidget {
         @inject(DiffTreeDecorator) protected readonly decorator: DiffTreeDecorator,
         @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
         @inject(DiffViewTreeModel) model: DiffViewTreeModel,
+        @inject(CommandService) protected readonly commandService: CommandService,
+        @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry,
+        @inject(ContributionProvider) @named(GLSPClientContribution) protected readonly contributionProvider: ContributionProvider<GLSPClientContribution>,
         @inject(ContextMenuRenderer) protected readonly contextMenuRenderer: ContextMenuRenderer
     ) {
         super(treeProps, model, contextMenuRenderer);
@@ -152,6 +162,7 @@ export class DiffViewWidget extends TreeWidget {
 
         if (SelectableTreeNode.is(node)) {
             this.model.selectNode(node);
+            this.selectionService.selection = node;
             // Keep the selection for the context menu, if the widget support multi-selection and the right click happens on an already selected node.
             //TODO multiselect
             /*if (!this.props.multiSelect || !node.selected) {
@@ -162,21 +173,14 @@ export class DiffViewWidget extends TreeWidget {
             const contextMenuPath = this.props.contextMenuPath;
             console.log("right clicked on node, cm", contextMenuPath);
             const { x, y } = event.nativeEvent;
-            //if (contextMenuPath) {
-                //
-                //const args = this.toContextMenuArgs(node);
-            //const addHandler = (property: string, type: string): any => this.onAddEmitter.fire({ node, property, type });
-            /*const renderOptions: RenderContextMenuOptions = {
-                menuPath: TreeContextMenu.ADD_MENU,
-                anchor:  {
-                    x: event.nativeEvent.x,
-                    y: event.nativeEvent.y
+
+            const contributions:GLSPClientContribution[] = this.contributionProvider.getContributions(false);
+            for(const c of contributions) {
+                if(c instanceof MergeDiffMenuContribution) {
+                    const mergeMenu: MergeDiffMenuContribution = c;
+                    mergeMenu.setFiles(this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
                 }
-            };            this.contextMenuRenderer.render(renderOptions);*/
-            console.log("menu1", this.menuModelRegistry.getMenu(MergeDiffMenuContribution.MERGE_DIFF));
-            console.log("menu3", MergeDiffMenuContribution.MERGE_DIFF);
-            //const menu:string[] = [this.menuModelRegistry.getMenu(TheiaSprottyContextMenu.CONTEXT_MENU.concat('merge-diff')).id];
-            //this.contextMenuRenderer.render({menuPath:menu, anchor:{x:x, y:y}});
+            }
 
             this.contextMenuRenderer.render({menuPath: ["menubar", "merge-diff"], anchor:{x:x, y:y}});
             this.doFocus();

@@ -1,14 +1,42 @@
-import {CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry} from '@theia/core';
-import { injectable, interfaces } from 'inversify';
+import {
+    CommandContribution,
+    CommandRegistry,
+    MAIN_MENU_BAR,
+    MenuContribution,
+    MenuModelRegistry,
+    SelectionService
+} from '@theia/core';
+import {inject, injectable, interfaces} from 'inversify';
 import {Command} from "@theia/core/src/common/command";
+import {ComparisonService} from "../../common";
+import {SplitPanelManager} from "../split-panel-manager";
+import {DiffMergeDiagManager} from "../diff-merge-diag-manager";
+import { GLSPClientContribution } from '@eclipse-glsp/theia-integration/lib/browser';
 
 export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
     bind(MenuContribution).to(MergeDiffMenuContribution);
     bind(CommandContribution).to(MergeDiffMenuContribution);
+    bind(GLSPClientContribution).to(MergeDiffMenuContribution);
 }
 
 @injectable()
 export class MergeDiffMenuContribution implements MenuContribution,CommandContribution {
+
+    @inject(SelectionService) protected readonly selectionService: SelectionService;
+    @inject(ComparisonService) protected readonly comparisonService: ComparisonService;
+    @inject(SplitPanelManager) protected readonly splitPanelManager: SplitPanelManager;
+    @inject(DiffMergeDiagManager) protected readonly diffMergeDiagManager: DiffMergeDiagManager;
+
+    private baseFilePath: string;
+    private firstFilePath: string;
+    private secondFilePath: string;
+
+    public setFiles(baseFilePath: string, firstFilePath: string, secondFilePath: string): void {
+        this.baseFilePath = baseFilePath;
+        this.firstFilePath = firstFilePath;
+        this.secondFilePath = secondFilePath;
+    }
+
     static readonly MERGE_DIFF = [...MAIN_MENU_BAR, 'merge-diff'];
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerSubmenu(MergeDiffMenuContribution.MERGE_DIFF, 'Resolve difference');
@@ -25,12 +53,16 @@ export class MergeDiffMenuContribution implements MenuContribution,CommandContri
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(MERGE, {
             execute: async () => {
-                console.log("pressed merge");
+                //const comparison = await this.comparisonService.getSingleMergeResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString(),this.selectionService.selection, false);
+                console.log("pressed merge",this.selectionService.selection);
+                console.log("pressed merge",this.baseFilePath);
+                console.log("pressed merge",this.firstFilePath);
+                console.log("pressed merge",this.secondFilePath);
             }
         });
         registry.registerCommand(REVERT, {
             execute: async () => {
-                console.log("pressed revert");
+                console.log("pressed revert",this.selectionService.selection);
             }
         });
     }

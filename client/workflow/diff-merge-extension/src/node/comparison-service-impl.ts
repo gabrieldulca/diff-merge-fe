@@ -20,6 +20,21 @@ export class ComparisonServiceImpl implements ComparisonService {
         return resp;
     }
 
+    async getSingleMergeResult(file1Path: string, file2Path: string, element: string, revert:boolean): Promise<ComparisonDto> {
+        console.log("merge link", 'http://localhost:8080/diff/merge/diagram?file1=' + file1Path + '&file2=' + file2Path);
+        console.log("element to be merged", element);
+        console.log("revert", revert);
+        const resp = fetch('http://localhost:8080/diff/mergesingle/diagram?file1=' + file1Path + '&file2=' + file2Path
+            + '&elem=' + element + '&revert=' + revert)
+            .then((res: { json: () => void; }) => res.json())
+            .catch((error: any) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        console.log("getSingleMergeResult", resp);
+
+        return resp;
+    }
+
     async getComparisonResult(file1Path: string, file2Path: string): Promise<ComparisonDto> {
         console.log('http://localhost:8080/diff/compare/diagram?file1=' + file1Path + '&file2=' + file2Path);
 

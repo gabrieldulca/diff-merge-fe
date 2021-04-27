@@ -174,6 +174,7 @@ export class DiffViewWidget extends TreeWidget {
             console.log("right clicked on node, cm", contextMenuPath);
             const { x, y } = event.nativeEvent;
 
+            this.model.refresh();
             const contributions:GLSPClientContribution[] = this.contributionProvider.getContributions(false);
             for(const c of contributions) {
                 if(c instanceof MergeDiffMenuContribution) {

@@ -16,10 +16,11 @@
 import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { injectable } from "inversify";
-import { DiagramManager, DiagramWidget, DiagramWidgetOptions } from "sprotty-theia";
+import { DiagramManager, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffSplitPanel } from "./diff-split-panel";
 import { DiffViewWidget } from "./diff-tree/diff-tree-widget";
+import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 
 
 @injectable()
@@ -28,6 +29,7 @@ export class SplitPanelManager extends DiagramManager {
     readonly iconClass = "fa fa-project-diagram";
     readonly label = "Workflow diagram Editor";
     public prevOpts: DiagramWidgetOptions;
+    public diffSplitPanel:DiffSplitPanel;
 
     async createSplitPanel(options?: any): Promise<DiffSplitPanel> {
         if (DiagramWidgetOptions.is(options)) {
@@ -35,15 +37,23 @@ export class SplitPanelManager extends DiagramManager {
             // const config = this.diagramConfigurationRegistry.get(options.diagramType);
             // const diContainer = config.createContainer(clientId);
             this.prevOpts = options;
-            const diffPanel = new DiffSplitPanel({ orientation: 'horizontal' });
+            this.diffSplitPanel = new DiffSplitPanel({ orientation: 'horizontal' });
             // diffPanel.initDiffPanel();
-            return diffPanel;
+            return this.diffSplitPanel;
         }
         throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
     }
+    
+    public getLeftWidget(): DiffMergeDiagWidget {
+        return this.diffSplitPanel.leftWidget;
+    }
+
+    public getRightWidget(): DiffMergeDiagWidget {
+        return this.diffSplitPanel.rightWidget;
+    }
 
 
-    async doCustomOpen(widget: DiagramWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffViewWidget, title: string) {
+    async doCustomOpen(widget: DiffMergeDiagWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffViewWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options

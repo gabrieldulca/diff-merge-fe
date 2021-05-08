@@ -240,6 +240,13 @@ sprotty-node.task.manual.newly-added-node {
     opacity: 0.5;
 }
 
+.newly-deleted-node-threeway {
+    fill: darkred !important;
+    stroke: darkred !important;
+    opacity: 0.6 !important;
+}
+
+
 .newly-deleted-node {
     fill: lightcoral !important;
     stroke: darkred!important;

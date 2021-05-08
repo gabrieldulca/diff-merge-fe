@@ -21,14 +21,21 @@ import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 export class ViewPortChangeHandler implements IActionHandler {
 
     readonly otherWidget: DiffMergeDiagWidget;
+    readonly threewayWidget: DiffMergeDiagWidget;
 
-    constructor(otherWidget: DiffMergeDiagWidget) {
+    constructor(otherWidget: DiffMergeDiagWidget, threewayWidget?: DiffMergeDiagWidget) {
         this.otherWidget = otherWidget;
+        if(threewayWidget) {
+            this.threewayWidget = threewayWidget;
+        }
     }
 
     handle(action: SetViewportAction): ICommand | Action | void {
         if (!(action instanceof ForwardedAction)) {
             this.otherWidget.actionDispatcher.dispatch(new ForwardedAction(action));
+            if(this.threewayWidget) {
+                this.threewayWidget.actionDispatcher.dispatch(new ForwardedAction(action));
+            }
         }
     }
 }

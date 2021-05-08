@@ -213,12 +213,26 @@ export class DiffViewWidget extends TreeWidget {
                     this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
             }
+            if (node.changeType === "change" && this.secondWidget) {
+                if (node.elementType !== "SEdge") {
+                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                } else {
+                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
+            }
             if (node.changeType === "add") {
                 this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                     console.log("setting viewport for added node", result.viewport);
                     this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
                         "sprotty", result.viewport, true)); //TODO change sprotty to model root
                 });
+                if(this.secondWidget) {
+                    this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                        console.log("setting viewport for added node", result.viewport);
+                        this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
+                            "sprotty", result.viewport, true)); //TODO change sprotty to model root
+                    });
+                }
             }
             if (node.changeType === "delete") {
                 console.log("setting viewport for deleted node", node);
@@ -226,15 +240,19 @@ export class DiffViewWidget extends TreeWidget {
                     console.log("setting viewport for deleted node", result.viewport);
                     this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
                         "sprotty", result.viewport, true));//TODO change sprotty to model root
+                    if(this.secondWidget) {
+                        this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
+                            "sprotty", result.viewport, true));//TODO change sprotty to model root
+                    }
                 });
             }
-            if (this.secondWidget) {
+            /*if (this.secondWidget) {
                 if (node.elementType !== "SEdge") {
                     this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
                 } else {
                     this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
-            }
+            }*/
         }
         event.stopPropagation();
     }

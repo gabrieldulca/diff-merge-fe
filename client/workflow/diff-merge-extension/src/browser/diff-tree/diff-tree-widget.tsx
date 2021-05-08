@@ -3,7 +3,7 @@ import {
     CommandService,
     ContributionProvider,
     Emitter,
-    MenuModelRegistry
+    MenuModelRegistry, MessageService
 } from "@theia/core";
 import {
     CompositeTreeNode,
@@ -16,7 +16,7 @@ import {
 } from "@theia/core/lib/browser";
 import { inject, injectable, named } from "inversify";
 import React = require("react");
-import { CenterAction, GetViewportAction, SetViewportAction } from "sprotty";
+import {CenterAction, GetViewportAction, RequestModelAction, SetViewportAction} from "sprotty";
 
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
 import { DiffTreeDecorator } from "./diff-decorator-service";
@@ -26,6 +26,8 @@ import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
 import {MergeDiffMenuContribution} from "../merge-diff-menu/merge-diff-menu-contribution";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
+import {ComparisonService} from "../../common";
+import {SplitPanelManager} from "../split-panel-manager";
 
 
 /**
@@ -60,6 +62,7 @@ export namespace DiffSymbolInformationNode {
 export type DiffViewWidgetFactory = () => DiffViewWidget;
 export const DiffViewWidgetFactory = Symbol('DiffViewWidgetFactory');
 
+
 @injectable()
 export class DiffViewWidget extends TreeWidget {
 
@@ -80,8 +83,11 @@ export class DiffViewWidget extends TreeWidget {
         @inject(MenuModelRegistry) protected menuModelRegistry: MenuModelRegistry,
         @inject(DiffLabelProvider) protected diffLabelProvider: DiffLabelProvider,
         @inject(DiffTreeDecorator) protected readonly decorator: DiffTreeDecorator,
+        @inject(MessageService) private readonly messageService: MessageService,
         @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
         @inject(DiffViewTreeModel) model: DiffViewTreeModel,
+        @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
+        @inject(SplitPanelManager) protected readonly splitPanelManager: SplitPanelManager,
         @inject(CommandService) protected readonly commandService: CommandService,
         @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry,
         @inject(ContributionProvider) @named(GLSPClientContribution) protected readonly contributionProvider: ContributionProvider<GLSPClientContribution>,
@@ -96,6 +102,8 @@ export class DiffViewWidget extends TreeWidget {
         this.title.iconClass = 'fa outline-view-tab-icon';
         this.addClass('theia-outline-view');
         this.treeProps.multiSelect = false;
+        this.saveChanges = this.saveChanges.bind(this);
+        this.revertChanges = this.revertChanges.bind(this);
         /*this.selectionService.onSelectionChanged(selection => {
             console.log("Selection changed ", selection);
         });*/
@@ -317,7 +325,19 @@ export class DiffViewWidget extends TreeWidget {
         let classNameIcon = 'fas fa-question';
 
         if (node.elementType === 'root') {
-            return <div></div>;
+            const buttonStyle = {
+                color: "white",
+                backgroundColor: "transparent",
+                marginRight: "5px",
+                borderRadius: "4px",
+                borderColor: "white",
+                border: "2px solid",
+                fontFamily: "Arial"
+            };
+            return <div>
+                    <button type="button" style={buttonStyle} onClick={this.saveChanges}>Save</button>
+                    <button type="button" style={buttonStyle} onClick={this.revertChanges}>Cancel</button>
+            </div>;
         } else if (node.elementType === 'TaskNode') {
             classNameIcon = "fas fa-genderless";
 
@@ -328,6 +348,54 @@ export class DiffViewWidget extends TreeWidget {
         }
         return <div style={{ width: "20px" }} className={classNameIcon}></div>;
 
+    }
+
+    public async saveChanges() {
+        console.log("THIS", this);
+        console.log("THIS base filepath", MergeDiffMenuContribution.baseFilePath);
+        const baseFilePath = this.baseWidget.uri.path.toString();
+        const firstFilePath = this.firstWidget.uri.path.toString();
+        const status = await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result)=>{
+            console.log("Invocation result: ", result);
+        },(reject)=>{
+            console.log("Rejected promise ", reject);
+        });
+        console.log(status);
+        this.messageService.info("Applied changes have been saved!");
+    }
+
+    public async revertChanges() {
+        const baseFilePath = this.baseWidget.uri.path.toString();
+        const firstFilePath = this.firstWidget.uri.path.toString();
+        console.log("CANCELLING MERGE!!!!",this.comparisonService);
+        console.log("THIS base filepath", baseFilePath);
+        console.log("THIS first filepath", firstFilePath);
+        const status = await this.comparisonService.revertFiles(baseFilePath, firstFilePath).then((result)=>{
+            console.log("Invocation result: ", result);
+        },(reject)=>{
+            console.log("Rejected promise ", reject);
+        });
+        console.log(status);
+
+        const comparison = await this.comparisonService.getComparisonResult(baseFilePath, firstFilePath);
+
+        delay(300).then(() => {
+            console.log("current diffs", comparison);
+            console.log("SplitpanelManager", this.splitPanelManager);
+
+
+            const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
+            const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
+            console.log("leftWidget", leftWidget.uri.path.toString());
+            console.log("rightWidget", rightWidget.uri.path.toString());
+            leftWidget.actionDispatcher.dispatch(new RequestModelAction({
+                sourceUri: decodeURI(leftWidget.uri.path.toString()),
+                needsClientLayout: 'true',
+                needsServerLayout: 'true'
+            }));
+
+        });
+        this.messageService.info("File " + this.baseWidget.uri.path.base + " has been reverted");
     }
 
 
@@ -367,4 +435,7 @@ export class DiffViewWidget extends TreeWidget {
         });
         return nodes;
     }
+}
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

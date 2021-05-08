@@ -20,6 +20,26 @@ export class ComparisonServiceImpl implements ComparisonService {
         return resp;
     }
 
+    async saveFiles(file1Path: string, file2Path: string): Promise<ComparisonDto> {
+        console.log("revert link", 'http://localhost:8080/diff/save/diagram?file1=' + file1Path + '&file2=' + file2Path);
+        const resp = fetch('http://localhost:8080/diff/revert/diagram?file1=' + file1Path + '&file2=' + file2Path)
+            .then((res: { json: () => void; }) => res.json())
+            .catch((error: any) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        return resp;
+    }
+
+    async revertFiles(file1Path: string, file2Path: string): Promise<ComparisonDto> {
+        console.log("revert link", 'http://localhost:8080/diff/revert/diagram?file1=' + file1Path + '&file2=' + file2Path);
+        const resp = fetch('http://localhost:8080/diff/revert/diagram?file1=' + file1Path + '&file2=' + file2Path)
+            .then((res: { json: () => void; }) => res.json())
+            .catch((error: any) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        return resp;
+    }
+
     async getSingleMergeResult(file1Path: string, file2Path: string, element: string, revert:boolean): Promise<ComparisonDto> {
         console.log("merge link", 'http://localhost:8080/diff/merge/diagram?file1=' + file1Path + '&file2=' + file2Path);
         console.log("element to be merged", element);

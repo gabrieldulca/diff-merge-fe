@@ -100,15 +100,7 @@ export class MergeDiffMenuContribution implements MenuContribution,CommandContri
                         needsClientLayout: 'true',
                         needsServerLayout: 'true'
                     }));
-                    /*leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
 
-                        const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
-                        leftWidget.glspActionDispatcher.dispatch(diffAction);
-                        console.log(diffAction);
-
-                        leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                        leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(MergeDiffMenuContribution.baseFilePath));
-                    });*/
                 });
             }
         });

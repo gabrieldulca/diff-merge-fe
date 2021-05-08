@@ -9,4 +9,6 @@ export interface ComparisonService {
     getComparisonResult(file1Path: string, file2Path: string): Promise<ComparisonDto>
     getMergeResult(file1Path: string, file2Path: string): Promise<ComparisonDto>
     getSingleMergeResult(file1Path: string, file2Path: string, element: string, revert: boolean): Promise<ComparisonDto>
+    revertFiles(file1Path: string, file2Path: string):Promise<ComparisonDto>
+    saveFiles(file1Path: string, file2Path: string):Promise<ComparisonDto>
 }

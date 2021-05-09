@@ -28,6 +28,7 @@ import {MergeDiffMenuContribution} from "../merge-diff-menu/merge-diff-menu-cont
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {ComparisonService} from "../../common";
 import {SplitPanelManager} from "../split-panel-manager";
+import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
 
 
 /**
@@ -76,6 +77,33 @@ export class DiffViewWidget extends TreeWidget {
     private baseWidget: DiffMergeDiagWidget;
     private firstWidget: DiffMergeDiagWidget;
     private secondWidget: DiffMergeDiagWidget;
+    private _additions: DiffTreeNode[];
+    private _changes: DiffTreeNode[];
+    private _deletions: DiffTreeNode[];
+
+    get additions(): DiffTreeNode[] {
+        return this._additions;
+    }
+
+    set additions(value: DiffTreeNode[]) {
+        this._additions = value;
+    }
+
+    get changes(): DiffTreeNode[] {
+        return this._changes;
+    }
+
+    set changes(value: DiffTreeNode[]) {
+        this._changes = value;
+    }
+
+    get deletions(): DiffTreeNode[] {
+        return this._deletions;
+    }
+
+    set deletions(value: DiffTreeNode[]) {
+        this._deletions = value;
+    }
 
     readonly onDidChangeOpenStateEmitter = new Emitter<boolean>();
 
@@ -187,11 +215,13 @@ export class DiffViewWidget extends TreeWidget {
             for(const c of contributions) {
                 if(c instanceof MergeDiffMenuContribution) {
                     const mergeMenu: MergeDiffMenuContribution = c;
-                    mergeMenu.setFiles(this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
+                    console.log("diftreewidget this ", this);
+                    mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
                 }
             }
 
             this.contextMenuRenderer.render({menuPath: ["menubar", "merge-diff"], anchor:{x:x, y:y}});
+
             this.doFocus();
         }
         event.stopPropagation();
@@ -277,6 +307,9 @@ export class DiffViewWidget extends TreeWidget {
 
 
     public setChanges(additions: DiffTreeNode[], deletions: DiffTreeNode[], changes: DiffTreeNode[]) {
+        this.additions = additions;
+        this.deletions = deletions;
+        this.changes = changes;
         this.model.root = this.model.root = {
             id: 'diff-tree-view-differences',
             name: 'Model differences',
@@ -370,15 +403,45 @@ export class DiffViewWidget extends TreeWidget {
         console.log("CANCELLING MERGE!!!!",this.comparisonService);
         console.log("THIS base filepath", baseFilePath);
         console.log("THIS first filepath", firstFilePath);
-        const status = await this.comparisonService.revertFiles(baseFilePath, firstFilePath).then((result)=>{
-            console.log("Invocation result: ", result);
-        },(reject)=>{
-            console.log("Rejected promise ", reject);
-        });
+        const comparison = await this.comparisonService.revertFiles(baseFilePath, firstFilePath);
         console.log(status);
 
-        const comparison = await this.comparisonService.getComparisonResult(baseFilePath, firstFilePath);
+        let _this = this;
 
+        delay(300).then(() => {
+            let additions: DiffTreeNode[] = [];
+            let deletions: DiffTreeNode[] = [];
+            let changes: DiffTreeNode[] = [];
+            this.baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                const diffAction = new ApplyDiffAction(comparison, _this.baseWidget.id);
+
+                _this.baseWidget.glspActionDispatcher.dispatch(diffAction);
+                delay(300).then(() => {
+                    changes = diffAction.changesTree as DiffTreeNode[];
+                });
+                console.log("deltions for tree", diffAction.deletionsTree);
+
+                deletions = diffAction.deletionsTree as DiffTreeNode[];
+
+            });
+            this.firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                const diffAction = new ApplyDiffAction(comparison, _this.firstWidget.id);
+
+                _this.firstWidget.glspActionDispatcher.dispatch(diffAction);
+                delay(300).then(() => {
+                    changes = diffAction.changesTree as DiffTreeNode[];
+                });
+                console.log("additions for tree", diffAction.additionsTree);
+
+                additions = diffAction.additionsTree as DiffTreeNode[];
+
+            });
+
+            delay(900).then(() => {
+                this.setChanges(additions, deletions, changes);
+            });
+
+        });
         delay(300).then(() => {
             console.log("current diffs", comparison);
             console.log("SplitpanelManager", this.splitPanelManager);
@@ -390,6 +453,11 @@ export class DiffViewWidget extends TreeWidget {
             console.log("rightWidget", rightWidget.uri.path.toString());
             leftWidget.actionDispatcher.dispatch(new RequestModelAction({
                 sourceUri: decodeURI(leftWidget.uri.path.toString()),
+                needsClientLayout: 'true',
+                needsServerLayout: 'true'
+            }));
+            rightWidget.actionDispatcher.dispatch(new RequestModelAction({
+                sourceUri: decodeURI(rightWidget.uri.path.toString()),
                 needsClientLayout: 'true',
                 needsServerLayout: 'true'
             }));

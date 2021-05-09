@@ -57,6 +57,16 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
+
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-node')).forEach((el) => el.classList.remove('newly-added-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
+
+
         this.changedElems = new Map();
         console.log("Applying diff command: context", context);
         console.log("Applying diff command: comparison", this.action.comparison);
@@ -185,7 +195,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
 
     markAdditions(context: CommandExecutionContext, additions: string[]): void {
-        for (const add of additions) {
+                for (const add of additions) {
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + newElem!.id);

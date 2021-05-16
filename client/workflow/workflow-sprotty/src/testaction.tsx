@@ -26,6 +26,7 @@ import { inject, injectable } from "inversify";
 
 import { ChangedElem, ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
+
 @injectable()
 export class ApplyDiffAction implements Action {
     public widgetId: string;
@@ -58,13 +59,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
 
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-node')).forEach((el) => el.classList.remove('newly-added-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length-1))!.querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-node')).forEach((el) => el.classList.remove('newly-added-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
 
 
         this.changedElems = new Map();
@@ -82,7 +83,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         this.markAdditions(context, additions);
         this.getAdditionsTree(context, additions);
 
-        if(this.action.comparison.threeWay == false) {//For threeway they are marked individually
+        if (this.action.comparison.threeWay == false) {//For threeway they are marked individually
             this.markDeletions(context, deletions);
         }
         this.getDeletionsTree(context, deletions);
@@ -145,14 +146,14 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const recthalf1 = rect.cloneNode(false) as HTMLElement;
                 const recthalf2 = rect.cloneNode(false) as HTMLElement;
 
-                const width:number = Number(rect.getAttribute("width"));
-                recthalf1.setAttribute("width", width/2);
+                const width: number = Number(rect.getAttribute("width"));
+                recthalf1.setAttribute("width", width / 2);
 
 
-                recthalf2.setAttribute("width", width/2);
-                recthalf2.setAttribute("x", width/2);
+                recthalf2.setAttribute("width", width / 2);
+                recthalf2.setAttribute("x", width / 2);
 
-                if(this.action.widgetSide === "base") {
+                if (this.action.widgetSide === "base") {
                     if (rect!.classList) {
                         if (direction === "right") {
                             child.appendChild(recthalf2);
@@ -168,7 +169,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 }
             }
         } else if (oldElem && oldElem instanceof SEdge) {
-            if(this.action.widgetSide === "base") {
+            if (this.action.widgetSide === "base") {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-edge"]);
                     const child = document.getElementById(this.action.widgetId + oldElem!.id);
@@ -195,7 +196,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
 
     markAdditions(context: CommandExecutionContext, additions: string[]): void {
-                for (const add of additions) {
+        for (const add of additions) {
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + newElem!.id);
@@ -275,11 +276,20 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.name = "[SEdge] " + this.changedElems.get(add)!.name;
                 node.elementType = "SEdge";
             } else {
-                node.name = "[ElemType] " + this.changedElems.get(add)!.name;
-                node.elementType = "unknown type";
+                if (newElem) {
+                    if (this.changedElems.get(add)!.name) {
+                        node.name = "[" + newElem.type + "] " + this.changedElems.get(add)!.name;
+                    } else {
+                        node.name = "[" + newElem.type + "] " + this.changedElems.get(add)!.id;
+                    }
+                    node.elementType = newElem.type;
+                }
             }
             node.changeType = "add";
-            this.action.additionsTree.push(node);
+            // in case of a threeway comparison, the addition is only contained in one of the widgets and shouldn't be overwritten
+            if (newElem && this.action.additionsTree.indexOf(node) < 0) {
+                this.action.additionsTree.push(node);
+            }
         }
     }
 
@@ -299,7 +309,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.elementType = "unknown type";
             }
             node.changeType = "delete";
-            this.action.deletionsTree.push(node);
+            if (oldElem && this.action.deletionsTree.indexOf(node) < 0) {
+                this.action.deletionsTree.push(node);
+            }
         }
     }
 
@@ -323,7 +335,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 node.elementType = "unknown type";
             }
             node.changeType = "change";
-            this.action.changesTree.push(node);
+            if (node.elementType !== "GLSPGraph") {
+                this.action.changesTree.push(node);
+            }
         }
     }
 
@@ -571,7 +585,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 }
             }
         } else {
-            if (((match.left != null) && (match.origin != null) && (match.origin.id != null) && (match.right != null)) && (match.diffs != null)) {
+            if ((((match.left != null) || (match.right != null)) && (match.origin != null) && (match.origin.id != null)) && (match.diffs != null)) {
                 if (match.diffs.length > 0) {
                     if (match.diffs[0].type.includes("CHANGE")) {
                         changes.push(match.origin.id);

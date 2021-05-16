@@ -1,0 +1,356 @@
+{
+  "id": "sprotty",
+  "children": [
+    {
+      "id": "task0",
+      "children": [
+        {
+          "id": "task0_header",
+          "children": [
+            {
+              "id": "task0_icon",
+              "children": [
+                {
+                  "id": "task0_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task0_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 60.03125,
+                "height": 22.0
+              },
+              "text": "Push2",
+              "alignment": {
+                "x": 30.015625,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 103.03125,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 930.0,
+        "y": 290.0
+      },
+      "size": {
+        "width": 113.03125,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "task3",
+      "children": [
+        {
+          "id": "task3_header",
+          "children": [
+            {
+              "id": "task3_icon",
+              "children": [
+                {
+                  "id": "task3_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task3_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 187.84375,
+                "height": 22.0
+              },
+              "text": "PreHeat_CHANGED",
+              "alignment": {
+                "x": 93.921875,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 230.84375,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 919.0138549804688,
+        "y": 448.00694274902344
+      },
+      "size": {
+        "width": 240.84375,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "task4",
+      "children": [
+        {
+          "id": "task4_header",
+          "children": [
+            {
+              "id": "task4_icon",
+              "children": [
+                {
+                  "id": "task4_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task4_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 49.359375,
+                "height": 22.0
+              },
+              "text": "Brew",
+              "alignment": {
+                "x": 24.453125,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 92.359375,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 1278.0138549804688,
+        "y": 256.00694274902344
+      },
+      "size": {
+        "width": 102.359375,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "bcd52a1c-534b-4478-992a-76a57675660a",
+      "type": "edge",
+      "sourceId": "task0",
+      "targetId": "task3"
+    },
+    {
+      "id": "12db11af-716e-4e37-8e88-692068ce6f33",
+      "type": "edge",
+      "sourceId": "task3",
+      "targetId": "task4"
+    },
+    {
+      "id": "df063055-aac9-4664-927e-64ddd5d4b015",
+      "children": [
+        {
+          "id": "df063055-aac9-4664-927e-64ddd5d4b015_header",
+          "children": [
+            {
+              "id": "df063055-aac9-4664-927e-64ddd5d4b015_icon",
+              "children": [
+                {
+                  "id": "df063055-aac9-4664-927e-64ddd5d4b015_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "hAlign": "center",
+                "resizeContainer": false
+              }
+            },
+            {
+              "id": "df063055-aac9-4664-927e-64ddd5d4b015_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 55.34375,
+                "height": 22.0
+              },
+              "text": "Enjoy",
+              "alignment": {
+                "x": 27.234375,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 98.34375,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 1470.0,
+        "y": 250.0
+      },
+      "size": {
+        "width": 108.34375,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "91cd5159-24ee-4710-beb3-d75be99e8344",
+      "type": "edge",
+      "sourceId": "task4",
+      "targetId": "df063055-aac9-4664-927e-64ddd5d4b015"
+    }
+  ],
+  "type": "graph"
+}

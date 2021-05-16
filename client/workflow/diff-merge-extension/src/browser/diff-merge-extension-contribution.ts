@@ -225,14 +225,14 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             firstWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
                                 console.log("additions for tree", diffAction.additionsTree);
-                                additions = diffAction.additionsTree as DiffTreeNode[];
+                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
                             });
                             firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                             firstWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.firstComparisonFile!.path.base));
 
                         });
                         baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined,"base");
+                            const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
                             baseWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
                                 changes = diffAction.changesTree as DiffTreeNode[];
@@ -248,12 +248,14 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             secondWidget.glspActionDispatcher.dispatch(diffAction);
                             delay(300).then(() => {
                                 console.log("additions for tree", diffAction.additionsTree);
-                                additions = diffAction.additionsTree as DiffTreeNode[];
+                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
                             });
                             secondWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                             secondWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(secondComparisonFile!.path.base));
                         });
+
                         delay(700).then(() => {
+                            console.log("ADDITIONS!!!!!!!!!!!!!", additions);
                             diffTreeWidget.setChanges(additions, deletions, changes);
                         });
                     });

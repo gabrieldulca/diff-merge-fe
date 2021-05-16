@@ -1,9 +1,13 @@
+import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
+import { ComparisonDto } from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
+import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
     CommandRegistry,
     CommandService,
     ContributionProvider,
     Emitter,
-    MenuModelRegistry, MessageService
+    MenuModelRegistry,
+    MessageService
 } from "@theia/core";
 import {
     CompositeTreeNode,
@@ -16,19 +20,17 @@ import {
 } from "@theia/core/lib/browser";
 import { inject, injectable, named } from "inversify";
 import React = require("react");
-import {CenterAction, GetViewportAction, RequestModelAction, SetViewportAction} from "sprotty";
+import { CenterAction, GetViewportAction, RequestModelAction, SetViewportAction } from "sprotty";
 
+import { ComparisonService } from "../../common";
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
+import { MergeDiffMenuContribution } from "../merge-diff-menu/merge-diff-menu-contribution";
+import { SplitPanelManager } from "../split-panel-manager";
 import { DiffTreeDecorator } from "./diff-decorator-service";
 import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffViewTreeModel } from "./diff-view-tree";
-import {MergeDiffMenuContribution} from "../merge-diff-menu/merge-diff-menu-contribution";
-import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
-import {ComparisonService} from "../../common";
-import {SplitPanelManager} from "../split-panel-manager";
-import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
 
 
 /**
@@ -211,16 +213,16 @@ export class DiffViewWidget extends TreeWidget {
             const { x, y } = event.nativeEvent;
 
             this.model.refresh();
-            const contributions:GLSPClientContribution[] = this.contributionProvider.getContributions(false);
-            for(const c of contributions) {
-                if(c instanceof MergeDiffMenuContribution) {
+            const contributions: GLSPClientContribution[] = this.contributionProvider.getContributions(false);
+            for (const c of contributions) {
+                if (c instanceof MergeDiffMenuContribution) {
                     const mergeMenu: MergeDiffMenuContribution = c;
                     console.log("diftreewidget this ", this);
                     mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
                 }
             }
 
-            this.contextMenuRenderer.render({menuPath: ["menubar", "merge-diff"], anchor:{x:x, y:y}});
+            this.contextMenuRenderer.render({ menuPath: ["menubar", "merge-diff"], anchor: { x: x, y: y } });
 
             this.doFocus();
         }
@@ -264,7 +266,7 @@ export class DiffViewWidget extends TreeWidget {
                     this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
                         "sprotty", result.viewport, true)); //TODO change sprotty to model root
                 });
-                if(this.secondWidget) {
+                if (this.secondWidget) {
                     this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                         console.log("setting viewport for added node", result.viewport);
                         this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
@@ -278,7 +280,7 @@ export class DiffViewWidget extends TreeWidget {
                     console.log("setting viewport for deleted node", result.viewport);
                     this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
                         "sprotty", result.viewport, true));//TODO change sprotty to model root
-                    if(this.secondWidget) {
+                    if (this.secondWidget) {
                         this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
                             "sprotty", result.viewport, true));//TODO change sprotty to model root
                     }
@@ -368,8 +370,8 @@ export class DiffViewWidget extends TreeWidget {
                 fontFamily: "Arial"
             };
             return <div>
-                    <button type="button" style={buttonStyle} onClick={this.saveChanges}>Save</button>
-                    <button type="button" style={buttonStyle} onClick={this.revertChanges}>Cancel</button>
+                <button type="button" style={buttonStyle} onClick={this.saveChanges}>Save</button>
+                <button type="button" style={buttonStyle} onClick={this.revertChanges}>Cancel</button>
             </div>;
         } else if (node.elementType === 'TaskNode') {
             classNameIcon = "fas fa-genderless";
@@ -388,9 +390,9 @@ export class DiffViewWidget extends TreeWidget {
         console.log("THIS base filepath", MergeDiffMenuContribution.baseFilePath);
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
-        const status = await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result)=>{
+        const status = await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
             console.log("Invocation result: ", result);
-        },(reject)=>{
+        }, (reject) => {
             console.log("Rejected promise ", reject);
         });
         console.log(status);
@@ -400,10 +402,16 @@ export class DiffViewWidget extends TreeWidget {
     public async revertChanges() {
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
-        console.log("CANCELLING MERGE!!!!",this.comparisonService);
+        console.log("CANCELLING MERGE!!!!", this.comparisonService);
         console.log("THIS base filepath", baseFilePath);
         console.log("THIS first filepath", firstFilePath);
-        const comparison = await this.comparisonService.revertFiles(baseFilePath, firstFilePath);
+        let comparison: ComparisonDto;
+        if (this.secondWidget) {
+            console.log("THIS second filepath", this.secondWidget.uri.path.toString());
+            comparison = await this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString());
+        } else {
+            comparison = await this.comparisonService.revertFiles(baseFilePath, firstFilePath);
+        }
         console.log(status);
 
         let _this = this;
@@ -447,8 +455,8 @@ export class DiffViewWidget extends TreeWidget {
             console.log("SplitpanelManager", this.splitPanelManager);
 
 
-            const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-            const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
+            const leftWidget: DiffMergeDiagWidget = this.baseWidget;
+            const rightWidget: DiffMergeDiagWidget = this.firstWidget;
             console.log("leftWidget", leftWidget.uri.path.toString());
             console.log("rightWidget", rightWidget.uri.path.toString());
             leftWidget.actionDispatcher.dispatch(new RequestModelAction({
@@ -456,11 +464,20 @@ export class DiffViewWidget extends TreeWidget {
                 needsClientLayout: 'true',
                 needsServerLayout: 'true'
             }));
+
             rightWidget.actionDispatcher.dispatch(new RequestModelAction({
                 sourceUri: decodeURI(rightWidget.uri.path.toString()),
                 needsClientLayout: 'true',
                 needsServerLayout: 'true'
             }));
+            if (this.secondWidget) {
+                const secondWidget: DiffMergeDiagWidget = this.secondWidget;
+                secondWidget.actionDispatcher.dispatch(new RequestModelAction({
+                    sourceUri: decodeURI(secondWidget.uri.path.toString()),
+                    needsClientLayout: 'true',
+                    needsServerLayout: 'true'
+                }));
+            }
 
         });
         this.messageService.info("File " + this.baseWidget.uri.path.base + " has been reverted");

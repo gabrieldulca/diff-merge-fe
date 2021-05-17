@@ -256,6 +256,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                         delay(700).then(() => {
                             console.log("ADDITIONS!!!!!!!!!!!!!", additions);
+                            console.log("ADDITIONS!!!!!!!!!!!!!", deletions);
                             diffTreeWidget.setChanges(additions, deletions, changes);
                         });
                     });

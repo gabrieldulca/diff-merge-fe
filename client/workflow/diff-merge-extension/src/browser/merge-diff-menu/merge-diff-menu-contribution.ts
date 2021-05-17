@@ -1,3 +1,5 @@
+import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
+import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
     CommandContribution,
     CommandRegistry,
@@ -5,19 +7,17 @@ import {
     MenuContribution,
     MenuModelRegistry,
     SelectionService
-} from '@theia/core';
-import {inject, injectable, interfaces} from 'inversify';
-import {Command} from "@theia/core/src/common/command";
-import {ComparisonService} from "../../common";
-import {SplitPanelManager} from "../split-panel-manager";
-import {DiffMergeDiagManager} from "../diff-merge-diag-manager";
-import { GLSPClientContribution } from '@eclipse-glsp/theia-integration/lib/browser';
-import {DiffTreeNode} from "../diff-tree/diff-tree-node";
+} from "@theia/core";
+import { Command } from "@theia/core/src/common/command";
+import { inject, injectable, interfaces } from "inversify";
+import { RequestModelAction } from "sprotty";
 
-import {DiffMergeDiagWidget} from "../diff-merge-diag-widget";
-import { RequestModelAction} from 'sprotty';
-import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
-import {DiffViewWidget} from "../diff-tree/diff-tree-widget";
+import { ComparisonService } from "../../common";
+import { DiffMergeDiagManager } from "../diff-merge-diag-manager";
+import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
+import { DiffTreeNode } from "../diff-tree/diff-tree-node";
+import { DiffViewWidget } from "../diff-tree/diff-tree-widget";
+import { SplitPanelManager } from "../split-panel-manager";
 
 export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
     bind(MenuContribution).to(MergeDiffMenuContribution);
@@ -26,7 +26,7 @@ export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
 }
 
 @injectable()
-export class MergeDiffMenuContribution implements MenuContribution,CommandContribution {
+export class MergeDiffMenuContribution implements MenuContribution, CommandContribution {
     static get secondFilePath(): string {
         return this._secondFilePath;
     }
@@ -59,7 +59,7 @@ export class MergeDiffMenuContribution implements MenuContribution,CommandContri
     public static _secondFilePath: string;
     public static diffTreeWidget: DiffViewWidget;
 
-    public setFiles(diffTreeWidget:DiffViewWidget, baseFilePath1: string, firstFilePath1: string, secondFilePath1: string): void {
+    public setFiles(diffTreeWidget: DiffViewWidget, baseFilePath1: string, firstFilePath1: string, secondFilePath1: string): void {
         MergeDiffMenuContribution.diffTreeWidget = diffTreeWidget;
         MergeDiffMenuContribution.baseFilePath = baseFilePath1;
         MergeDiffMenuContribution.firstFilePath = firstFilePath1;
@@ -84,10 +84,10 @@ export class MergeDiffMenuContribution implements MenuContribution,CommandContri
         registry.registerCommand(MERGE, {
             execute: async () => {
                 //const comparison = await this.comparisonService.getSingleMergeResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString(),this.selectionService.selection, false);
-                const selectedElem:DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
-                console.log("pressed merge", selectedElem.id);
+                const selectedElem: DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
+                console.log("pressed merge", selectedElem.modelElementId);
                 console.log("diffTreeWidget", MergeDiffMenuContribution.diffTreeWidget);
-                await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.id, false);
+                await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false);
 
                 const comparison = await this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath);
 
@@ -152,9 +152,9 @@ export class MergeDiffMenuContribution implements MenuContribution,CommandContri
         });
         registry.registerCommand(REVERT, {
             execute: async () => {
-                const selectedElem:DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
-                console.log("pressed revert", selectedElem.id);
-                await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.id, true);
+                const selectedElem: DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
+                console.log("pressed revert", selectedElem.modelElementId);
+                await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true);
 
                 const comparison = await this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath);
 

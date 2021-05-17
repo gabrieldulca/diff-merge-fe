@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { GLSPActionDispatcher, RequestTypeHintsAction, EnableToolPaletteAction } from "@eclipse-glsp/client";
+import { EnableToolPaletteAction, GLSPActionDispatcher, RequestTypeHintsAction } from "@eclipse-glsp/client";
 import { GLSPDiagramWidget, GLSPTheiaDiagramServer } from "@eclipse-glsp/theia-integration/lib/browser";
 import { EditorManager, EditorPreferences } from "@theia/editor/lib/browser";
 import { Container, injectable } from "inversify";
@@ -34,11 +34,12 @@ import { DiagramWidgetOptions, TheiaSprottyConnector } from "sprotty-theia";
 @injectable()
 export class DiffMergeDiagWidget extends GLSPDiagramWidget {
     public hasToolPalette: boolean = true;
+    public ms: ModelSource;
 
     constructor(options: DiagramWidgetOptions, readonly widgetId: string, readonly diContainer: Container,
         readonly editorPreferences: EditorPreferences, hasToolPalette?: boolean, readonly connector?: TheiaSprottyConnector, readonly editorManager?: EditorManager) {
         super(options, widgetId, diContainer, editorPreferences, connector);
-        if(!hasToolPalette) {
+        if (!hasToolPalette) {
             this.hasToolPalette = false;
         }
     }
@@ -46,6 +47,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
     protected initializeSprotty(): void {
         console.log("asdasfsafa", this.options.uri);
         const modelSource = this.diContainer.get<ModelSource>(TYPES.ModelSource);
+
         if (modelSource instanceof DiagramServer)
             modelSource.clientId = this.id;
         if (modelSource instanceof GLSPTheiaDiagramServer && this.connector)
@@ -55,7 +57,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
             if (modelSource instanceof GLSPTheiaDiagramServer && this.connector)
                 this.connector.disconnect(modelSource);
         });
-
+        this.ms = modelSource;
 
         this.actionDispatcher.dispatch(new RequestModelAction({
             sourceUri: this.options.uri.replace("file://", ""),
@@ -70,7 +72,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
         console.log("Tool Palette", this.hasToolPalette);
-        if(this.hasToolPalette) {
+        if (this.hasToolPalette) {
             this.actionDispatcher.dispatch(new EnableToolPaletteAction());
         }
 
@@ -84,6 +86,7 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
             delay(300).then(() => {
 
                 _this.glspActionDispatcher.dispatch(new CenterAction([]));
+                _this.ms = _this.diContainer.get<ModelSource>(TYPES.ModelSource);
             });
         });
 

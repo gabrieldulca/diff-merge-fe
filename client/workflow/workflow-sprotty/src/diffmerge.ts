@@ -17,6 +17,8 @@
 export class DiffTreeNode {
 
     id: string;
+    modelElementId: string;
+    diffSource?: string | undefined;
     name: string;
     visible: boolean = true;
     selected: boolean = false;
@@ -35,6 +37,7 @@ export class ChangedElem {
     changeType: string;
     source?: string | undefined;
     target?: string | undefined;
+    diffSource?: string | undefined;
 
     constructor(id: string, name: string, changeType: string) {
         this.id = id;

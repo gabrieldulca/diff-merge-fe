@@ -10,5 +10,7 @@ export interface DiffTreeNode extends SelectableTreeNode, CompositeTreeNode {
     source?: string | undefined;
     target?: string | undefined;
     icon?: string | undefined;
+    modelElementId: string;
+    diffSource?: string | undefined;
 
 }

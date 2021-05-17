@@ -87,6 +87,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
             this.markDeletions(context, deletions);
         }
         this.getDeletionsTree(context, deletions);
+        console.log("DELETIONS TREE FOR " + this.action.widgetId, this.action.deletionsTree);
 
         this.markChanges(context, changes);
         this.getChangesTree(context, changes);
@@ -267,7 +268,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
     getAdditionsTree(context: CommandExecutionContext, additions: string[]): void {
         for (const add of additions) {
             const node: DiffTreeNode = new DiffTreeNode();
-            node.id = add;
+            node.id = add + "_add";
+            node.modelElementId = add;
+            node.diffSource = this.changedElems.get(add)!.diffSource;
             const newElem = context.root.index.getById(add);
             if (newElem && newElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(add)!.name;
@@ -296,7 +299,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
     getDeletionsTree(context: CommandExecutionContext, deletions: string[]): void {
         for (const del of deletions) {
             const node: DiffTreeNode = new DiffTreeNode();
-            node.id = del;
+            node.id = del + "_delete";
+            node.modelElementId = del;
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(del)!.name;
@@ -318,7 +322,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
     getChangesTree(context: CommandExecutionContext, changes: string[]): void {
         for (const change of changes) {
             const node: DiffTreeNode = new DiffTreeNode();
-            node.id = change;
+            node.id = change + "_change";
+            node.modelElementId = change;
             const changedElem = context.root.index.getById(change);
             if (changedElem && changedElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(change)!.name;
@@ -384,7 +389,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 }
             }
         } else {
-            if ((match.right === null) && (match.origin != null)) {
+            if ((match.right === null) && (match.origin != null) && (match.origin.id != null)) {
                 deletions.push(match.origin.id);
                 this.markThreewayDeletion(context, match.origin.id, "right");
                 let name: string = "";
@@ -407,8 +412,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 changed.target = target;
                 this.changedElems.set(match.origin.id, changed);
             }
-            if ((match.left === null) && (match.origin != null)) {
-                //deletions.push(match.origin.id);
+            if ((match.left === null) && (match.origin != null) && (match.origin.id != null)) {
+                deletions.push(match.origin.id);
                 this.markThreewayDeletion(context, match.origin.id, "left");
                 let name: string = "";
                 const modelElem = context.root.index.getById(match.origin.id);
@@ -503,6 +508,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.left.id, name, "add");
                 changed.source = source;
                 changed.target = target;
+                changed.diffSource = "left";
                 this.changedElems.set(match.left.id, changed);
             }
             if ((match.right != null) && ((match.origin === null) || (match.origin.id === null))) {
@@ -525,6 +531,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.right.id, name, "add");
                 changed.source = source;
                 changed.target = target;
+                changed.diffSource = "right";
                 this.changedElems.set(match.right.id, changed);
             }
             if (match.subMatches != null) {

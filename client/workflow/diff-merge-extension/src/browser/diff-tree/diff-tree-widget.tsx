@@ -157,7 +157,7 @@ export class DiffViewWidget extends TreeWidget {
      * @param node the tree node if available.
      * @param event the mouse single-click event.
      */
-    protected handleClickEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+    protected handleClickEvent(node: DiffTreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
         if (node) {
 
             if (!!this.props.multiSelect) {
@@ -179,6 +179,7 @@ export class DiffViewWidget extends TreeWidget {
                 if (SelectableTreeNode.is(node)) {
                     console.log("toggeling node", node);
                     event.currentTarget.setAttribute('data-node-id', node.id);
+                    event.currentTarget.setAttribute('data-model-element-id', node.modelElementId);
                     this.toggle(event);
                     this.model.selectNode(node);
                 }
@@ -195,7 +196,7 @@ export class DiffViewWidget extends TreeWidget {
      */
     protected readonly toggle = (event: React.MouseEvent<HTMLElement>) => this.doToggle(event);
 
-    protected handleContextMenuEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+    protected handleContextMenuEvent(node: DiffTreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
         console.log("right clicked on node", node);
 
         if (SelectableTreeNode.is(node)) {
@@ -235,32 +236,100 @@ export class DiffViewWidget extends TreeWidget {
      */
     protected doToggle(event: React.MouseEvent<HTMLElement>): void {
         const nodeId = event.currentTarget.getAttribute('data-node-id');
+        const modelElementId = event.currentTarget.getAttribute('data-model-element-id');
         console.log("clicked on nodeId", nodeId);
-        if (nodeId) {
+        if (nodeId && modelElementId) {
             const node: DiffTreeNode = this.model.getNode(nodeId) as DiffTreeNode;
             console.log("clicked on", node);
-            if (node.changeType !== "add") {
+            if (node.changeType === "delete") {
                 if (node.elementType !== "SEdge") {
-                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
                 } else {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
             }
-            if (node.changeType !== "delete") {
+            if (node.changeType == "change") {
                 if (node.elementType !== "SEdge") {
-                    this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                    this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
                 } else {
                     this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
+                if (node.elementType !== "SEdge") {
+                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
+                } else {
+                    this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                }
+            }
+            if (node.changeType === "add") {
+                if (this.secondWidget) {
+                    let centerAction: CenterAction;
+                    if (node.elementType === "SEdge") {
+                        centerAction = new CenterAction([node.source!, node.target!]);
+                    } else {
+                        centerAction = new CenterAction([modelElementId]);
+                    }
+                    //let found = false;
+                    const c = new CenterAction([modelElementId]);
+                    console.log("CENTERACTION FW", c);
+                    console.log("clicked node ################# ", node);
+                    if (node.diffSource === "left") {
+                        this.firstWidget.glspActionDispatcher.dispatch(centerAction);
+                        this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                            console.log("setting viewport for added node", result.viewport);
+                            this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                "sprotty", result.viewport, true)); //TODO change sprotty to model root
+                            this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                "sprotty", result.viewport, true));
+                        });
+                    }
+                    if (node.diffSource === "right") {
+                        this.secondWidget.glspActionDispatcher.dispatch(centerAction);
+                        this.secondWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                            console.log("setting viewport for added node", result.viewport);
+                            this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                "sprotty", result.viewport, true)); //TODO change sprotty to model root
+                            this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                "sprotty", result.viewport, true));
+                        });
+                    }
+                    /*this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId])).then((result: any) => {
+                        console.log("CENTERACTION", result);
+                        if (result[0] instanceof GLSPGraph) {
+                            result[0].children.forEach(child => {
+                                if (child.id === modelElementId) {
+                                    console.log("FOUND IT!!!", modelElementId);
+                                    found = true;
+                                }
+                            })
+                        }
+                        if (found == false) {
+                            this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
+                            this.secondWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                                console.log("setting viewport for added node", result.viewport);
+                                this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                    "sprotty", result.viewport, true)); //TODO change sprotty to model root
+                            });
+                        }
+                    });*/
+
+                } else
+                // No second widget is present, so center the frist one
+                {
+                    if (node.elementType !== "SEdge") {
+                        this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
+                    } else {
+                        this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
+                    }
                 }
             }
             if (node.changeType === "change" && this.secondWidget) {
                 if (node.elementType !== "SEdge") {
-                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
+                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
                 } else {
                     this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
             }
-            if (node.changeType === "add") {
+            /*if (node.changeType === "add") {
                 this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                     console.log("setting viewport for added node", result.viewport);
                     this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
@@ -273,7 +342,7 @@ export class DiffViewWidget extends TreeWidget {
                             "sprotty", result.viewport, true)); //TODO change sprotty to model root
                     });
                 }
-            }
+            }*/
             if (node.changeType === "delete") {
                 console.log("setting viewport for deleted node", node);
                 this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
@@ -312,16 +381,19 @@ export class DiffViewWidget extends TreeWidget {
         this.additions = additions;
         this.deletions = deletions;
         this.changes = changes;
-        this.model.root = this.model.root = {
+        console.log("DELETIONS!!!! ", deletions);
+        this.model.root = {
             id: 'diff-tree-view-differences',
             name: 'Model differences',
             visible: true,
             selected: false,
             changeType: "change",
             elementType: "root",
+            modelElementId: "diff-tree-view-differences",
             children: [{
                 id: 'diff-tree-view-additions',
                 name: 'DIFF TREE Additions',
+                modelElementId: 'diff-tree-view-additions',
                 visible: false,
                 children: additions,
                 changeType: "add",
@@ -333,12 +405,14 @@ export class DiffViewWidget extends TreeWidget {
                 name: 'DIFF TREE Deletions',
                 visible: false,
                 children: deletions,
+                modelElementId: 'diff-tree-view-deletions',
                 changeType: "delete",
                 parent: undefined,
                 selected: false
             } as DiffTreeNode,
             {
                 id: 'diff-tree-view-changes',
+                modelElementId: 'diff-tree-view-changes',
                 name: 'DIFF TREE Changes',
                 visible: false,
                 children: changes,
@@ -349,6 +423,7 @@ export class DiffViewWidget extends TreeWidget {
             parent: undefined
         } as DiffTreeNode;
         console.log("additions in tree: ", additions);
+        console.log("TREEE!!!! ", this.model.root);
     }
 
     /**

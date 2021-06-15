@@ -69,6 +69,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
 
         this.changedElems = new Map();
+        console.log("Applying diffAction ", this.action);
         console.log("Applying diff command: context", context);
         console.log("Applying diff command: comparison", this.action.comparison);
 
@@ -80,7 +81,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Applying diff command: changes", changes);
         console.log("Applying diff command: all diffs", this.changedElems);
 
-        this.markAdditions(context, additions);
+        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay == true)) {
+            this.markAdditions(context, additions);
+        }
         this.getAdditionsTree(context, additions);
 
         if (this.action.comparison.threeWay == false) {//For threeway they are marked individually
@@ -89,7 +92,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
         this.getDeletionsTree(context, deletions);
         console.log("DELETIONS TREE FOR " + this.action.widgetId, this.action.deletionsTree);
 
-        this.markChanges(context, changes);
+        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay == true)) {
+            this.markChanges(context, changes);
+        }
         this.getChangesTree(context, changes);
 
         return context.root;

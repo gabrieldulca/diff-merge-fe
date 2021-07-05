@@ -219,7 +219,11 @@ export class DiffViewWidget extends TreeWidget {
                 if (c instanceof MergeDiffMenuContribution) {
                     const mergeMenu: MergeDiffMenuContribution = c;
                     console.log("diftreewidget this ", this);
-                    mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
+                    if(!this.secondWidget) {
+                        mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
+                    } else {
+                        mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), this.secondWidget.uri.path.toString());
+                    }
                 }
             }
 

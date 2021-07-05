@@ -5,17 +5,20 @@ import {
     MenuContribution,
     MenuModelRegistry,
     SelectionService
-} from "@theia/core";
-import { Command } from "@theia/core/src/common/command";
-import { inject, injectable, interfaces } from "inversify";
-import { RequestModelAction } from "sprotty";
+} from '@theia/core';
+import {inject, injectable, interfaces} from 'inversify';
+import {Command} from "@theia/core/src/common/command";
+import {ComparisonService} from "../../common";
+import {SplitPanelManager} from "../split-panel-manager";
+import {DiffMergeDiagManager} from "../diff-merge-diag-manager";
+import { GLSPClientContribution } from '@eclipse-glsp/theia-integration/lib/browser';
+import {DiffTreeNode} from "../diff-tree/diff-tree-node";
 
-import { ComparisonService } from "../../common";
-import { DiffMergeDiagManager } from "../diff-merge-diag-manager";
-import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
-import { DiffTreeNode } from "../diff-tree/diff-tree-node";
-import { DiffViewWidget } from "../diff-tree/diff-tree-widget";
-import { SplitPanelManager } from "../split-panel-manager";
+import {DiffMergeDiagWidget} from "../diff-merge-diag-widget";
+import { RequestModelAction} from 'sprotty';
+import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
+import {DiffViewWidget} from "../diff-tree/diff-tree-widget";
+import { ComparisonDto } from '@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge';
 
 export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
     bind(MenuContribution).to(MergeDiffMenuContribution);

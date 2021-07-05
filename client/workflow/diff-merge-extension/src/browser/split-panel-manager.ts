@@ -52,6 +52,10 @@ export class SplitPanelManager extends DiagramManager {
         return this.diffSplitPanel.rightWidget;
     }
 
+    public getBaseWidget(): DiffMergeDiagWidget {
+        return this.diffSplitPanel.baseWidget;
+    }
+
 
     async doCustomOpen(widget: DiffMergeDiagWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffViewWidget, title: string) {
         const op: WidgetOpenerOptions = {

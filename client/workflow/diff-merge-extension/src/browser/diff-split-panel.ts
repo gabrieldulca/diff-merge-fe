@@ -14,6 +14,7 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
     public widgetId = 'testasdas';
     public uri: URI;
     public leftWidget: DiffMergeDiagWidget;
+    public baseWidget: DiffMergeDiagWidget;
     public rightWidget: DiffMergeDiagWidget;
 
     public setNavigator(diffViewWidget: DiffViewWidget) {
@@ -46,13 +47,16 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
         this.uri = uri;
     }
 
-    public initThreewayDiffPanel(leftWidget: DiffMergeDiagWidget, base: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
+    public initThreewayDiffPanel(leftWidget: DiffMergeDiagWidget, baseWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
+        this.leftWidget = leftWidget;
+        this.baseWidget = baseWidget;
+        this.rightWidget = rightWidget;
         this.addWidget(leftWidget);
-        this.addWidget(base);
+        this.addWidget(baseWidget);
         this.addWidget(rightWidget);
-        leftWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(base, rightWidget));
-        base.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(rightWidget, leftWidget));
-        rightWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(leftWidget, base));
+        leftWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(baseWidget, rightWidget));
+        baseWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(rightWidget, leftWidget));
+        rightWidget.actionHandlerRegistry.register(SetViewportAction.KIND, new ViewPortChangeHandler(leftWidget, baseWidget));
 
         for (const handle of this.handles) {
             handle.classList.add("diff-panel-handle");

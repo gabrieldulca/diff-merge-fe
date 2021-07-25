@@ -394,6 +394,7 @@ export class DiffViewWidget extends TreeWidget {
             changeType: "change",
             elementType: "root",
             modelElementId: "diff-tree-view-differences",
+            expanded: true,
             children: [{
                 id: 'diff-tree-view-additions',
                 name: 'DIFF TREE Additions',
@@ -402,7 +403,8 @@ export class DiffViewWidget extends TreeWidget {
                 children: additions,
                 changeType: "add",
                 parent: undefined,
-                selected: false
+                selected: false,
+                expanded: true,
             } as DiffTreeNode,
             {
                 id: 'diff-tree-view-deletions',
@@ -412,7 +414,8 @@ export class DiffViewWidget extends TreeWidget {
                 modelElementId: 'diff-tree-view-deletions',
                 changeType: "delete",
                 parent: undefined,
-                selected: false
+                selected: false,
+                expanded: true,
             } as DiffTreeNode,
             {
                 id: 'diff-tree-view-changes',
@@ -422,7 +425,8 @@ export class DiffViewWidget extends TreeWidget {
                 children: changes,
                 changeType: "change",
                 parent: undefined,
-                selected: false
+                selected: false,
+                expanded: true,
             } as DiffTreeNode],
             parent: undefined
         } as DiffTreeNode;

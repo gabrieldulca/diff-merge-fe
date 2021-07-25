@@ -93,9 +93,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("DELETIONS TREE FOR " + this.action.widgetId, this.action.deletionsTree);
 
         if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay == true)) {
-            this.markChanges(context, changes);
+            this.markChanges(context, changes, this.action.widgetSide!);
         }
-        this.getChangesTree(context, changes);
+        this.getChangesTree(context, changes, this.action.widgetSide!);
 
         return context.root;
     }
@@ -238,8 +238,15 @@ export class ApplyDiffCommand extends FeedbackCommand {
         }
     }
 
-    markChanges(context: CommandExecutionContext, changes: string[]): void {
-        for (const change of changes) {
+    markChanges(context: CommandExecutionContext, changes: string[], widgetSide: string): void {
+        for (const c of changes) {
+            const change = c.split("-")[0];
+            if(this.action.comparison.threeWay) {
+                const changeSide = c.split("-")[1];
+                if (changeSide.toUpperCase() !== widgetSide.toUpperCase()) {
+                    continue;
+                }
+            }
             const changedElem = context.root.index.getById(change);
             if (changedElem && changedElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + changedElem!.id);
@@ -324,10 +331,25 @@ export class ApplyDiffCommand extends FeedbackCommand {
         }
     }
 
-    getChangesTree(context: CommandExecutionContext, changes: string[]): void {
-        for (const change of changes) {
+    getChangesTree(context: CommandExecutionContext, changes: string[], widgetSide: string): void {
+        for (const c of changes) {
+            let changeSide = "";
+            const change = c.split("-")[0];
+            if(this.action.comparison.threeWay) {
+                changeSide = c.split("-")[1];
+                if (changeSide.toUpperCase() !== widgetSide.toUpperCase() && widgetSide !== "base") {
+                    continue;
+                }
+            }
             const node: DiffTreeNode = new DiffTreeNode();
-            node.id = change + "_change";
+            if(widgetSide === "base") {
+                node.id = change + "_change"+"_BASE";
+                if(this.action.changesTree.filter(x => x.id === node.id).length > 0) {
+                    continue;
+                }
+            } else {
+                node.id = change + "_change"+"_"+changeSide.toUpperCase();
+            }
             node.modelElementId = change;
             const changedElem = context.root.index.getById(change);
             if (changedElem && changedElem instanceof TaskNode) {
@@ -346,9 +368,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             node.changeType = "change";
             if (node.elementType !== "GLSPGraph") {
+                console.log("CHANGENode"+ changeSide, node);
                 this.action.changesTree.push(node);
             }
         }
+        console.log("CHANGETree"+ widgetSide, this.action.changesTree);
     }
 
     getDeletions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
@@ -565,7 +589,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         if (threeWay === false) {
             if ((match.left != null) && (match.right != null) && (match.diffs != null)) {
                 if (match.diffs.length > 0) {
-                    if (match.diffs[0].type.includes("CHANGE")) {
+                    if (match.diffs[0].kind.includes("CHANGE")) {
                         changes.push(match.right.id);
                         let name: string = "";
                         const modelElem = context.root.index.getById(match.right.id);
@@ -599,8 +623,12 @@ export class ApplyDiffCommand extends FeedbackCommand {
         } else {
             if ((((match.left != null) || (match.right != null)) && (match.origin != null) && (match.origin.id != null)) && (match.diffs != null)) {
                 if (match.diffs.length > 0) {
-                    if (match.diffs[0].type.includes("CHANGE")) {
-                        changes.push(match.origin.id);
+                    if (match.diffs[0].kind.includes("CHANGE")) {
+                        for (const md of match.diffs) {
+                            if(changes.indexOf(match.origin.id + "-" + md.source) === -1) {
+                                changes.push(match.origin.id + "-" + md.source);
+                            }
+                        }
                         let name: string = "";
                         const modelElem = context.root.index.getById(match.origin.id);
                         if (modelElem && modelElem instanceof TaskNode) {
@@ -625,12 +653,20 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     }
                 }
             }
+
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    changes = changes.concat(this.getSubMatchChanges(context, subMatch, threeWay));
+                    let submatchChanges: string[] = this.getSubMatchChanges(context, subMatch, threeWay);
+                    for (const subChange of submatchChanges) {
+                        if(changes.indexOf(subChange) === -1) {
+                            changes.push(subChange);
+                        }
+                    }
                 }
             }
+
         }
+
         return changes;
     }
 }

@@ -27,6 +27,7 @@ export class DiffTreeNode {
     source?: string | undefined;
     target?: string | undefined;
     parent: DiffTreeNode | undefined = undefined;
+    expanded: boolean = false;
 
 }
 
@@ -76,9 +77,13 @@ export class DiffDto {
     attribute: string;
     conflict: string;
     kind: string;
+    source: string;
+    matchId: string;
     parent: string;
     referenceDto: string;
     referenceType: string;
     type: string;
     value: string;
 }
+
+

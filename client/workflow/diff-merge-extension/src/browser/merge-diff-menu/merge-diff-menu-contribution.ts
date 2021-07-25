@@ -15,10 +15,11 @@ import { GLSPClientContribution } from '@eclipse-glsp/theia-integration/lib/brow
 import {DiffTreeNode} from "../diff-tree/diff-tree-node";
 
 import {DiffMergeDiagWidget} from "../diff-merge-diag-widget";
-import { RequestModelAction} from 'sprotty';
+import {RequestModelAction} from 'sprotty';
 import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
 import {DiffViewWidget} from "../diff-tree/diff-tree-widget";
 import { ComparisonDto } from '@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge';
+import {DiffMergeExtensionCommandContribution} from "../diff-merge-extension-contribution";
 
 export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
     bind(MenuContribution).to(MergeDiffMenuContribution);
@@ -92,121 +93,35 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                 console.log("MergeDiffMenuContribution.baseFilePath", MergeDiffMenuContribution.baseFilePath);
                 console.log("MergeDiffMenuContribution.firstFilePath", MergeDiffMenuContribution.firstFilePath);
 
-                let comparison:ComparisonDto;
                 if(MergeDiffMenuContribution.secondFilePath === "") {
                     console.log("NO THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false);
-                    comparison = await this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath);
+                    await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false)
+                    .then(() => {
+                            this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath)
+                                .then((result) => {
+                                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                });
+                        });
                 } else {
                     console.log("THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    if(selectedElem.diffSource === "left") {
-                        await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false);
-                    } else if (selectedElem.diffSource === "right") {
-                        await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.secondFilePath, selectedElem.modelElementId, false);
+                    if(selectedElem.diffSource === "LEFT") {
+                        this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false)
+                            .then(() => {
+                                this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
+                                    .then((result) => {
+                                        MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                    });
+                            });
+                    } else if (selectedElem.diffSource === "RIGHT") {
+                        this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.secondFilePath, selectedElem.modelElementId, false)
+                            .then(() => {
+                                this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
+                                    .then((result) => {
+                                        MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                    });
+                            });
                     }
-                    comparison = await this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath);
                 }
-
-                delay(300).then(() => {
-                    let additions: DiffTreeNode[] = [];
-                    let deletions: DiffTreeNode[] = [];
-                    let changes: DiffTreeNode[] = [];
-                    const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                    const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                    console.log("this.splitPanelManager.getLeftWidget()", this.splitPanelManager.getLeftWidget());
-                    console.log("this.splitPanelManager.getRightWidget()", this.splitPanelManager.getRightWidget());
-                    if (MergeDiffMenuContribution.secondFilePath === "") {
-                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
-
-                            leftWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("deltions for tree", diffAction.deletionsTree);
-
-                            deletions = diffAction.deletionsTree as DiffTreeNode[];
-
-                        });
-
-                        rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
-
-                            rightWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("additions for tree", diffAction.additionsTree);
-
-                            additions = diffAction.additionsTree as DiffTreeNode[];
-
-                        });
-                    } else {
-                        const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                        const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                        const baseWidget: DiffMergeDiagWidget = this.splitPanelManager.getBaseWidget();
-                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id, undefined, "left");
-                            leftWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                console.log("additions for tree", diffAction.additionsTree);
-                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                            });
-                        });
-                        baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
-                            baseWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("deltions for tree", diffAction.deletionsTree);
-                            deletions = diffAction.deletionsTree as DiffTreeNode[];
-                        });
-                        rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, rightWidget.id, undefined, "right");
-                            rightWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                console.log("additions for tree", diffAction.additionsTree);
-                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                            });
-                        });
-                    }
-
-                    delay(900).then(() => {
-                        MergeDiffMenuContribution.diffTreeWidget.setChanges(additions, deletions, changes);
-                    });
-
-                });
-                delay(300).then(() => {
-                    console.log("current diffs", comparison);
-                    console.log("SplitpanelManager", this.splitPanelManager);
-
-
-                    const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                    const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                    console.log("leftWidget", leftWidget.uri.path.toString());
-                    console.log("rightWidget", rightWidget.uri.path.toString());
-                    leftWidget.actionDispatcher.dispatch(new RequestModelAction({
-                        sourceUri: decodeURI(leftWidget.uri.path.toString()),
-                        needsClientLayout: 'true',
-                        needsServerLayout: 'true'
-                    }));
-                    rightWidget.actionDispatcher.dispatch(new RequestModelAction({
-                        sourceUri: decodeURI(rightWidget.uri.path.toString()),
-                        needsClientLayout: 'true',
-                        needsServerLayout: 'true'
-                    }));
-                    if (MergeDiffMenuContribution.secondFilePath !== "") {
-                        const baseWidget: DiffMergeDiagWidget = this.splitPanelManager.getBaseWidget();
-                        console.log("baseWidget", baseWidget.uri.path.toString());
-                        baseWidget.actionDispatcher.dispatch(new RequestModelAction({
-                            sourceUri: decodeURI(baseWidget.uri.path.toString()),
-                            needsClientLayout: 'true',
-                            needsServerLayout: 'true'
-                        }));
-                    }
-
-                });
             }
         });
         registry.registerCommand(REVERT, {
@@ -215,137 +130,136 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                 console.log("pressed revert", selectedElem.modelElementId);
                 await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true);
 
-                let comparison:ComparisonDto;
                 if(MergeDiffMenuContribution.secondFilePath === "") {
                     console.log("NO THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true);
-                    comparison = await this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath);
+                    this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true)
+                        .then(() => {
+                             this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath)
+                                .then((result) => {
+                                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                });
+                        });
                 } else {
                     console.log("THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    if(selectedElem.diffSource === "left") {
-                        await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true);
-                    } else if (selectedElem.diffSource === "right") {
-                        await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.secondFilePath, selectedElem.modelElementId, true);
+                    if(selectedElem.diffSource === "LEFT") {
+                        this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true)
+                            .then(() => {
+                                this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
+                                .then((result) => {
+                                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                });
+                            });
+                    } else if (selectedElem.diffSource === "RIGHT") {
+                        this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.secondFilePath, selectedElem.modelElementId, true)
+                        .then(() => {
+                                this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
+                                    .then((result) => {
+                                        MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                                    });
+                            });
                     }
-                    comparison = await this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath);
                 }
-
-                delay(300).then(() => {
-                    let additions: DiffTreeNode[] = [];
-                    let deletions: DiffTreeNode[] = [];
-                    let changes: DiffTreeNode[] = [];
-                    const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                    const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                    console.log("this.splitPanelManager.getLeftWidget()", this.splitPanelManager.getLeftWidget());
-                    console.log("this.splitPanelManager.getRightWidget()", this.splitPanelManager.getRightWidget());
-                    if (MergeDiffMenuContribution.secondFilePath === "") {
-                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
-
-                            leftWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("deltions for tree", diffAction.deletionsTree);
-
-                            deletions = diffAction.deletionsTree as DiffTreeNode[];
-
-                        });
-
-                        rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
-
-                            rightWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("additions for tree", diffAction.additionsTree);
-
-                            additions = diffAction.additionsTree as DiffTreeNode[];
-
-                        });
-                    } else {
-                        const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                        const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                        const baseWidget: DiffMergeDiagWidget = this.splitPanelManager.getBaseWidget();
-                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id, undefined, "left");
-                            leftWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                console.log("additions for tree", diffAction.additionsTree);
-                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                            });
-                        });
-                        baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
-                            baseWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                changes = diffAction.changesTree as DiffTreeNode[];
-                            });
-                            console.log("deltions for tree", diffAction.deletionsTree);
-                            deletions = diffAction.deletionsTree as DiffTreeNode[];
-                        });
-                        rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, rightWidget.id, undefined, "right");
-                            rightWidget.glspActionDispatcher.dispatch(diffAction);
-                            delay(300).then(() => {
-                                console.log("additions for tree", diffAction.additionsTree);
-                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                            });
-                        });
-                    }
-
-                    delay(900).then(() => {
-                        MergeDiffMenuContribution.diffTreeWidget.setChanges(additions, deletions, changes);
-                    });
-
-                });
-                delay(300).then(() => {
-                    console.log("current diffs", comparison);
-                    console.log("SplitpanelManager", this.splitPanelManager);
-
-
-                    const leftWidget: DiffMergeDiagWidget = this.splitPanelManager.getLeftWidget();
-                    const rightWidget: DiffMergeDiagWidget = this.splitPanelManager.getRightWidget();
-                    console.log("leftWidget", leftWidget.uri.path.toString());
-                    console.log("rightWidget", rightWidget.uri.path.toString());
-                    leftWidget.actionDispatcher.dispatch(new RequestModelAction({
-                        sourceUri: decodeURI(leftWidget.uri.path.toString()),
-                        needsClientLayout: 'true',
-                        needsServerLayout: 'true'
-                    }));
-                    rightWidget.actionDispatcher.dispatch(new RequestModelAction({
-                        sourceUri: decodeURI(rightWidget.uri.path.toString()),
-                        needsClientLayout: 'true',
-                        needsServerLayout: 'true'
-                    }));
-                    if (MergeDiffMenuContribution.secondFilePath !== "") {
-                        const baseWidget: DiffMergeDiagWidget = this.splitPanelManager.getBaseWidget();
-                        console.log("baseWidget", baseWidget.uri.path.toString());
-                        baseWidget.actionDispatcher.dispatch(new RequestModelAction({
-                            sourceUri: decodeURI(baseWidget.uri.path.toString()),
-                            needsClientLayout: 'true',
-                            needsServerLayout: 'true'
-                        }));
-                    }
-
-                });
-
             }
         });
     }
+
+    public static refreshComparison(comparison: ComparisonDto, splitPanelManager: SplitPanelManager) {
+        let additions: DiffTreeNode[] = [];
+        let deletions: DiffTreeNode[] = [];
+        let changes: DiffTreeNode[] = [];
+        const leftWidget: DiffMergeDiagWidget = splitPanelManager.getLeftWidget();
+        const rightWidget: DiffMergeDiagWidget = splitPanelManager.getRightWidget();
+        if (MergeDiffMenuContribution.secondFilePath === "") {
+            leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
+
+                leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                    deletions = diffAction.deletionsTree as DiffTreeNode[];
+                }).then(() => {
+                    rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                        const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
+
+                        rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                            changes = diffAction.changesTree as DiffTreeNode[];
+                            additions = diffAction.additionsTree as DiffTreeNode[];
+                        }).then(() => {
+                            MergeDiffMenuContribution.diffTreeWidget.setChanges(additions, deletions, changes);
+                        }).then(() => {
+                            leftWidget.actionDispatcher.dispatch(new RequestModelAction({
+                                sourceUri: decodeURI(leftWidget.uri.path.toString()),
+                                needsClientLayout: 'true',
+                                needsServerLayout: 'true'
+                            }));
+                            rightWidget.actionDispatcher.dispatch(new RequestModelAction({
+                                sourceUri: decodeURI(rightWidget.uri.path.toString()),
+                                needsClientLayout: 'true',
+                                needsServerLayout: 'true'
+                            }));
+                        });
+                    });
+                });
+            });
+        } else {
+            const leftWidget: DiffMergeDiagWidget = splitPanelManager.getLeftWidget();
+            const rightWidget: DiffMergeDiagWidget = splitPanelManager.getRightWidget();
+            const baseWidget: DiffMergeDiagWidget = splitPanelManager.getBaseWidget();
+            leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, undefined, "left");
+                leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                    additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
+                    changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                }).then(() => {
+                    baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                        const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
+                        baseWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                            changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                            deletions = diffAction.deletionsTree as DiffTreeNode[];
+                        }).then(() => {
+                            rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                const diffAction = new ApplyDiffAction(comparison, rightWidget.id, undefined, "right");
+                                rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                    additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
+                                    changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                                }).then(function () {
+                                    //TODO maybe migrate to backend
+                                    changes = DiffMergeExtensionCommandContribution.handleConflicts(changes);
+                                    MergeDiffMenuContribution.diffTreeWidget.setChanges(additions, deletions, changes);
+                                }).then(() => {
+                                    leftWidget.actionDispatcher.dispatch(new RequestModelAction({
+                                        sourceUri: decodeURI(leftWidget.uri.path.toString()),
+                                        needsClientLayout: 'true',
+                                        needsServerLayout: 'true'
+                                    }));
+                                    rightWidget.actionDispatcher.dispatch(new RequestModelAction({
+                                        sourceUri: decodeURI(rightWidget.uri.path.toString()),
+                                        needsClientLayout: 'true',
+                                        needsServerLayout: 'true'
+                                    }));
+                                    if (MergeDiffMenuContribution.secondFilePath !== "") {
+                                        baseWidget.actionDispatcher.dispatch(new RequestModelAction({
+                                            sourceUri: decodeURI(baseWidget.uri.path.toString()),
+                                            needsClientLayout: 'true',
+                                            needsServerLayout: 'true'
+                                        }));
+                                    }
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        }
+    }
 }
+
+
 
 export const MERGE: Command = {
     id: 'core.merge',
-    label: 'Merge'
+    label: 'Apply'
 };
 
 export const REVERT: Command = {
     id: 'core.revert',
-    label: 'Revert'
+    label: 'Discard'
 };
-
-function delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}

@@ -313,6 +313,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
             const node: DiffTreeNode = new DiffTreeNode();
             node.id = del + "_delete";
             node.modelElementId = del;
+            node.diffSource = this.changedElems.get(del)!.diffSource;
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(del)!.name;
@@ -342,6 +343,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 }
             }
             const node: DiffTreeNode = new DiffTreeNode();
+            node.diffSource = this.changedElems.get(change)!.diffSource;
             if(widgetSide === "base") {
                 node.id = change + "_change"+"_BASE";
                 if(this.action.changesTree.filter(x => x.id === node.id).length > 0) {
@@ -439,6 +441,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.origin.id, name, "delete-right");
                 changed.source = source;
                 changed.target = target;
+                changed.diffSource = "RIGHT";
                 this.changedElems.set(match.origin.id, changed);
             }
             if ((match.left === null) && (match.origin != null) && (match.origin.id != null)) {
@@ -462,6 +465,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.origin.id, name, "delete-left");
                 changed.source = source;
                 changed.target = target;
+                changed.diffSource = "LEFT";
                 this.changedElems.set(match.origin.id, changed);
             }
             if (match.subMatches != null) {
@@ -537,7 +541,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.left.id, name, "add");
                 changed.source = source;
                 changed.target = target;
-                changed.diffSource = "left";
+                changed.diffSource = "LEFT";
                 this.changedElems.set(match.left.id, changed);
             }
             if ((match.right != null) && ((match.origin === null) || (match.origin.id === null))) {
@@ -560,7 +564,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const changed = new ChangedElem(match.right.id, name, "add");
                 changed.source = source;
                 changed.target = target;
-                changed.diffSource = "right";
+                changed.diffSource = "RIGHT";
                 this.changedElems.set(match.right.id, changed);
             }
             if (match.subMatches != null) {
@@ -649,6 +653,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         const changed = new ChangedElem(match.origin.id, name, "change");
                         changed.source = source;
                         changed.target = target;
+                        changed.diffSource = this.action.widgetSide!.toUpperCase();
                         this.changedElems.set(match.origin.id, changed);
                     }
                 }

@@ -135,41 +135,38 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     diffTreeWidget.setDiagWidgets(leftWidget, rightWidget);
 
                     await this.splitPanelManager.createSplitPanel(rightWidgetOptions).then(function (splitPanel: DiffSplitPanel) {
-                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
                         splitPanel.initDiffPanel(leftWidget, rightWidget, diffUri);
+                        _this.splitPanelManager.doCustomOpen(leftWidget, splitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
+                            let additions: DiffTreeNode[] = [];
+                            let deletions: DiffTreeNode[] = [];
+                            let changes: DiffTreeNode[] = [];
+                            leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
 
-                        _this.splitPanelManager.doCustomOpen(leftWidget, splitPanel, diffUri, wop, diffTreeWidget, title);
+                                leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                    deletions = diffAction.deletionsTree as DiffTreeNode[];
+                                }).then(() => {
+                                    rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                        const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
 
-                    });
-                    delay(300).then(() => {
-                        let additions: DiffTreeNode[] = [];
-                        let deletions: DiffTreeNode[] = [];
-                        let changes: DiffTreeNode[] = [];
-                        leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
+                                        rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                            changes = diffAction.changesTree as DiffTreeNode[];
+                                            additions = diffAction.additionsTree as DiffTreeNode[];
+                                        }).then(() => {
+                                            diffTreeWidget.setChanges(additions, deletions, changes);
+                                        });
+                                        rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                        rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
 
-                            leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
-                                deletions = diffAction.deletionsTree as DiffTreeNode[];
-                            }).then(() => {
-                                rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                    const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
-
-                                    rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
-                                        changes = diffAction.changesTree as DiffTreeNode[];
-                                        additions = diffAction.additionsTree as DiffTreeNode[];
-                                    }).then(() => {
-                                        diffTreeWidget.setChanges(additions, deletions, changes);
                                     });
-                                    rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                    rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
-
                                 });
-                            });
-                            console.log("deltions for tree", diffAction.deletionsTree);
-                            leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                            leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
+                                console.log("deltions for tree", diffAction.deletionsTree);
+                                leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
 
+                            });
                         });
+
                     });
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {
                     console.log("base file", this.baseComparisonFile.path.toString());
@@ -203,50 +200,46 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
                         splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
-                        // splitPanel.setNavigator(_this.fileNavigatorWidget);
-                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, diffTreeWidget, title);
-
-                    });
-
-                    delay(300).then(() => {
-                        let additions: DiffTreeNode[] = [];
-                        let deletions: DiffTreeNode[] = [];
-                        let changes: DiffTreeNode[] = [];
-                        firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                            const diffAction = new ApplyDiffAction(comparison, firstWidget.id, undefined, "left");
-                            firstWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
-                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                                changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
-                            }).then(() => {
-                                baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                    const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
-                                    baseWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
-                                        changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
-                                        deletions = diffAction.deletionsTree as DiffTreeNode[];
-                                    }).then(() => {
-                                        secondWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                            const diffAction = new ApplyDiffAction(comparison, secondWidget.id, undefined, "right");
-                                            secondWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
-                                                additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
-                                                changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
-                                            }).then(function () {
-                                                console.log("CHANGESTree!!!", changes);
-                                                //TODO maybe migrate to backend
-                                                changes = _this.handleConflicts(changes);
-                                                console.log("CHANGESTree 2 !!!", changes);
-                                                diffTreeWidget.setChanges(additions, deletions, changes);
+                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
+                            let additions: DiffTreeNode[] = [];
+                            let deletions: DiffTreeNode[] = [];
+                            let changes: DiffTreeNode[] = [];
+                            firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                const diffAction = new ApplyDiffAction(comparison, firstWidget.id, undefined, "left");
+                                firstWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                    additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
+                                    changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                                }).then(() => {
+                                    baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                        const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
+                                        baseWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                            changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                                            deletions = diffAction.deletionsTree as DiffTreeNode[];
+                                        }).then(() => {
+                                            secondWidget.glspActionDispatcher.onceModelInitialized().then(function () {
+                                                const diffAction = new ApplyDiffAction(comparison, secondWidget.id, undefined, "right");
+                                                secondWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                                    additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
+                                                    changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
+                                                }).then(function () {
+                                                    console.log("CHANGESTree!!!", changes);
+                                                    //TODO maybe migrate to backend
+                                                    changes = DiffMergeExtensionCommandContribution.handleConflicts(changes);
+                                                    console.log("CHANGESTree 2 !!!", changes);
+                                                    diffTreeWidget.setChanges(additions, deletions, changes);
+                                                });
+                                                secondWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                                secondWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(secondComparisonFile!.path.base));
                                             });
-                                            secondWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                            secondWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(secondComparisonFile!.path.base));
                                         });
+                                        baseWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                        baseWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
                                     });
-                                    baseWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                    baseWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
                                 });
-                            });
-                            firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                            firstWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.firstComparisonFile!.path.base));
+                                firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                firstWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.firstComparisonFile!.path.base));
 
+                            });
                         });
                     });
 
@@ -288,7 +281,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         });
     }
 
-    private handleConflicts(changes: DiffTreeNode[]) {
+    public static handleConflicts(changes: DiffTreeNode[]) {
         changes.sort((n1,n2) => {
             if (n1.id > n2.id) {return 1;}
             if (n1.id < n2.id) {return -1;}
@@ -351,8 +344,4 @@ export class DiffMergeExtensionMenuContribution implements MenuContribution {
         });
     }
 
-}
-
-function delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

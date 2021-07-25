@@ -1,5 +1,3 @@
-import { ApplyDiffAction } from "@eclipse-glsp-examples/workflow-sprotty";
-import { ComparisonDto } from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
     CommandRegistry,
@@ -20,7 +18,7 @@ import {
 } from "@theia/core/lib/browser";
 import { inject, injectable, named } from "inversify";
 import React = require("react");
-import { CenterAction, GetViewportAction, RequestModelAction, SetViewportAction } from "sprotty";
+import { CenterAction, GetViewportAction, SetViewportAction } from "sprotty";
 
 import { ComparisonService } from "../../common";
 import { DiffMergeDiagWidget } from "../diff-merge-diag-widget";
@@ -276,7 +274,7 @@ export class DiffViewWidget extends TreeWidget {
                     const c = new CenterAction([modelElementId]);
                     console.log("CENTERACTION FW", c);
                     console.log("clicked node ################# ", node);
-                    if (node.diffSource === "left") {
+                    if (node.diffSource === "LEFT") {
                         this.firstWidget.glspActionDispatcher.dispatch(centerAction);
                         this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                             console.log("setting viewport for added node", result.viewport);
@@ -286,7 +284,7 @@ export class DiffViewWidget extends TreeWidget {
                                 "sprotty", result.viewport, true));
                         });
                     }
-                    if (node.diffSource === "right") {
+                    if (node.diffSource === "RIGHT") {
                         this.secondWidget.glspActionDispatcher.dispatch(centerAction);
                         this.secondWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                             console.log("setting viewport for added node", result.viewport);
@@ -485,84 +483,18 @@ export class DiffViewWidget extends TreeWidget {
     public async revertChanges() {
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
-        console.log("CANCELLING MERGE!!!!", this.comparisonService);
-        console.log("THIS base filepath", baseFilePath);
-        console.log("THIS first filepath", firstFilePath);
-        let comparison: ComparisonDto;
+
         if (this.secondWidget) {
-            console.log("THIS second filepath", this.secondWidget.uri.path.toString());
-            comparison = await this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString());
+            await this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString())
+                .then((result) => {
+                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                });
         } else {
-            comparison = await this.comparisonService.revertFiles(baseFilePath, firstFilePath);
+            await this.comparisonService.revertFiles(baseFilePath, firstFilePath)
+                .then((result) => {
+                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                });
         }
-        console.log(status);
-
-        let _this = this;
-
-        delay(300).then(() => {
-            let additions: DiffTreeNode[] = [];
-            let deletions: DiffTreeNode[] = [];
-            let changes: DiffTreeNode[] = [];
-            this.baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                const diffAction = new ApplyDiffAction(comparison, _this.baseWidget.id);
-
-                _this.baseWidget.glspActionDispatcher.dispatch(diffAction);
-                delay(300).then(() => {
-                    changes = diffAction.changesTree as DiffTreeNode[];
-                });
-                console.log("deltions for tree", diffAction.deletionsTree);
-
-                deletions = diffAction.deletionsTree as DiffTreeNode[];
-
-            });
-            this.firstWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                const diffAction = new ApplyDiffAction(comparison, _this.firstWidget.id);
-
-                _this.firstWidget.glspActionDispatcher.dispatch(diffAction);
-                delay(300).then(() => {
-                    changes = diffAction.changesTree as DiffTreeNode[];
-                });
-                console.log("additions for tree", diffAction.additionsTree);
-
-                additions = diffAction.additionsTree as DiffTreeNode[];
-
-            });
-
-            delay(900).then(() => {
-                this.setChanges(additions, deletions, changes);
-            });
-
-        });
-        delay(300).then(() => {
-            console.log("current diffs", comparison);
-            console.log("SplitpanelManager", this.splitPanelManager);
-
-
-            const leftWidget: DiffMergeDiagWidget = this.baseWidget;
-            const rightWidget: DiffMergeDiagWidget = this.firstWidget;
-            console.log("leftWidget", leftWidget.uri.path.toString());
-            console.log("rightWidget", rightWidget.uri.path.toString());
-            leftWidget.actionDispatcher.dispatch(new RequestModelAction({
-                sourceUri: decodeURI(leftWidget.uri.path.toString()),
-                needsClientLayout: 'true',
-                needsServerLayout: 'true'
-            }));
-
-            rightWidget.actionDispatcher.dispatch(new RequestModelAction({
-                sourceUri: decodeURI(rightWidget.uri.path.toString()),
-                needsClientLayout: 'true',
-                needsServerLayout: 'true'
-            }));
-            if (this.secondWidget) {
-                const secondWidget: DiffMergeDiagWidget = this.secondWidget;
-                secondWidget.actionDispatcher.dispatch(new RequestModelAction({
-                    sourceUri: decodeURI(secondWidget.uri.path.toString()),
-                    needsClientLayout: 'true',
-                    needsServerLayout: 'true'
-                }));
-            }
-
-        });
         this.messageService.info("File " + this.baseWidget.uri.path.base + " has been reverted");
     }
 
@@ -603,7 +535,4 @@ export class DiffViewWidget extends TreeWidget {
         });
         return nodes;
     }
-}
-function delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

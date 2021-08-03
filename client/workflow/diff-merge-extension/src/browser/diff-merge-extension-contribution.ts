@@ -261,10 +261,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         registry.registerCommand(ComparisonSelectBaseExtensionCommand, {
             execute: async () => {
                 this.baseComparisonFile = UriSelection.getUri(this.selectionService.selection);
-                this.firstComparisonFile = undefined;
-                console.log("base", this.baseComparisonFile);
                 this.messageService.info("Selected base file");
-
             }
         });
         registry.registerCommand(ComparisonMergeExtensionCommand, {

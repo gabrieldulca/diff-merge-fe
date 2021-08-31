@@ -36,9 +36,12 @@ export class ApplyDiffAction implements Action {
     public changesTree: DiffTreeNode[];
     public deletionsTree: DiffTreeNode[];
     public widgetSide: string | undefined; // left, base or right
+    public leftWidgetId: string | undefined;
+    public rightWidgetId: string | undefined;
+    public baseWidgetId: string | undefined;
 
 
-    constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string) {
+    constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string, leftWidgetId?: string, rightWidgetId?: string,  baseWidgetId?: string) {
         this.widgetId = widgetId.replace("widget", "");
         this.requestId = requestId;
         this.comparison = comparison;
@@ -46,6 +49,15 @@ export class ApplyDiffAction implements Action {
         this.changesTree = [];
         this.deletionsTree = [];
         this.widgetSide = widgetSide;
+        if (leftWidgetId != null) {
+            this.leftWidgetId = leftWidgetId;
+        }
+        if (rightWidgetId != null) {
+            this.rightWidgetId = rightWidgetId;
+        }
+        if (baseWidgetId != null) {
+            this.baseWidgetId = baseWidgetId;
+        }
     }
     readonly kind = ApplyDiffCommand.KIND;
 
@@ -59,13 +71,20 @@ export class ApplyDiffCommand extends FeedbackCommand {
     constructor(@inject(TYPES.Action) public readonly action: ApplyDiffAction) { super(); }
     execute(context: CommandExecutionContext): CommandReturn {
 
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-node')).forEach((el) => el.classList.remove('newly-added-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!.querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-added-node')).forEach((el) => el.classList.remove('newly-added-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
 
 
         this.changedElems = new Map();
@@ -81,18 +100,18 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Applying diff command: changes", changes);
         console.log("Applying diff command: all diffs", this.changedElems);
 
-        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay == true)) {
+        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay === true)) {
             this.markAdditions(context, additions);
         }
         this.getAdditionsTree(context, additions);
 
-        if (this.action.comparison.threeWay == false) {//For threeway they are marked individually
+        if (this.action.comparison.threeWay === false) { // For threeway they are marked individually
             this.markDeletions(context, deletions);
         }
         this.getDeletionsTree(context, deletions);
         console.log("DELETIONS TREE FOR " + this.action.widgetId, this.action.deletionsTree);
 
-        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay == true)) {
+        if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay === true)) {
             this.markChanges(context, changes, this.action.widgetSide!);
         }
         this.getChangesTree(context, changes, this.action.widgetSide!);
@@ -105,15 +124,86 @@ export class ApplyDiffCommand extends FeedbackCommand {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                console.log("oldElemHtmlChild", child);
-                console.log("oldElemHtmlChildId", document.getElementById(oldElem!.id));
-                console.log("oldElemHtmlChildParentId", document.getElementById(oldElem!.parent.id));
                 if (child) {
                     const rect = child.childNodes[0] as HTMLElement;
                     if (rect!.classList) {
                         rect!.classList.add("newly-deleted-node");
                     }
+                    const rightWidgetSvgElem = document.getElementById(this.action.rightWidgetId!.replace("_widget","_sprotty"));
+                    const rightWidgetSvgElemParent = document.getElementById(this.action.rightWidgetId!.replace("_widget","")) as Node;
+                    console.log("rightWidgetIdHTML", rightWidgetSvgElem);
+                    console.log("rightWidgetIdHTML parent", rightWidgetSvgElemParent);
+                    console.log("rightWidgetIdHTML children", rightWidgetSvgElemParent!.children);
+                    console.log("rightWidgetIdHTML children 2", rightWidgetSvgElemParent!.childNodes);
+                    console.log("rightWidgetIdHTML children 3", rightWidgetSvgElem!.childNodes);
+                    console.log("rightWidgetIdHTML child first", rightWidgetSvgElem!.firstChild);
+                    console.log("rightWidgetIdHTML child last", rightWidgetSvgElem!.lastChild);
+                    console.log("rightWidgetIdHTML child 2", rightWidgetSvgElemParent!.childNodes.item(0));
+                    console.log("rightWidgetIdHTML child 3", rightWidgetSvgElem!.childNodes.item(0));
+                    console.log("rightWidgetIdHTML child child 3", rightWidgetSvgElem!.childNodes.item(0).childNodes);
+                    const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    newElement.setAttribute('fill', 'orange');
+                    newElement.setAttribute('width', '200');
+                    newElement.setAttribute('height', '200');
+                    //rightWidgetSvgElem.parentNode!.replaceChild(rightWidgetSvgElem,newElement);
+
+                    if (rightWidgetSvgElem && rightWidgetSvgElemParent) {
+                        const rwCopy = rightWidgetSvgElem.cloneNode(true);
+                        //rightWidgetSvgElem!.childNodes.item(0).appendChild(newElement);
+                        const nodeCopy = child.cloneNode(true);
+                        (nodeCopy as HTMLElement).id = (nodeCopy as HTMLElement).id.replace(this.action.leftWidgetId!.replace("_widget",""),this.action.rightWidgetId!.replace("_widget",""));
+                        rightWidgetSvgElem!.firstChild!.appendChild(nodeCopy);
+                        console.log("child renamed", nodeCopy);
+                        console.log("rightWidgetIdHTML", rightWidgetSvgElem);
+                        console.log("rightWidgetIdHTML copy", rwCopy);
+                        rwCopy.childNodes.item(0).appendChild(nodeCopy);
+                        (rightWidgetSvgElem.lastChild as Node).appendChild(nodeCopy);
+                        console.log("rightWidgetIdHTML copy 2", rwCopy);
+                        (rwCopy as HTMLElement)!.setAttribute("opacity", 1);
+                        console.log("RW LAST CHILD", (rightWidgetSvgElem as Node).lastChild!);
+                        console.log("RW ALL CHILDREN", (rightWidgetSvgElem as Node).childNodes!);
+                        ((rightWidgetSvgElem as Node).lastChild as Node)!.appendChild((nodeCopy as Node));
+                        let x = (rightWidgetSvgElemParent as Node).childNodes.item(0) as Node;
+                        console.log("RW PARENT ", rightWidgetSvgElemParent);
+                        console.log("RW PARENT E", (rightWidgetSvgElem as Node).parentNode);
+                        console.log("RW PARENT LAST CHILD HTML", (rightWidgetSvgElemParent as HTMLElement).children);
+                        console.log("RW PARENT LAST CHILD X", x);
+                        rightWidgetSvgElemParent.removeChild((rightWidgetSvgElemParent.firstChild as Node));
+                        //(x.lastChild as Node).appendChild(nodeCopy);
+                        (x as HTMLElement)!.innerHTML += "";
+                        console.log("RW PARENT LAST CHILD UPDATED", x);
+                        rightWidgetSvgElemParent.appendChild(rightWidgetSvgElem);
+
+                        //(rightWidgetSvgElem.lastChild as Node).appendChild((nodeCopy as HTMLElement));
+                        //(rightWidgetSvgElem as HTMLElement).lastElementChild!.setAttributeNodeNS((nodeCopy as Attr))
+                        //rightWidgetSvgElemParent.removeChild((rightWidgetSvgElemParent.lastChild as Node));
+                        //rightWidgetSvgElemParent.appendChild(rwCopy);
+
+                        /*const nodeCopy2 = child.cloneNode(true) as HTMLElement;
+                        const nodeCopy3 = child.cloneNode(true) as HTMLElement;
+                        nodeCopy.id += "aaa";
+                        const rightWidgetSvgGroup = rightWidgetSvgElem.children.item(0);
+                        rightWidgetSvgGroup!.removeChild(rightWidgetSvgGroup!.childNodes.item(0));
+                        rightWidgetSvgGroup!.appendChild(nodeCopy);
+
+
+                        console.log("added to childe node",  rightWidgetSvgElem.children.item(0));
+
+                        const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        newElement.setAttribute('fill', 'orange');
+                        newElement.setAttribute('width', '200');
+                        newElement.setAttribute('height', '200');
+
+                        rightWidgetSvgElem.appendChild(nodeCopy2);
+                        console.log("added child", nodeCopy);
+                        console.log("added child to rightwidget child", rightWidgetSvgElem.firstChild);
+                        console.log("added child to rightwidget", rightWidgetSvgElem);
+                        document.getElementById(this.action.rightWidgetId!.replace("_widget",""))!.appendChild(nodeCopy3);
+                        rightWidgetSvgElem!.innerHTML += "";
+                        rightWidgetSvgGroup!.innerHTML += "";*/
+                    }
                 }
+
             } else if (oldElem && oldElem instanceof SEdge) {
                 if (oldElem.cssClasses) {
                     oldElem.cssClasses.concat(["newly-deleted-edge"]);
@@ -163,12 +253,12 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     if (rect!.classList) {
                         if (direction === "right") {
                             child.appendChild(recthalf2);
-                            //rect!.classList.add("newly-deleted-node-rightthreeway");
+                            // rect!.classList.add("newly-deleted-node-rightthreeway");
                             recthalf2!.classList.add("newly-deleted-node-threeway");
                         }
                         if (direction === "left") {
                             child.appendChild(recthalf1);
-                            //rect!.classList.add("newly-deleted-node-rightthreeway");
+                            // rect!.classList.add("newly-deleted-node-rightthreeway");
                             recthalf1!.classList.add("newly-deleted-node-threeway");
                         }
                     }
@@ -241,7 +331,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
     markChanges(context: CommandExecutionContext, changes: string[], widgetSide: string): void {
         for (const c of changes) {
             const change = c.split("-")[0];
-            if(this.action.comparison.threeWay) {
+            if (this.action.comparison.threeWay) {
                 const changeSide = c.split("-")[1];
                 if (changeSide.toUpperCase() !== widgetSide.toUpperCase()) {
                     continue;
@@ -336,7 +426,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         for (const c of changes) {
             let changeSide = "";
             const change = c.split("-")[0];
-            if(this.action.comparison.threeWay) {
+            if (this.action.comparison.threeWay) {
                 changeSide = c.split("-")[1];
                 if (changeSide.toUpperCase() !== widgetSide.toUpperCase() && widgetSide !== "base") {
                     continue;
@@ -344,13 +434,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             const node: DiffTreeNode = new DiffTreeNode();
             node.diffSource = this.changedElems.get(change)!.diffSource;
-            if(widgetSide === "base") {
-                node.id = change + "_change"+"_BASE";
-                if(this.action.changesTree.filter(x => x.id === node.id).length > 0) {
+            if (widgetSide === "base") {
+                node.id = change + "_change" + "_BASE";
+                if (this.action.changesTree.filter(x => x.id === node.id).length > 0) {
                     continue;
                 }
             } else {
-                node.id = change + "_change"+"_"+changeSide.toUpperCase();
+                node.id = change + "_change" + "_" + changeSide.toUpperCase();
             }
             node.modelElementId = change;
             const changedElem = context.root.index.getById(change);
@@ -370,11 +460,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             node.changeType = "change";
             if (node.elementType !== "GLSPGraph") {
-                console.log("CHANGENode"+ changeSide, node);
+                console.log("CHANGENode" + changeSide, node);
                 this.action.changesTree.push(node);
             }
         }
-        console.log("CHANGETree"+ widgetSide, this.action.changesTree);
+        console.log("CHANGETree" + widgetSide, this.action.changesTree);
     }
 
     getDeletions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
@@ -629,7 +719,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 if (match.diffs.length > 0) {
                     if (match.diffs[0].kind.includes("CHANGE")) {
                         for (const md of match.diffs) {
-                            if(changes.indexOf(match.origin.id + "-" + md.source) === -1) {
+                            if (changes.indexOf(match.origin.id + "-" + md.source) === -1) {
                                 changes.push(match.origin.id + "-" + md.source);
                             }
                         }
@@ -661,9 +751,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    let submatchChanges: string[] = this.getSubMatchChanges(context, subMatch, threeWay);
+                    const submatchChanges: string[] = this.getSubMatchChanges(context, subMatch, threeWay);
                     for (const subChange of submatchChanges) {
-                        if(changes.indexOf(subChange) === -1) {
+                        if (changes.indexOf(subChange) === -1) {
                             changes.push(subChange);
                         }
                     }

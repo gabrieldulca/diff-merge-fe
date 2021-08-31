@@ -123,7 +123,6 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
                     const rightWidget = await this.diffMergeDiagManager.createWidgetNoTP(rightWidgetOptions);
-                    // widget2.actionDispatcher.dispatch(new ApplyDiffAction("comparison result"));
 
                     // Naming diagram widgets
                     leftWidget.title.caption = "asd";
@@ -141,7 +140,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             let deletions: DiffTreeNode[] = [];
                             let changes: DiffTreeNode[] = [];
                             leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
+                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, "", "left", leftWidget.widgetId, rightWidget.widgetId);
 
                                 leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                                     deletions = diffAction.deletionsTree as DiffTreeNode[];

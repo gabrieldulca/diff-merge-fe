@@ -193,7 +193,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
                     let x: SModelRootSchema = this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;
                     console.log("MODEL", x);
-                    this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(x)).then(
+                    this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(this.action.rightWidgetRoot)).then(
                         () => {
                             const childRight = document.getElementById(this.action.rightWidgetId + oldElem!.id + "_deleted");
                             console.log("TO BE COLORED", this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");

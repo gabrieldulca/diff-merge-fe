@@ -140,7 +140,10 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                             let deletions: DiffTreeNode[] = [];
                             let changes: DiffTreeNode[] = [];
                             leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, "", "left", leftWidget.widgetId, rightWidget.widgetId);
+                                console.log("Right widget MODELSOURCE before diff", rightWidget.ms);
+                                rightWidget.requestModel().then( (result) => console.log("Right widget REQUEST MODEL MODELSOURCE before diff", result));
+                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, "", "left", leftWidget.widgetId, rightWidget.widgetId, rightWidget.ms);
+                                console.log("Right widget MODELSOURCE after diff", rightWidget.ms);
 
                                 leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                                     deletions = diffAction.deletionsTree as DiffTreeNode[];
@@ -159,7 +162,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                                     });
                                 });
-                                console.log("deltions for tree", diffAction.deletionsTree);
+                                console.log("deltions", deletions);
                                 leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                                 leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
 
@@ -167,6 +170,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         });
 
                     });
+                    console.log("Left widget ", leftWidget);
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {
                     console.log("base file", this.baseComparisonFile.path.toString());
                     console.log("first file", this.firstComparisonFile.path.toString());

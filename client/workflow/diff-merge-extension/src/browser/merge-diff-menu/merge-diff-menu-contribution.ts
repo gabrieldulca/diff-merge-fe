@@ -17,7 +17,7 @@ import {DiffTreeNode} from "../diff-tree/diff-tree-node";
 import {DiffMergeDiagWidget} from "../diff-merge-diag-widget";
 import {RequestModelAction} from 'sprotty';
 import {ApplyDiffAction} from "@eclipse-glsp-examples/workflow-sprotty";
-import {DiffViewWidget} from "../diff-tree/diff-tree-widget";
+import {DiffTreeWidget} from "../diff-tree/diff-tree-widget";
 import { ComparisonDto } from '@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge';
 import {DiffMergeExtensionCommandContribution} from "../diff-merge-extension-contribution";
 
@@ -59,9 +59,9 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
     public static _baseFilePath: string;
     public static _firstFilePath: string;
     public static _secondFilePath: string;
-    public static diffTreeWidget: DiffViewWidget;
+    public static diffTreeWidget: DiffTreeWidget;
 
-    public setFiles(diffTreeWidget: DiffViewWidget, baseFilePath1: string, firstFilePath1: string, secondFilePath1: string): void {
+    public setFiles(diffTreeWidget: DiffTreeWidget, baseFilePath1: string, firstFilePath1: string, secondFilePath1: string): void {
         MergeDiffMenuContribution.diffTreeWidget = diffTreeWidget;
         MergeDiffMenuContribution.baseFilePath = baseFilePath1;
         MergeDiffMenuContribution.firstFilePath = firstFilePath1;

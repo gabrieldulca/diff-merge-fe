@@ -27,7 +27,7 @@ import { DiffDecoratorService, DiffTreeDecorator } from "./diff-tree/diff-decora
 import { DiffLabelProvider } from "./diff-tree/diff-label-provider";
 import { DiffTreeProps } from "./diff-tree/diff-tree-props";
 import { DiffTreeService } from "./diff-tree/diff-tree-service";
-import { DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
+import { DiffTreeWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
 import { DiffViewTreeModel } from "./diff-tree/diff-view-tree";
 import { SplitPanelManager } from "./split-panel-manager";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
@@ -87,13 +87,13 @@ export default new ContainerModule((bind, _unbind, isBound) => {
  *
  * @returns the `OutlineViewWidget`.
  */
-function createDiffViewWidget(parent: interfaces.Container): DiffViewWidget {
+function createDiffViewWidget(parent: interfaces.Container): DiffTreeWidget {
     const child = createTreeContainer(parent);
 
     child.bind(DiffTreeProps).toConstantValue({ ...defaultTreeProps, search: true });
 
     child.unbind(TreeWidget);
-    child.bind(DiffViewWidget).toSelf();
+    child.bind(DiffTreeWidget).toSelf();
 
     child.unbind(TreeModelImpl);
     child.bind(DiffViewTreeModel).toSelf();
@@ -103,7 +103,7 @@ function createDiffViewWidget(parent: interfaces.Container): DiffViewWidget {
     // child.rebind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffDecoratorService)).inSingletonScope();
     bindDiffTreeDecorator(child);
 
-    return child.get(DiffViewWidget);
+    return child.get(DiffTreeWidget);
 }
 
 

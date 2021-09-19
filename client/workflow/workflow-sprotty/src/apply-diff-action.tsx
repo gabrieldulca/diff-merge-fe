@@ -26,6 +26,7 @@ import { inject, injectable } from "inversify";
 
 import { ChangedElem, ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
+import {ModelSource, SModelRootSchema, SModelElementSchema, SChildElement, UpdateModelAction, SCompartment, SShapeElement, SLabel} from "sprotty";
 
 @injectable()
 export class ApplyDiffAction implements Action {
@@ -39,9 +40,12 @@ export class ApplyDiffAction implements Action {
     public leftWidgetId: string | undefined;
     public rightWidgetId: string | undefined;
     public baseWidgetId: string | undefined;
+    public rightWidgetRoot: SModelRootSchema;
+    public rightWidgetMS: ModelSource;
 
 
-    constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string, leftWidgetId?: string, rightWidgetId?: string,  baseWidgetId?: string) {
+    constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string, leftWidgetId?: string,
+                rightWidgetId?: string, rightWidgetMS?: ModelSource, baseWidgetId?: string) {
         this.widgetId = widgetId.replace("widget", "");
         this.requestId = requestId;
         this.comparison = comparison;
@@ -55,9 +59,22 @@ export class ApplyDiffAction implements Action {
         if (rightWidgetId != null) {
             this.rightWidgetId = rightWidgetId;
         }
+        if (rightWidgetMS != null) {
+            console.log("MODELSOURCE right widget", rightWidgetMS);
+            this.rightWidgetMS = rightWidgetMS;
+            this.rightWidgetRoot = rightWidgetMS.commitModel({
+                type: 'NONE',
+                id: 'ROOT'
+            }) as SModelRootSchema;
+            rightWidgetMS.commitModel(this.rightWidgetRoot);
+            console.log("MODELSOURCE right widget promise", this.rightWidgetRoot);
+        }
         if (baseWidgetId != null) {
             this.baseWidgetId = baseWidgetId;
         }
+
+        console.log("MODELSOURCE right", rightWidgetMS);
+
     }
     readonly kind = ApplyDiffCommand.KIND;
 
@@ -119,89 +136,79 @@ export class ApplyDiffCommand extends FeedbackCommand {
         return context.root;
     }
 
+    mapTNToSMESchema(oldElem: TaskNode): SModelElementSchema {
+        return {
+            type: oldElem.type,
+            id: oldElem.id + "_deleted",
+            children: this.mapChildrenToSMESchema(oldElem.children),
+            name: oldElem.name,
+            layout: oldElem.layout,
+            position: oldElem.position,
+            size: oldElem.size,
+            taskType: oldElem.taskType
+        } as SModelElementSchema;
+    }
+
+    mapChildrenToSMESchema(children: SChildElement[]): SModelElementSchema[] {
+        const childrenSchemas: SModelElementSchema[] = [];
+         for (const c of children) {
+             let schema: any = { id: c.id, type: c.type };
+             if (c.children.length > 0) {
+                 schema.children = this.mapChildrenToSMESchema(c.children as SChildElement[]);
+             }
+             if (c instanceof SShapeElement) {
+                 if ((c as SShapeElement).position) {
+                     schema.position = (c as SShapeElement).position;
+                 }
+                 if ((c as SShapeElement).size) {
+                     schema.size = (c as SShapeElement).size;
+                 }
+             }
+             if (c instanceof SCompartment) {
+                 if ((c as SCompartment).layout) {
+                     schema.layout = (c as SCompartment).layout;
+                 }
+             }
+             if (c instanceof SLabel) {
+                 if ((c as SLabel).text) {
+                     schema.text = (c as SLabel).text;
+                 }
+                 if ((c as SLabel).alignment) {
+                     schema.alignment = (c as SLabel).alignment;
+                 }
+             }
+             childrenSchemas.push(schema);
+         }
+         return childrenSchemas;
+    }
+
     markDeletions(context: CommandExecutionContext, deletions: string[]): void {
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem && oldElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 if (child) {
-                    const rect = child.childNodes[0] as HTMLElement;
+                    /*const rect = child.childNodes[0] as HTMLElement;
                     if (rect!.classList) {
                         rect!.classList.add("newly-deleted-node");
-                    }
-                    const rightWidgetSvgElem = document.getElementById(this.action.rightWidgetId!.replace("_widget","_sprotty"));
-                    const rightWidgetSvgElemParent = document.getElementById(this.action.rightWidgetId!.replace("_widget","")) as Node;
-                    console.log("rightWidgetIdHTML", rightWidgetSvgElem);
-                    console.log("rightWidgetIdHTML parent", rightWidgetSvgElemParent);
-                    console.log("rightWidgetIdHTML children", rightWidgetSvgElemParent!.children);
-                    console.log("rightWidgetIdHTML children 2", rightWidgetSvgElemParent!.childNodes);
-                    console.log("rightWidgetIdHTML children 3", rightWidgetSvgElem!.childNodes);
-                    console.log("rightWidgetIdHTML child first", rightWidgetSvgElem!.firstChild);
-                    console.log("rightWidgetIdHTML child last", rightWidgetSvgElem!.lastChild);
-                    console.log("rightWidgetIdHTML child 2", rightWidgetSvgElemParent!.childNodes.item(0));
-                    console.log("rightWidgetIdHTML child 3", rightWidgetSvgElem!.childNodes.item(0));
-                    console.log("rightWidgetIdHTML child child 3", rightWidgetSvgElem!.childNodes.item(0).childNodes);
-                    const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    newElement.setAttribute('fill', 'orange');
-                    newElement.setAttribute('width', '200');
-                    newElement.setAttribute('height', '200');
-                    //rightWidgetSvgElem.parentNode!.replaceChild(rightWidgetSvgElem,newElement);
+                    }*/
+                    console.log("oldElem", oldElem);
+                    this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
+                    let x: SModelRootSchema = this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;
+                    console.log("MODEL", x);
+                    this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(x)).then(
+                        () => {
+                            const childRight = document.getElementById(this.action.rightWidgetId + oldElem!.id + "_deleted");
+                            console.log("TO BE COLORED", this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                            console.log("TO BE COLORED", childRight);
+                            if(childRight) {
+                                const rect = childRight.childNodes[0] as HTMLElement;
+                                if (rect!.classList) {
+                                    rect!.classList.add("newly-deleted-node");
+                                }
+                            }
+                        });
 
-                    if (rightWidgetSvgElem && rightWidgetSvgElemParent) {
-                        const rwCopy = rightWidgetSvgElem.cloneNode(true);
-                        //rightWidgetSvgElem!.childNodes.item(0).appendChild(newElement);
-                        const nodeCopy = child.cloneNode(true);
-                        (nodeCopy as HTMLElement).id = (nodeCopy as HTMLElement).id.replace(this.action.leftWidgetId!.replace("_widget",""),this.action.rightWidgetId!.replace("_widget",""));
-                        rightWidgetSvgElem!.firstChild!.appendChild(nodeCopy);
-                        console.log("child renamed", nodeCopy);
-                        console.log("rightWidgetIdHTML", rightWidgetSvgElem);
-                        console.log("rightWidgetIdHTML copy", rwCopy);
-                        rwCopy.childNodes.item(0).appendChild(nodeCopy);
-                        (rightWidgetSvgElem.lastChild as Node).appendChild(nodeCopy);
-                        console.log("rightWidgetIdHTML copy 2", rwCopy);
-                        (rwCopy as HTMLElement)!.setAttribute("opacity", 1);
-                        console.log("RW LAST CHILD", (rightWidgetSvgElem as Node).lastChild!);
-                        console.log("RW ALL CHILDREN", (rightWidgetSvgElem as Node).childNodes!);
-                        ((rightWidgetSvgElem as Node).lastChild as Node)!.appendChild((nodeCopy as Node));
-                        let x = (rightWidgetSvgElemParent as Node).childNodes.item(0) as Node;
-                        console.log("RW PARENT ", rightWidgetSvgElemParent);
-                        console.log("RW PARENT E", (rightWidgetSvgElem as Node).parentNode);
-                        console.log("RW PARENT LAST CHILD HTML", (rightWidgetSvgElemParent as HTMLElement).children);
-                        console.log("RW PARENT LAST CHILD X", x);
-                        rightWidgetSvgElemParent.removeChild((rightWidgetSvgElemParent.firstChild as Node));
-                        //(x.lastChild as Node).appendChild(nodeCopy);
-                        (x as HTMLElement)!.innerHTML += "";
-                        console.log("RW PARENT LAST CHILD UPDATED", x);
-                        rightWidgetSvgElemParent.appendChild(rightWidgetSvgElem);
-
-                        //(rightWidgetSvgElem.lastChild as Node).appendChild((nodeCopy as HTMLElement));
-                        //(rightWidgetSvgElem as HTMLElement).lastElementChild!.setAttributeNodeNS((nodeCopy as Attr))
-                        //rightWidgetSvgElemParent.removeChild((rightWidgetSvgElemParent.lastChild as Node));
-                        //rightWidgetSvgElemParent.appendChild(rwCopy);
-
-                        /*const nodeCopy2 = child.cloneNode(true) as HTMLElement;
-                        const nodeCopy3 = child.cloneNode(true) as HTMLElement;
-                        nodeCopy.id += "aaa";
-                        const rightWidgetSvgGroup = rightWidgetSvgElem.children.item(0);
-                        rightWidgetSvgGroup!.removeChild(rightWidgetSvgGroup!.childNodes.item(0));
-                        rightWidgetSvgGroup!.appendChild(nodeCopy);
-
-
-                        console.log("added to childe node",  rightWidgetSvgElem.children.item(0));
-
-                        const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                        newElement.setAttribute('fill', 'orange');
-                        newElement.setAttribute('width', '200');
-                        newElement.setAttribute('height', '200');
-
-                        rightWidgetSvgElem.appendChild(nodeCopy2);
-                        console.log("added child", nodeCopy);
-                        console.log("added child to rightwidget child", rightWidgetSvgElem.firstChild);
-                        console.log("added child to rightwidget", rightWidgetSvgElem);
-                        document.getElementById(this.action.rightWidgetId!.replace("_widget",""))!.appendChild(nodeCopy3);
-                        rightWidgetSvgElem!.innerHTML += "";
-                        rightWidgetSvgGroup!.innerHTML += "";*/
-                    }
                 }
 
             } else if (oldElem && oldElem instanceof SEdge) {

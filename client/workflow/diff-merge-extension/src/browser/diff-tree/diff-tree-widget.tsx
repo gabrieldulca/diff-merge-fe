@@ -60,12 +60,12 @@ export namespace DiffSymbolInformationNode {
     }
 }
 
-export type DiffViewWidgetFactory = () => DiffViewWidget;
+export type DiffViewWidgetFactory = () => DiffTreeWidget;
 export const DiffViewWidgetFactory = Symbol('DiffViewWidgetFactory');
 
 
 @injectable()
-export class DiffViewWidget extends TreeWidget {
+export class DiffTreeWidget extends TreeWidget {
 
     setDiagWidgets(baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
         this.baseWidget = baseWidget;

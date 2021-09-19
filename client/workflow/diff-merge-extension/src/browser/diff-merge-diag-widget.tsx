@@ -101,6 +101,15 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         return this.diContainer.get<ActionHandlerRegistry>(ActionHandlerRegistry) as ActionHandlerRegistry;
     }
 
+    public requestModel(): Promise<void> {
+        return this.actionDispatcher.dispatch(new RequestModelAction({
+            sourceUri: this.options.uri.replace("file://", ""),
+            needsClientLayout: 'true',
+            needsServerLayout: 'true',
+            ...this.options
+        }));
+    }
+
 }
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));

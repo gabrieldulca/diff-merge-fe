@@ -90,7 +90,7 @@ import { directTaskEditor } from "./direct-task-editing/di.config";
 import { EnableFileNameAction, FileNameBanner } from "./file-name-component";
 import { ActivityNode, Icon, TaskNode, WeightedEdge } from "./model";
 import { GotoContextMenuItemProvider } from "./navigation";
-import { ApplyDiffCommand } from "./testaction";
+import { ApplyDiffCommand } from "./apply-diff-action";
 import { ForkOrJoinNodeView, IconView, TaskNodeView, WeightedEdgeView, WorkflowEdgeView } from "./workflow-views";
 
 const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {

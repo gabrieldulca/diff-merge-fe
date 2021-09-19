@@ -19,7 +19,7 @@ import { injectable } from "inversify";
 import { DiagramManager, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffSplitPanel } from "./diff-split-panel";
-import { DiffViewWidget } from "./diff-tree/diff-tree-widget";
+import { DiffTreeWidget } from "./diff-tree/diff-tree-widget";
 import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
 
 
@@ -57,7 +57,7 @@ export class SplitPanelManager extends DiagramManager {
     }
 
 
-    async doCustomOpen(widget: DiffMergeDiagWidget, splitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffViewWidget, title: string) {
+    async doCustomOpen(widget: DiffMergeDiagWidget, widgetSplitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffTreeWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -73,22 +73,22 @@ export class SplitPanelManager extends DiagramManager {
                 widgetOptions.mode = options && options.widgetOptions && options.widgetOptions.mode ? options.widgetOptions.mode : 'open-to-right';
             }
 
-            const split2 = new DiffSplitPanel({ orientation: 'vertical' });
+            const mainSplitPanel = new DiffSplitPanel({ orientation: 'vertical' });
 
             diffViewWidget.setRoot();
-            split2.setNavigator(diffViewWidget!);
-            split2.setSplitPanel(splitPanel);
-            split2.setRelativeSizes([0.3, 1.0]);
+            mainSplitPanel.setNavigator(diffViewWidget!);
+            mainSplitPanel.setSplitPanel(widgetSplitPanel);
+            mainSplitPanel.setRelativeSizes([0.3, 1.0]);
 
-            split2.title.label = title;
-            split2.title.iconClass = 'fa navigator-tab-icon';
-            split2.title.closable = true;
+            mainSplitPanel.title.label = title;
+            mainSplitPanel.title.iconClass = 'fa navigator-tab-icon';
+            mainSplitPanel.title.closable = true;
 
-            for (const handle of split2.handles) {
+            for (const handle of mainSplitPanel.handles) {
                 handle.classList.add("diff-panel-handle");
             }
 
-            this.shell.addWidget(split2, widgetOptions);
+            this.shell.addWidget(mainSplitPanel, widgetOptions);
         }
         const promises: Promise<void>[] = [];
         if (op.mode === 'activate') {

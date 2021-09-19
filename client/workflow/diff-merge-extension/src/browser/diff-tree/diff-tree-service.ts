@@ -2,14 +2,14 @@ import { DisposableCollection, Emitter, Event } from "@theia/core";
 import { WidgetFactory } from "@theia/core/lib/browser";
 import { inject, injectable } from "inversify";
 
-import { DiffSymbolInformationNode, DiffViewWidget, DiffViewWidgetFactory } from "./diff-tree-widget";
+import { DiffSymbolInformationNode, DiffTreeWidget, DiffViewWidgetFactory } from "./diff-tree-widget";
 
 @injectable()
 export class DiffTreeService implements WidgetFactory {
 
     id = 'diff-tree-view';
 
-    protected widget?: DiffViewWidget;
+    protected widget?: DiffTreeWidget;
     protected readonly onDidChangeOutlineEmitter = new Emitter<DiffSymbolInformationNode[]>();
     protected readonly onDidChangeOpenStateEmitter = new Emitter<boolean>();
     protected readonly onDidSelectEmitter = new Emitter<DiffSymbolInformationNode>();
@@ -49,7 +49,7 @@ export class DiffTreeService implements WidgetFactory {
         }
     }
 
-    createWidget(): Promise<DiffViewWidget> {
+    createWidget(): Promise<DiffTreeWidget> {
         this.widget = this.factory();
         const disposables = new DisposableCollection();
         disposables.push(this.widget.onDidChangeOpenStateEmitter.event(open => this.onDidChangeOpenStateEmitter.fire(open)));

@@ -133,9 +133,9 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const diffTreeWidget = await this.diffTreeService.createWidget();
                     diffTreeWidget.setDiagWidgets(leftWidget, rightWidget);
 
-                    await this.splitPanelManager.createSplitPanel(rightWidgetOptions).then(function (splitPanel: DiffSplitPanel) {
-                        splitPanel.initDiffPanel(leftWidget, rightWidget, diffUri);
-                        _this.splitPanelManager.doCustomOpen(leftWidget, splitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
+                    await this.splitPanelManager.createWidgetSplitPanel(rightWidgetOptions).then(function (widgetSplitPanel: DiffSplitPanel) {
+                        widgetSplitPanel.initWidgetSplitPanel(leftWidget, rightWidget, diffUri);
+                        _this.splitPanelManager.doCustomOpen(leftWidget, widgetSplitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
                             let additions: DiffTreeNode[] = [];
                             let deletions: DiffTreeNode[] = [];
                             let changes: DiffTreeNode[] = [];
@@ -201,9 +201,9 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const diffTreeWidget = await this.diffTreeService.createWidget();
                     diffTreeWidget.setDiagWidgets(baseWidget, firstWidget, secondWidget);//TODO
 
-                    await this.splitPanelManager.createSplitPanel(options2).then(function (splitPanel: DiffSplitPanel) {
-                        splitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
-                        _this.splitPanelManager.doCustomOpen(firstWidget, splitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
+                    await this.splitPanelManager.createWidgetSplitPanel(options2).then(function (widgetSplitPanel: DiffSplitPanel) {
+                        widgetSplitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);
+                        _this.splitPanelManager.doCustomOpen(firstWidget, widgetSplitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
                             let additions: DiffTreeNode[] = [];
                             let deletions: DiffTreeNode[] = [];
                             let changes: DiffTreeNode[] = [];

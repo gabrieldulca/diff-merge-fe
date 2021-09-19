@@ -31,14 +31,13 @@ export class SplitPanelManager extends DiagramManager {
     public prevOpts: DiagramWidgetOptions;
     public diffSplitPanel:DiffSplitPanel;
 
-    async createSplitPanel(options?: any): Promise<DiffSplitPanel> {
+    /*
+     * Create SplitPanel to which the DiagramWidgets shall be added
+     */
+    async createWidgetSplitPanel(options?: any): Promise<DiffSplitPanel> {
         if (DiagramWidgetOptions.is(options)) {
-            // const clientId = this.createClientId();
-            // const config = this.diagramConfigurationRegistry.get(options.diagramType);
-            // const diContainer = config.createContainer(clientId);
             this.prevOpts = options;
             this.diffSplitPanel = new DiffSplitPanel({ orientation: 'horizontal' });
-            // diffPanel.initDiffPanel();
             return this.diffSplitPanel;
         }
         throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
@@ -56,8 +55,10 @@ export class SplitPanelManager extends DiagramManager {
         return this.diffSplitPanel.baseWidget;
     }
 
-
-    async doCustomOpen(widget: DiffMergeDiagWidget, widgetSplitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffViewWidget: DiffTreeWidget, title: string) {
+    /*
+     * Create main SplitPanel containing the DiffTree and the Splitpanel with the Diagrams
+     */
+    async doCustomOpen(widget: DiffMergeDiagWidget, widgetSplitPanel: DiffSplitPanel, uri: URI, options: WidgetOpenerOptions, diffTreeWidget: DiffTreeWidget, title: string) {
         const op: WidgetOpenerOptions = {
             mode: options && options.mode ? options.mode : 'activate',
             ...options
@@ -75,8 +76,8 @@ export class SplitPanelManager extends DiagramManager {
 
             const mainSplitPanel = new DiffSplitPanel({ orientation: 'vertical' });
 
-            diffViewWidget.setRoot();
-            mainSplitPanel.setNavigator(diffViewWidget!);
+            diffTreeWidget.setRoot();
+            mainSplitPanel.setNavigator(diffTreeWidget!);
             mainSplitPanel.setSplitPanel(widgetSplitPanel);
             mainSplitPanel.setRelativeSizes([0.3, 1.0]);
 

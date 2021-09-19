@@ -25,7 +25,10 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
         this.addWidget(splitPanel);
     }
 
-    public initDiffPanel(leftWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
+    /*
+     * Add the widgets to the Splitpanel and synchronize them to each other
+     */
+    public initWidgetSplitPanel(leftWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
         this.leftWidget = leftWidget;
         this.rightWidget = rightWidget;
         this.addWidget(leftWidget);
@@ -45,6 +48,9 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
         this.uri = uri;
     }
 
+    /*
+     * Add the widgets to the Splitpanel and synchronize them to each other (for threeway diffing)
+     */
     public initThreewayDiffPanel(leftWidget: DiffMergeDiagWidget, baseWidget: DiffMergeDiagWidget, rightWidget: DiffMergeDiagWidget, uri: URI) {
         this.leftWidget = leftWidget;
         this.baseWidget = baseWidget;

@@ -258,13 +258,14 @@ export class DiffTreeWidget extends TreeWidget {
                 }
             }
             if (node.changeType === "add") {
+                let centerAction: CenterAction;
+                if (node.elementType === "SEdge") {
+                    centerAction = new CenterAction([node.source!, node.target!]);
+                } else {
+                    centerAction = new CenterAction([modelElementId]);
+                }
+                // threeway comparison
                 if (this.secondWidget) {
-                    let centerAction: CenterAction;
-                    if (node.elementType === "SEdge") {
-                        centerAction = new CenterAction([node.source!, node.target!]);
-                    } else {
-                        centerAction = new CenterAction([modelElementId]);
-                    }
                     if (node.diffSource === "LEFT") {
                         this.firstWidget.glspActionDispatcher.dispatch(centerAction);
                         this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
@@ -284,34 +285,16 @@ export class DiffTreeWidget extends TreeWidget {
                                 "sprotty", result.viewport, true));
                         });
                     }
-                    /*this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId])).then((result: any) => {
-                        console.log("CENTERACTION", result);
-                        if (result[0] instanceof GLSPGraph) {
-                            result[0].children.forEach(child => {
-                                if (child.id === modelElementId) {
-                                    console.log("FOUND IT!!!", modelElementId);
-                                    found = true;
-                                }
-                            })
-                        }
-                        if (found == false) {
-                            this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
-                            this.secondWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                                console.log("setting viewport for added node", result.viewport);
-                                this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
-                                    "sprotty", result.viewport, true)); //TODO change sprotty to model root
-                            });
-                        }
-                    });*/
 
                 } else
-                // No second widget is present, so center the frist one
+                // No second widget is present (it's not a threeway comparison), so center the first one
                 {
-                    if (node.elementType !== "SEdge") {
-                        this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
-                    } else {
-                        this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
-                    }
+                    this.firstWidget.glspActionDispatcher.dispatch(centerAction).then(() =>
+                        this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
+                            this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
+                                "sprotty", result.viewport, true));
+                    }));
+
                 }
             }
             if (node.changeType === "change" && this.secondWidget) {
@@ -321,20 +304,6 @@ export class DiffTreeWidget extends TreeWidget {
                     this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
             }
-            /*if (node.changeType === "add") {
-                this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                    console.log("setting viewport for added node", result.viewport);
-                    this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
-                        "sprotty", result.viewport, true)); //TODO change sprotty to model root
-                });
-                if (this.secondWidget) {
-                    this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                        console.log("setting viewport for added node", result.viewport);
-                        this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
-                            "sprotty", result.viewport, true)); //TODO change sprotty to model root
-                    });
-                }
-            }*/
             if (node.changeType === "delete") {
                 console.log("setting viewport for deleted node", node);
                 this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
@@ -347,13 +316,6 @@ export class DiffTreeWidget extends TreeWidget {
                     }
                 });
             }
-            /*if (this.secondWidget) {
-                if (node.elementType !== "SEdge") {
-                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([nodeId]));
-                } else {
-                    this.secondWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
-                }
-            }*/
         }
         event.stopPropagation();
     }

@@ -27,6 +27,9 @@ export function registerMergeDiffContextMenu(bind: interfaces.Bind): void {
     bind(GLSPClientContribution).to(MergeDiffMenuContribution);
 }
 
+/*
+ * Context menu for applying and reverting changes
+ */
 @injectable()
 export class MergeDiffMenuContribution implements MenuContribution, CommandContribution {
     static get secondFilePath(): string {
@@ -82,19 +85,16 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
         });
     }
 
+    /*
+     * Commands for applying and reverting changes
+     */
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(MERGE, {
             execute: async () => {
                 //const comparison = await this.comparisonService.getSingleMergeResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString(),this.selectionService.selection, false);
                 const selectedElem: DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
-                console.log("pressed merge", selectedElem);
-                console.log("diffTreeWidget", MergeDiffMenuContribution.diffTreeWidget);
-                console.log("MergeDiffMenuContribution.secondFilePath", MergeDiffMenuContribution.secondFilePath);
-                console.log("MergeDiffMenuContribution.baseFilePath", MergeDiffMenuContribution.baseFilePath);
-                console.log("MergeDiffMenuContribution.firstFilePath", MergeDiffMenuContribution.firstFilePath);
 
-                if(MergeDiffMenuContribution.secondFilePath === "") {
-                    console.log("NO THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
+                if (MergeDiffMenuContribution.secondFilePath === "") {
                     await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false)
                     .then(() => {
                             this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath)
@@ -103,8 +103,7 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                                 });
                         });
                 } else {
-                    console.log("THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    if(selectedElem.diffSource === "LEFT") {
+                    if (selectedElem.diffSource === "LEFT") {
                         this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, false)
                             .then(() => {
                                 this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
@@ -127,11 +126,9 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
         registry.registerCommand(REVERT, {
             execute: async () => {
                 const selectedElem: DiffTreeNode = <DiffTreeNode>this.selectionService.selection;
-                console.log("pressed revert", selectedElem.modelElementId);
                 await this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true);
 
-                if(MergeDiffMenuContribution.secondFilePath === "") {
-                    console.log("NO THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
+                if (MergeDiffMenuContribution.secondFilePath === "") {
                     this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true)
                         .then(() => {
                              this.comparisonService.getComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath)
@@ -140,8 +137,7 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                                 });
                         });
                 } else {
-                    console.log("THREEWAY APPLYING OF CHANGES", MergeDiffMenuContribution.secondFilePath);
-                    if(selectedElem.diffSource === "LEFT") {
+                    if (selectedElem.diffSource === "LEFT") {
                         this.comparisonService.getSingleMergeResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, selectedElem.modelElementId, true)
                             .then(() => {
                                 this.comparisonService.getThreeWayComparisonResult(MergeDiffMenuContribution.baseFilePath, MergeDiffMenuContribution.firstFilePath, MergeDiffMenuContribution.secondFilePath)
@@ -163,6 +159,9 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
         });
     }
 
+    /*
+     * refreshing widgets and tree after applying/ reverting changes
+     */
     public static refreshComparison(comparison: ComparisonDto, splitPanelManager: SplitPanelManager) {
         let additions: DiffTreeNode[] = [];
         let deletions: DiffTreeNode[] = [];

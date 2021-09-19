@@ -105,9 +105,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
 
         this.changedElems = new Map();
-        console.log("Applying diffAction ", this.action);
-        console.log("Applying diff command: context", context);
-        console.log("Applying diff command: comparison", this.action.comparison);
+
 
         const additions: string[] = this.getAdditions(context, this.action.comparison);
         console.log("Applying diff command: additions for " + this.action.widgetId, additions);
@@ -126,7 +124,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
             this.markDeletions(context, deletions);
         }
         this.getDeletionsTree(context, deletions);
-        console.log("DELETIONS TREE FOR " + this.action.widgetId, this.action.deletionsTree);
 
         if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay === true)) {
             this.markChanges(context, changes, this.action.widgetSide!);
@@ -224,7 +221,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 } else {
                     oldElem.cssClasses = ["newly-deleted-edge"];
                     const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                    console.log("child", child);
                     if (child) {
                         const arrow = child!.childNodes[1] as HTMLElement;
                         if (arrow!.classList) {
@@ -240,9 +236,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         const oldElem = context.root.index.getById(del);
         if (oldElem && oldElem instanceof TaskNode) {
             const child = document.getElementById(this.action.widgetId + oldElem!.id);
-            console.log("oldElemHtmlChild", child);
-            console.log("oldElemHtmlChildId", document.getElementById(oldElem!.id));
-            console.log("oldElemHtmlChildParentId", document.getElementById(oldElem!.parent.id));
+
             if (child) {
                 const rect = child.childNodes[0] as HTMLElement;
 
@@ -251,8 +245,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
                 const width: number = Number(rect.getAttribute("width"));
                 recthalf1.setAttribute("width", width / 2);
-
-
                 recthalf2.setAttribute("width", width / 2);
                 recthalf2.setAttribute("x", width / 2);
 
@@ -285,7 +277,6 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 } else {
                     oldElem.cssClasses = ["newly-deleted-edge"];
                     const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                    console.log("child", child);
                     if (child) {
                         const arrow = child!.childNodes[1] as HTMLElement;
                         if (arrow!.classList) {
@@ -467,11 +458,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             node.changeType = "change";
             if (node.elementType !== "GLSPGraph") {
-                console.log("CHANGENode" + changeSide, node);
                 this.action.changesTree.push(node);
             }
         }
-        console.log("CHANGETree" + widgetSide, this.action.changesTree);
     }
 
     getDeletions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
@@ -608,6 +597,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     }
                 }
                 const changed = new ChangedElem(match.right.id, name, "add");
+                changed.diffSource = "RIGHT";
                 changed.source = source;
                 changed.target = target;
                 this.changedElems.set(match.right.id, changed);

@@ -40,7 +40,6 @@ import { DiffSplitPanel } from "./diff-split-panel";
 import { DiffTreeNode } from "./diff-tree/diff-tree-node";
 import { DiffTreeService } from "./diff-tree/diff-tree-service";
 import { SplitPanelManager } from "./split-panel-manager";
-import { UnusedWidget } from "./unused-widget";
 
 
 import WidgetOptions = ApplicationShell.WidgetOptions;
@@ -86,8 +85,6 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         @inject(DiffMergeDiagManager) protected readonly diffMergeDiagManager: DiffMergeDiagManager,
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(DiffService) protected readonly diffService: DiffService,
-        // @inject(FileNavigatorWidget) protected readonly fileNavigatorWidget: FileNavigatorWidget,
-        // @inject(ResourceTreeEditorWidget) protected readonly resourceTreeEditorWidget: ResourceTreeEditorWidget,
         @inject(MessageService) private readonly messageService: MessageService,
         @inject(DiffTreeService) private readonly diffTreeService: DiffTreeService,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
@@ -96,8 +93,8 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         @multiInject(DiagramManagerProvider) protected diagramManagerProviders: DiagramManagerProvider[]
     ) {
         super({
-            widgetId: UnusedWidget.ID,
-            widgetName: UnusedWidget.LABEL,
+            widgetId: 'diff-merge-fe:widget',
+            widgetName: 'DiffMergeFe Widget',
             defaultWidgetOptions: { area: 'left' },
             toggleCommandId: ComparisonExtensionCommand.id
         });
@@ -108,21 +105,18 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
         registry.registerCommand(ComparisonExtensionCommand, {
             execute: async () => {
                 if (this.baseComparisonFile && !this.firstComparisonFile) {
-                    console.log("first file", this.baseComparisonFile.path.toString());
                     const firstComparisonFile = UriSelection.getUri(this.selectionService.selection);
-                    console.log("second file", firstComparisonFile!.path.toString());
                     const comparison = await this.comparisonService.getComparisonResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
                     console.log("comparison result", comparison);
-                    // this.messageService.info(JSON.stringify(comparison));
 
                     const _this = this;
                     const leftWidgetOptions: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const leftWidget = await this.diffMergeDiagManager.createWidgetNoTP(leftWidgetOptions);
+                    const leftWidget = await this.diffMergeDiagManager.createWidgetNoToolPalette(leftWidgetOptions);
                     const rightWidgetOptions: DiagramWidgetOptions = { uri: firstComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
                     const widgetOptions: WidgetOptions = { mode: 'split-right' };
                     const wop: WidgetOpenerOptions = { widgetOptions: widgetOptions };
 
-                    const rightWidget = await this.diffMergeDiagManager.createWidgetNoTP(rightWidgetOptions);
+                    const rightWidget = await this.diffMergeDiagManager.createWidgetNoToolPalette(rightWidgetOptions);
 
                     // Naming diagram widgets
                     leftWidget.title.caption = "asd";
@@ -186,14 +180,14 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
 
                     // open first file
                     const options: DiagramWidgetOptions = { uri: this.firstComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const firstWidget = await this.diffMergeDiagManager.createWidgetNoTP(options);
+                    const firstWidget = await this.diffMergeDiagManager.createWidgetNoToolPalette(options);
                     // open base
                     const optionsBase: DiagramWidgetOptions = { uri: this.baseComparisonFile.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const baseWidget = await this.diffMergeDiagManager.createWidgetNoTP(optionsBase);
+                    const baseWidget = await this.diffMergeDiagManager.createWidgetNoToolPalette(optionsBase);
 
                     // open second file
                     const options2: DiagramWidgetOptions = { uri: secondComparisonFile!.path.toString(), diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
-                    const secondWidget = await this.diffMergeDiagManager.createWidgetNoTP(options2);
+                    const secondWidget = await this.diffMergeDiagManager.createWidgetNoToolPalette(options2);
 
                     const _this = this;
                     const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);

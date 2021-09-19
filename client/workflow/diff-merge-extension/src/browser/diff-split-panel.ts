@@ -3,7 +3,6 @@ import URI from "@theia/core/lib/common/uri";
 import { SetViewportAction } from "sprotty";
 
 import { DiffMergeDiagWidget } from "./diff-merge-diag-widget";
-import { DiffTreeWidget } from "./diff-tree/diff-tree-widget";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
 
 
@@ -16,14 +15,6 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
     public leftWidget: DiffMergeDiagWidget;
     public baseWidget: DiffMergeDiagWidget;
     public rightWidget: DiffMergeDiagWidget;
-
-    public setNavigator(diffViewWidget: DiffTreeWidget) {
-        this.addWidget(diffViewWidget);
-    }
-
-    public setSplitPanel(splitPanel: DiffSplitPanel) {
-        this.addWidget(splitPanel);
-    }
 
     /*
      * Add the widgets to the Splitpanel and synchronize them to each other
@@ -72,7 +63,6 @@ export class DiffSplitPanel extends SplitPanel implements StatefulWidget, Naviga
     get id(): string {
         return this.widgetId;
     }
-
 
     storeState(): object {
         throw new Error("Method not implemented.");

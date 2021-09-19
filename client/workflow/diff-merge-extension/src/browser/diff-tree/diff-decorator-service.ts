@@ -22,9 +22,11 @@ export class DiffTreeDecorator implements TreeDecorator {
         return this.emitter.event;
     }
 
+    /*
+     * Decorates additions, changes and deletions in the tree
+     */
     decorations(tree: Tree): MaybePromise<Map<string, WidgetDecoration.Data>> {
         const result = new Map();
-        console.log("decorating tree", tree);
         if (tree.root) {
             if ((tree.root as DiffTreeNode).children.length === 3) {
                 const additions: DiffTreeNode = (tree.root as DiffTreeNode).children[0] as DiffTreeNode;

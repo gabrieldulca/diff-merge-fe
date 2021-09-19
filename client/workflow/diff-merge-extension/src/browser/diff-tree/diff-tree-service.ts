@@ -7,7 +7,7 @@ import { DiffSymbolInformationNode, DiffTreeWidget, DiffViewWidgetFactory } from
 @injectable()
 export class DiffTreeService implements WidgetFactory {
 
-    id = 'diff-tree-view';
+    id = 'diff-tree-service';
 
     protected widget?: DiffTreeWidget;
     protected readonly onDidChangeOutlineEmitter = new Emitter<DiffSymbolInformationNode[]>();

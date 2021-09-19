@@ -2,7 +2,7 @@ import { CompositeTreeNode, ExpandableTreeNode, TreeExpansionService, TreeModelI
 import { inject, injectable } from "inversify";
 
 @injectable()
-export class DiffViewTreeModel extends TreeModelImpl {
+export class DiffTreeModel extends TreeModelImpl {
 
     @inject(TreeExpansionService) protected readonly expansionService: TreeExpansionService;
 

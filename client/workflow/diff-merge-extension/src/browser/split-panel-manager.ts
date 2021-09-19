@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { ApplicationShell, WidgetOpenerOptions } from "@theia/core/lib/browser";
+import { ApplicationShell, WidgetOpenerOptions, SplitPanel } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { injectable } from "inversify";
 import { DiagramManager, DiagramWidgetOptions } from "sprotty-theia";
@@ -42,7 +42,7 @@ export class SplitPanelManager extends DiagramManager {
         }
         throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
     }
-    
+
     public getLeftWidget(): DiffMergeDiagWidget {
         return this.diffSplitPanel.leftWidget;
     }
@@ -74,11 +74,13 @@ export class SplitPanelManager extends DiagramManager {
                 widgetOptions.mode = options && options.widgetOptions && options.widgetOptions.mode ? options.widgetOptions.mode : 'open-to-right';
             }
 
-            const mainSplitPanel = new DiffSplitPanel({ orientation: 'vertical' });
+            const mainSplitPanel = new SplitPanel({ orientation: 'vertical' });
+
+            mainSplitPanel.id = "main-split-panel";
 
             diffTreeWidget.setRoot();
-            mainSplitPanel.setNavigator(diffTreeWidget!);
-            mainSplitPanel.setSplitPanel(widgetSplitPanel);
+            mainSplitPanel.addWidget(diffTreeWidget!);
+            mainSplitPanel.addWidget(widgetSplitPanel);
             mainSplitPanel.setRelativeSizes([0.3, 1.0]);
 
             mainSplitPanel.title.label = title;
@@ -94,11 +96,8 @@ export class SplitPanelManager extends DiagramManager {
         const promises: Promise<void>[] = [];
         if (op.mode === 'activate') {
             await widget.getSvgElement();
-            // promises.push(this.onActive(widget));
-            // promises.push(this.onReveal(widget));
             this.shell.activateWidget(widget.widgetId);
         } else if (op.mode === 'reveal') {
-            // promises.push(this.onReveal(widget));
             this.shell.revealWidget(widget.widgetId);
         }
         await Promise.all(promises);

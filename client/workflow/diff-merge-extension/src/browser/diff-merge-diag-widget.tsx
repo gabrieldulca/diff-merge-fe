@@ -44,8 +44,10 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         }
     }
 
+    /*
+     * Diagram widget initialization
+     */
     protected initializeSprotty(): void {
-        console.log("asdasfsafa", this.options.uri);
         const modelSource = this.diContainer.get<ModelSource>(TYPES.ModelSource);
 
         if (modelSource instanceof DiagramServer)
@@ -59,19 +61,9 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         });
         this.ms = modelSource;
 
-        this.actionDispatcher.dispatch(new RequestModelAction({
-            sourceUri: this.options.uri.replace("file://", ""),
-            needsClientLayout: 'true',
-            needsServerLayout: 'true',
-            ...this.options
-        }));
-
-        // const modelElement: SModelElement | undefined = context.root.index.getById('task0');
-        // const maxSeverityCSSClass = 'error';
-        // modelElement.cssClasses = [maxSeverityCSSClass];
+        this.requestModel();
 
         this.actionDispatcher.dispatch(new RequestTypeHintsAction(this.options.diagramType));
-        console.log("Tool Palette", this.hasToolPalette);
         if (this.hasToolPalette) {
             this.actionDispatcher.dispatch(new EnableToolPaletteAction());
         }
@@ -82,25 +74,19 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         this.glspActionDispatcher.onceModelInitialized().then(function () {
             _this.glspActionDispatcher.dispatch(new CenterAction([], false));
         });
-        this.glspActionDispatcher.onceModelInitialized().then(function () {
-            delay(300).then(() => {
-
-                _this.glspActionDispatcher.dispatch(new CenterAction([]));
-                _this.ms = _this.diContainer.get<ModelSource>(TYPES.ModelSource);
-            });
-        });
-
     }
 
     get glspActionDispatcher(): GLSPActionDispatcher {
         return this.diContainer.get(TYPES.IActionDispatcher) as GLSPActionDispatcher;
     }
 
-
     get actionHandlerRegistry(): ActionHandlerRegistry {
         return this.diContainer.get<ActionHandlerRegistry>(ActionHandlerRegistry) as ActionHandlerRegistry;
     }
 
+    /*
+     * Method for requesting the current model for this widget
+     */
     public requestModel(): Promise<void> {
         return this.actionDispatcher.dispatch(new RequestModelAction({
             sourceUri: this.options.uri.replace("file://", ""),
@@ -110,7 +96,4 @@ export class DiffMergeDiagWidget extends GLSPDiagramWidget {
         }));
     }
 
-}
-function delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

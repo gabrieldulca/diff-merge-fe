@@ -188,10 +188,10 @@ export class ApplyDiffCommand extends FeedbackCommand {
             if (oldElem && oldElem instanceof TaskNode) {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 if (child) {
-                    /*const rect = child.childNodes[0] as HTMLElement;
+                    const rect = child.childNodes[0] as HTMLElement;
                     if (rect!.classList) {
                         rect!.classList.add("newly-deleted-node");
-                    }*/
+                    }
                     console.log("oldElem", oldElem);
                     this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
                     let x: SModelRootSchema = this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;

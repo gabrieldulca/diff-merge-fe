@@ -28,7 +28,7 @@ import { DiffTreeDecorator } from "./diff-decorator-service";
 import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
-import { DiffViewTreeModel } from "./diff-view-tree";
+import { DiffTreeModel } from "./diff-tree-model";
 
 
 /**
@@ -113,7 +113,7 @@ export class DiffTreeWidget extends TreeWidget {
         @inject(DiffTreeDecorator) protected readonly decorator: DiffTreeDecorator,
         @inject(MessageService) private readonly messageService: MessageService,
         @inject(DiffTreeProps) protected readonly treeProps: DiffTreeProps,
-        @inject(DiffViewTreeModel) model: DiffViewTreeModel,
+        @inject(DiffTreeModel) model: DiffTreeModel,
         @inject(ComparisonService) protected readonly comparisonService: ComparisonService,
         @inject(SplitPanelManager) protected readonly splitPanelManager: SplitPanelManager,
         @inject(CommandService) protected readonly commandService: CommandService,
@@ -195,8 +195,6 @@ export class DiffTreeWidget extends TreeWidget {
     protected readonly toggle = (event: React.MouseEvent<HTMLElement>) => this.doToggle(event);
 
     protected handleContextMenuEvent(node: DiffTreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
-        console.log("right clicked on node", node);
-
         if (SelectableTreeNode.is(node)) {
             this.model.selectNode(node);
             this.selectionService.selection = node;
@@ -207,8 +205,6 @@ export class DiffTreeWidget extends TreeWidget {
                 this.model.addSelection({ node, type });
             }*/
 
-            const contextMenuPath = this.props.contextMenuPath;
-            console.log("right clicked on node, cm", contextMenuPath);
             const { x, y } = event.nativeEvent;
 
             this.model.refresh();
@@ -216,8 +212,7 @@ export class DiffTreeWidget extends TreeWidget {
             for (const c of contributions) {
                 if (c instanceof MergeDiffMenuContribution) {
                     const mergeMenu: MergeDiffMenuContribution = c;
-                    console.log("diftreewidget this ", this);
-                    if(!this.secondWidget) {
+                    if (!this.secondWidget) {
                         mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), "");
                     } else {
                         mergeMenu.setFiles(this, this.baseWidget.uri.path.toString(), this.firstWidget.uri.path.toString(), this.secondWidget.uri.path.toString());
@@ -250,7 +245,7 @@ export class DiffTreeWidget extends TreeWidget {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([node.source!, node.target!]));
                 }
             }
-            if (node.changeType == "change") {
+            if (node.changeType === "change") {
                 if (node.elementType !== "SEdge") {
                     this.firstWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
                 } else {
@@ -270,14 +265,9 @@ export class DiffTreeWidget extends TreeWidget {
                     } else {
                         centerAction = new CenterAction([modelElementId]);
                     }
-                    //let found = false;
-                    const c = new CenterAction([modelElementId]);
-                    console.log("CENTERACTION FW", c);
-                    console.log("clicked node ################# ", node);
                     if (node.diffSource === "LEFT") {
                         this.firstWidget.glspActionDispatcher.dispatch(centerAction);
                         this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                            console.log("setting viewport for added node", result.viewport);
                             this.secondWidget.actionDispatcher.dispatch(new SetViewportAction(
                                 "sprotty", result.viewport, true)); //TODO change sprotty to model root
                             this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(

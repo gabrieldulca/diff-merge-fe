@@ -25,21 +25,27 @@ export class ViewPortChangeHandler implements IActionHandler {
 
     constructor(otherWidget: DiffMergeDiagWidget, threewayWidget?: DiffMergeDiagWidget) {
         this.otherWidget = otherWidget;
-        if(threewayWidget) {
+        if (threewayWidget) {
             this.threewayWidget = threewayWidget;
         }
     }
 
+    /*
+     * Synchronizes the widgets to each other, so that the viewport allways changes in both/all three of them
+     */
     handle(action: SetViewportAction): ICommand | Action | void {
         if (!(action instanceof ForwardedAction)) {
             this.otherWidget.actionDispatcher.dispatch(new ForwardedAction(action));
-            if(this.threewayWidget) {
+            if (this.threewayWidget) {
                 this.threewayWidget.actionDispatcher.dispatch(new ForwardedAction(action));
             }
         }
     }
 }
 
+/*
+ * Sets the viewport and makes sure it is not a repeated action
+ */
 export class ForwardedAction extends SetViewportAction {
     readonly kind: string = "viewport";
 

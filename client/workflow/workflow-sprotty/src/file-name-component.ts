@@ -22,6 +22,9 @@ export class EnableFileNameAction implements Action {
     static readonly KIND = "enableFileName";
     public fileName: string;
 
+    /*
+     * Action responsible for displaying the filenames in each widget
+     */
     constructor(fileName: string) {
         this.fileName = fileName;
     }
@@ -36,10 +39,12 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
     private fileName: string;
 
 
+    /*
+     * Displaying the filenames in the diagram widgets
+     */
     handle(action: Action): void | Action | ICommand {
         this.fileName = "";
         if (action.kind === EnableFileNameAction.KIND) {
-            console.log("enabling filename banner");
             this.actionDispatcher.dispatch(new SetUIExtensionVisibilityAction(FileNameBanner.ID, true));
             this.fileName = (action as EnableFileNameAction).fileName;
         }
@@ -48,34 +53,21 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
 
 
     id() { return FileNameBanner.ID; }
+
     containerClass() { return FileNameBanner.ID; }
 
-    /*initialize() {
-        if (!this.paletteItems) {
-            return false;
-        }
-        return super.initialize();
-    }*/
-
     protected initializeContents(containerElement: HTMLElement): void {
-        // this.createHeader();
-        // this.createBody();
         containerElement.innerText = this.fileName;
 
         const baseDiv = document.getElementById(this.options.baseDiv);
 
-
+        // creating div and setting text for filename
         if (baseDiv && baseDiv.parentNode) {
             const div = document.createElement("div");
             div.innerText = this.fileName;
             div.classList.add("filename-banner");
             baseDiv.parentNode.insertBefore(div, baseDiv);
         }
-
         containerElement.style.display = "none";
-
-        console.log("initializing filename banner", containerElement.innerText = this.fileName);
-
-
     }
 }

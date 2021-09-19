@@ -28,7 +28,7 @@ import { DiffLabelProvider } from "./diff-tree/diff-label-provider";
 import { DiffTreeProps } from "./diff-tree/diff-tree-props";
 import { DiffTreeService } from "./diff-tree/diff-tree-service";
 import { DiffTreeWidget, DiffViewWidgetFactory } from "./diff-tree/diff-tree-widget";
-import { DiffViewTreeModel } from "./diff-tree/diff-view-tree";
+import { DiffTreeModel } from "./diff-tree/diff-tree-model";
 import { SplitPanelManager } from "./split-panel-manager";
 import { ViewPortChangeHandler } from "./viewport-change-handler";
 import {registerMergeDiffContextMenu} from "./merge-diff-menu/merge-diff-menu-contribution";
@@ -96,8 +96,8 @@ function createDiffViewWidget(parent: interfaces.Container): DiffTreeWidget {
     child.bind(DiffTreeWidget).toSelf();
 
     child.unbind(TreeModelImpl);
-    child.bind(DiffViewTreeModel).toSelf();
-    child.rebind(TreeModel).toService(DiffViewTreeModel);
+    child.bind(DiffTreeModel).toSelf();
+    child.rebind(TreeModel).toService(DiffTreeModel);
 
     // child.bind(DiffDecoratorService).toSelf().inSingletonScope();
     // child.rebind(TreeDecoratorService).toDynamicValue(ctx => ctx.container.get(DiffDecoratorService)).inSingletonScope();

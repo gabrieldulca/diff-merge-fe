@@ -132,11 +132,6 @@ export class DiffTreeWidget extends TreeWidget {
         this.treeProps.multiSelect = false;
         this.saveChanges = this.saveChanges.bind(this);
         this.revertChanges = this.revertChanges.bind(this);
-        /*this.selectionService.onSelectionChanged(selection => {
-            console.log("Selection changed ", selection);
-        });*/
-        console.log("Selectionservice", this.selectionService);
-
     }
 
     public setRoot() {
@@ -147,7 +142,6 @@ export class DiffTreeWidget extends TreeWidget {
             children: [],
             parent: undefined
         } as CompositeTreeNode;
-        console.log("setting root node to", this.model.root);
     }
 
     /**
@@ -175,7 +169,6 @@ export class DiffTreeWidget extends TreeWidget {
                 }
             } else {
                 if (SelectableTreeNode.is(node)) {
-                    console.log("toggeling node", node);
                     event.currentTarget.setAttribute('data-node-id', node.id);
                     event.currentTarget.setAttribute('data-model-element-id', node.modelElementId);
                     this.toggle(event);
@@ -234,10 +227,8 @@ export class DiffTreeWidget extends TreeWidget {
     protected doToggle(event: React.MouseEvent<HTMLElement>): void {
         const nodeId = event.currentTarget.getAttribute('data-node-id');
         const modelElementId = event.currentTarget.getAttribute('data-model-element-id');
-        console.log("clicked on nodeId", nodeId);
         if (nodeId && modelElementId) {
             const node: DiffTreeNode = this.model.getNode(nodeId) as DiffTreeNode;
-            console.log("clicked on", node);
             if (node.changeType === "delete") {
                 if (node.elementType !== "SEdge") {
                     this.baseWidget.glspActionDispatcher.dispatch(new CenterAction([modelElementId]));
@@ -278,7 +269,6 @@ export class DiffTreeWidget extends TreeWidget {
                     if (node.diffSource === "RIGHT") {
                         this.secondWidget.glspActionDispatcher.dispatch(centerAction);
                         this.secondWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                            console.log("setting viewport for added node", result.viewport);
                             this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
                                 "sprotty", result.viewport, true)); //TODO change sprotty to model root
                             this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
@@ -305,9 +295,7 @@ export class DiffTreeWidget extends TreeWidget {
                 }
             }
             if (node.changeType === "delete") {
-                console.log("setting viewport for deleted node", node);
                 this.baseWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
-                    console.log("setting viewport for deleted node", result.viewport);
                     this.firstWidget.actionDispatcher.dispatch(new SetViewportAction(
                         "sprotty", result.viewport, true));//TODO change sprotty to model root
                     if (this.secondWidget) {
@@ -335,7 +323,6 @@ export class DiffTreeWidget extends TreeWidget {
         this.additions = additions;
         this.deletions = deletions;
         this.changes = changes;
-        console.log("DELETIONS!!!! ", deletions);
         this.model.root = {
             id: 'diff-tree-view-differences',
             name: 'Model differences',
@@ -380,8 +367,6 @@ export class DiffTreeWidget extends TreeWidget {
             } as DiffTreeNode],
             parent: undefined
         } as DiffTreeNode;
-        console.log("additions in tree: ", additions);
-        console.log("TREEE!!!! ", this.model.root);
     }
 
     /**
@@ -419,16 +404,13 @@ export class DiffTreeWidget extends TreeWidget {
     }
 
     public async saveChanges() {
-        console.log("THIS", this);
-        console.log("THIS base filepath", MergeDiffMenuContribution.baseFilePath);
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
-        const status = await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
+        await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
             console.log("Invocation result: ", result);
         }, (reject) => {
             console.log("Rejected promise ", reject);
         });
-        console.log(status);
         this.messageService.info("Applied changes have been saved!");
     }
 

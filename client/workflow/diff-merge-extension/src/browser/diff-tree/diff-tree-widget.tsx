@@ -132,6 +132,7 @@ export class DiffTreeWidget extends TreeWidget {
         this.treeProps.multiSelect = false;
         this.saveChanges = this.saveChanges.bind(this);
         this.revertChanges = this.revertChanges.bind(this);
+        this.mergeNonConflicting = this.mergeNonConflicting.bind(this);
     }
 
     public setRoot() {
@@ -390,6 +391,7 @@ export class DiffTreeWidget extends TreeWidget {
             return <div>
                 <button type="button" style={buttonStyle} onClick={this.saveChanges}>Save</button>
                 <button type="button" style={buttonStyle} onClick={this.revertChanges}>Cancel</button>
+                <button type="button" style={buttonStyle} onClick={this.mergeNonConflicting}>Merge non-conflicting changes</button>
             </div>;
         } else if (node.elementType === 'TaskNode') {
             classNameIcon = "fas fa-genderless";
@@ -412,6 +414,24 @@ export class DiffTreeWidget extends TreeWidget {
             console.log("Rejected promise ", reject);
         });
         this.messageService.info("Applied changes have been saved!");
+    }
+
+    public async mergeNonConflicting() {
+        const baseFilePath = this.baseWidget.uri.path.toString();
+        const firstFilePath = this.firstWidget.uri.path.toString();
+
+        if (this.secondWidget) {
+            await this.comparisonService.getThreeWayMergeResult(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString());
+                /*.then((result) => {
+                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                });*/
+        } else {
+            await this.comparisonService.getMergeResult(baseFilePath, firstFilePath);
+                /*.then((result) => {
+                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+                });*/
+        }
+        this.messageService.info("File " + this.baseWidget.uri.path.base + " has been merged");
     }
 
     public async revertChanges() {

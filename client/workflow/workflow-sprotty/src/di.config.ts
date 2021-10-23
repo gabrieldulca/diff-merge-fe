@@ -79,7 +79,7 @@ import {
     SRoutingHandleView,
     toolFeedbackModule,
     toolsModule,
-    TYPES,
+    TYPES, UpdateModelCommand,
     validationModule,
     viewportModule,
     zorderModule
@@ -92,6 +92,7 @@ import { ActivityNode, Icon, TaskNode, WeightedEdge } from "./model";
 import { GotoContextMenuItemProvider } from "./navigation";
 import { ApplyDiffCommand } from "./apply-diff-action";
 import { ForkOrJoinNodeView, IconView, TaskNodeView, WeightedEdgeView, WorkflowEdgeView } from "./workflow-views";
+import {CustomUpdateModelCommand} from "./custom-update-model";
 
 const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
@@ -103,6 +104,9 @@ const workflowDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     bind(TYPES.IContextMenuItemProvider).to(GotoContextMenuItemProvider);
     const context = { bind, unbind, isBound, rebind };
     configureCommand(context, ApplyDiffCommand);
+    configureCommand(context, UpdateModelCommand);
+    configureCommand(context, CustomUpdateModelCommand);
+    rebind(UpdateModelCommand).to(CustomUpdateModelCommand);
     // configureActionHandler({ bind, isBound }, SetViewportAction.KIND, ViewPortChangeHandler);
     configureModelElement(context, 'graph', GLSPGraph, SGraphView);
     configureModelElement(context, 'task:automated', TaskNode, TaskNodeView);

@@ -122,41 +122,44 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     leftWidget.title.caption = "asd";
                     leftWidget.title.iconClass = 'fa navigator-tab-icon';
                     console.log("Left widget ", leftWidget);
+                    console.log("Right widget ", rightWidget);
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
                     const diffTreeWidget = await this.diffTreeService.createWidget();
                     diffTreeWidget.setDiagWidgets(leftWidget, rightWidget);
-
+                    console.log("Tree widget", diffTreeWidget);
                     await this.splitPanelManager.createWidgetSplitPanel(rightWidgetOptions).then(function (widgetSplitPanel: DiffSplitPanel) {
                         widgetSplitPanel.initWidgetSplitPanel(leftWidget, rightWidget, diffUri);
+                        console.log("Initialized split panel", widgetSplitPanel);
                         _this.splitPanelManager.doCustomOpen(leftWidget, widgetSplitPanel, diffUri, wop, diffTreeWidget, title).then(() => {
                             let additions: DiffTreeNode[] = [];
                             let deletions: DiffTreeNode[] = [];
                             let changes: DiffTreeNode[] = [];
+                            console.log("Opened split panel");
                             leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                console.log("Right widget MODELSOURCE before diff", rightWidget.ms);
-                                rightWidget.requestModel().then( (result) => console.log("Right widget REQUEST MODEL MODELSOURCE before diff", result));
-                                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, "", "left", leftWidget.widgetId, rightWidget.widgetId, rightWidget.ms);
-                                console.log("Right widget MODELSOURCE after diff", rightWidget.ms);
+                                let diffAction = new ApplyDiffAction(comparison, leftWidget.widgetId, "", "left", leftWidget.widgetId, rightWidget.widgetId, rightWidget.ms);
+                                console.log("Created diffAction for left side", rightWidget.widgetId);
 
                                 leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                    console.log("Applying diffAction on left side");
                                     deletions = diffAction.deletionsTree as DiffTreeNode[];
                                 }).then(() => {
                                     rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                        const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
-
+                                        diffAction = new ApplyDiffAction(comparison, rightWidget.widgetId, "", "right", leftWidget.widgetId, rightWidget.widgetId, rightWidget.ms);
+                                        console.log("Created diffAction for right side");
                                         rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
+                                            console.log("Applying diffAction on right side");
                                             changes = diffAction.changesTree as DiffTreeNode[];
                                             additions = diffAction.additionsTree as DiffTreeNode[];
                                         }).then(() => {
+                                            console.log("Setting tree changes");
                                             diffTreeWidget.setChanges(additions, deletions, changes);
+                                            rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                                            rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
                                         });
-                                        rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                        rightWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(firstComparisonFile!.path.base));
-
                                     });
                                 });
-                                console.log("deltions", deletions);
+                                console.log("deletions", deletions);
                                 leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                                 leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
 
@@ -164,7 +167,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         });
 
                     });
-                    console.log("Left widget ", leftWidget);
+                    console.log("Finished comparison");
                 } else if (this.baseComparisonFile && this.firstComparisonFile) {
                     console.log("base file", this.baseComparisonFile.path.toString());
                     console.log("first file", this.firstComparisonFile.path.toString());
@@ -271,6 +274,13 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const firstComparisonFile = UriSelection.getUri(this.selectionService.selection);
                     console.log("second merge file", firstComparisonFile!.path.toString());
                     const merge = await this.comparisonService.getMergeResult(this.baseComparisonFile.path.toString(), firstComparisonFile!.path.toString());
+                    console.log("merge result", merge);
+                } else if (this.baseComparisonFile && this.firstComparisonFile) {
+                    console.log("base merge file", this.baseComparisonFile.path.toString());
+                    console.log("first merge file", this.firstComparisonFile.path.toString());
+                    const secondComparisonFile = UriSelection.getUri(this.selectionService.selection);
+                    console.log("second merge file", secondComparisonFile!.path.toString());
+                    const merge = await this.comparisonService.getThreeWayMergeResult(this.baseComparisonFile.path.toString(), this.firstComparisonFile!.path.toString(), secondComparisonFile!.path.toString());
                     console.log("merge result", merge);
                 }
 

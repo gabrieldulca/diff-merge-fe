@@ -27,6 +27,7 @@ import { inject, injectable } from "inversify";
 import { ChangedElem, ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
 import {ModelSource, SModelRootSchema, SModelElementSchema, SChildElement, UpdateModelAction, SCompartment, SShapeElement, SLabel} from "sprotty";
+import {CustomUpdateModelCommand} from "./custom-update-model";
 
 @injectable()
 export class ApplyDiffAction implements Action {
@@ -146,10 +147,30 @@ export class ApplyDiffCommand extends FeedbackCommand {
         } as SModelElementSchema;
     }
 
+    mapEdgeToSMESchema(oldElem: SEdge, deletions: string[]): SModelElementSchema {
+        let sid = oldElem.sourceId;
+        if (deletions.indexOf(sid) !== -1) {
+            sid += "_deleted";
+        }
+        let tid = oldElem.targetId;
+        if (deletions.indexOf(tid) !== -1) {
+            tid += "_deleted";
+        }
+        return {
+            type: oldElem.type,
+            id: oldElem.id + "_deleted",
+            children: [],
+            sourceId: sid,
+            targetId: tid,
+            bounds: oldElem.bounds,
+            routerKind: oldElem.routerKind
+        } as SModelElementSchema;
+    }
+
     mapChildrenToSMESchema(children: SChildElement[]): SModelElementSchema[] {
         const childrenSchemas: SModelElementSchema[] = [];
          for (const c of children) {
-             let schema: any = { id: c.id, type: c.type };
+             const schema: any = { id: c.id, type: c.type };
              if (c.children.length > 0) {
                  schema.children = this.mapChildrenToSMESchema(c.children as SChildElement[]);
              }
@@ -180,56 +201,54 @@ export class ApplyDiffCommand extends FeedbackCommand {
     }
 
     markDeletions(context: CommandExecutionContext, deletions: string[]): void {
+        if (this.action.widgetSide === "right") {
+            return;
+        }
+        console.log("Starting to draw deletions for", this.action.widgetId);
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
-            if (oldElem && oldElem instanceof TaskNode) {
+            if (oldElem) {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 if (child) {
-                    const rect = child.childNodes[0] as HTMLElement;
-                    if (rect!.classList) {
-                        rect!.classList.add("newly-deleted-node");
-                    }
-                    console.log("oldElem", oldElem);
-                    this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
-                    let x: SModelRootSchema = this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;
-                    console.log("MODEL", x);
-                    this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(this.action.rightWidgetRoot)).then(
-                        () => {
-                            const childRight = document.getElementById(this.action.rightWidgetId + oldElem!.id + "_deleted");
-                            console.log("TO BE COLORED", this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
-                            console.log("TO BE COLORED", childRight);
-                            if(childRight) {
-                                const rect = childRight.childNodes[0] as HTMLElement;
-                                if (rect!.classList) {
-                                    rect!.classList.add("newly-deleted-node");
-                                }
-                            }
-                        });
-
-                }
-
-            } else if (oldElem && oldElem instanceof SEdge) {
-                if (oldElem.cssClasses) {
-                    oldElem.cssClasses.concat(["newly-deleted-edge"]);
-                    const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                    if (child) {
-                        const arrow = child!.childNodes[1] as HTMLElement;
-                        if (arrow!.classList) {
-                            arrow!.classList.add("newly-deleted-arrow");
-                        }
-                    }
-                } else {
-                    oldElem.cssClasses = ["newly-deleted-edge"];
-                    const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                    if (child) {
-                        const arrow = child!.childNodes[1] as HTMLElement;
-                        if (arrow!.classList) {
-                            arrow!.classList.add("newly-deleted-arrow");
-                        }
+                    if (oldElem && oldElem instanceof TaskNode) {
+                        this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
+                    } else if (oldElem && oldElem instanceof SEdge) {
+                        this.action.rightWidgetRoot.children!.push(this.mapEdgeToSMESchema(oldElem, deletions));
                     }
                 }
             }
         }
+        console.log("Starting to commit model");
+        this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;
+        CustomUpdateModelCommand.setModelRoot(context, this.action.rightWidgetRoot);
+        console.log("Starting to color elems", this.action.rightWidgetId);
+        this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(this.action.rightWidgetRoot)).then(
+        () => {
+            for (const del of deletions) {
+                const oldElem = context.root.index.getById(del);
+                if (oldElem) {
+                    const childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                    if (childRight) {
+                        if (oldElem && oldElem instanceof TaskNode) {
+                            const rect = childRight.childNodes[0] as HTMLElement;
+                            if (rect!.classList) {
+                                rect!.classList.add("newly-deleted-node");
+                            }
+                            console.log("Colored node", childRight);
+                        } else if (oldElem && oldElem instanceof SEdge) {
+                            if (childRight.classList) {
+                                childRight.classList.add("newly-deleted-arrow");
+                            }
+                            const arrow = childRight.childNodes[1] as HTMLElement;
+                            if (arrow!.classList) {
+                                arrow!.classList.add("newly-deleted-node");
+                            }
+                            console.log("Colored edge", childRight);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     markThreewayDeletion(context: CommandExecutionContext, del: string, direction: string): void {

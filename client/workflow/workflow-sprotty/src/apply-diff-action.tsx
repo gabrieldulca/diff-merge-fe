@@ -237,11 +237,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
                             console.log("Colored node", childRight);
                         } else if (oldElem && oldElem instanceof SEdge) {
                             if (childRight.classList) {
-                                childRight.classList.add("newly-deleted-arrow");
+                                childRight.classList.add("newly-deleted-edge");
                             }
                             const arrow = childRight.childNodes[1] as HTMLElement;
                             if (arrow!.classList) {
-                                arrow!.classList.add("newly-deleted-node");
+                                arrow!.classList.add("newly-deleted-arrow");
                             }
                             console.log("Colored edge", childRight);
                         }

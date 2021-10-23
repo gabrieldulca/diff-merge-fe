@@ -250,27 +250,27 @@ sprotty-node.task.manual.newly-added-node {
 .newly-deleted-node {
     fill: lightcoral !important;
     stroke: darkred!important;
-    opacity: 0.5!important;
+    opacity: 0.3!important;
 }
 
 .newly-deleted-edge {
     stroke: lightcoral !important;
-    opacity: 0.5!important;
+    opacity: 0.3!important;
 }
 
 .newly-deleted-edge.mouseover {
-    opacity: 1!important;
+    opacity: 0.7!important;
 }
 
 .newly-deleted-node.mouseover {
     stroke: darkred !important;
-    opacity: 1!important;
+    opacity: 0.7!important;
 }
 
 .newly-deleted-arrow {
     fill: lightcoral !important;
     stroke: lightcoral !important;
-    opacity: 0.5!important;
+    opacity: 0.3!important;
 }
 
 .newly-deleted-arrow.mouseover {

@@ -42,11 +42,13 @@ export class ApplyDiffAction implements Action {
     public rightWidgetId: string | undefined;
     public baseWidgetId: string | undefined;
     public rightWidgetRoot: SModelRootSchema;
+    public leftWidgetRoot: SModelRootSchema;
     public rightWidgetMS: ModelSource;
+    public leftWidgetMS: ModelSource;
 
 
     constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string, leftWidgetId?: string,
-                rightWidgetId?: string, rightWidgetMS?: ModelSource, baseWidgetId?: string) {
+                rightWidgetId?: string, leftWidgetMS?: ModelSource, rightWidgetMS?: ModelSource, baseWidgetId?: string) {
         this.widgetId = widgetId.replace("widget", "");
         this.requestId = requestId;
         this.comparison = comparison;
@@ -69,6 +71,16 @@ export class ApplyDiffAction implements Action {
             }) as SModelRootSchema;
             rightWidgetMS.commitModel(this.rightWidgetRoot);
             console.log("MODELSOURCE right widget promise", this.rightWidgetRoot);
+        }
+        if (leftWidgetMS != null) {
+            console.log("MODELSOURCE right widget", leftWidgetMS);
+            this.leftWidgetMS = leftWidgetMS;
+            this.leftWidgetRoot = leftWidgetMS.commitModel({
+                type: 'NONE',
+                id: 'ROOT'
+            }) as SModelRootSchema;
+            leftWidgetMS.commitModel(this.leftWidgetRoot);
+            console.log("MODELSOURCE right widget promise", this.leftWidgetRoot);
         }
         if (baseWidgetId != null) {
             this.baseWidgetId = baseWidgetId;
@@ -122,7 +134,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         this.getAdditionsTree(context, additions);
 
         if (this.action.comparison.threeWay === false) { // For threeway they are marked individually
-            this.markDeletions(context, deletions);
+            this.markDeletions(context, deletions, this.action.rightWidgetRoot, this.action.rightWidgetMS);
         }
         this.getDeletionsTree(context, deletions);
 
@@ -200,8 +212,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
          return childrenSchemas;
     }
 
-    markDeletions(context: CommandExecutionContext, deletions: string[]): void {
-        if (this.action.widgetSide === "right") {
+    markDeletions(context: CommandExecutionContext, deletions: string[], widgetRoot: SModelRootSchema, widgetMS: ModelSource): void {
+        if ((this.action.comparison.threeWay === false && this.action.widgetSide === "right") || this.action.widgetSide === "base") {
             return;
         }
         console.log("Starting to draw deletions for", this.action.widgetId);
@@ -211,23 +223,28 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 if (child) {
                     if (oldElem && oldElem instanceof TaskNode) {
-                        this.action.rightWidgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
+                        widgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
                     } else if (oldElem && oldElem instanceof SEdge) {
-                        this.action.rightWidgetRoot.children!.push(this.mapEdgeToSMESchema(oldElem, deletions));
+                        widgetRoot.children!.push(this.mapEdgeToSMESchema(oldElem, deletions));
                     }
                 }
             }
         }
         console.log("Starting to commit model");
-        this.action.rightWidgetMS.commitModel(this.action.rightWidgetRoot) as SModelRootSchema;
-        CustomUpdateModelCommand.setModelRoot(context, this.action.rightWidgetRoot);
-        console.log("Starting to color elems", this.action.rightWidgetId);
-        this.action.rightWidgetMS.actionDispatcher.dispatch(new UpdateModelAction(this.action.rightWidgetRoot)).then(
+        widgetMS.commitModel(widgetRoot) as SModelRootSchema;
+        CustomUpdateModelCommand.setModelRoot(context, widgetRoot);
+        console.log("Starting to color elems", this.action.widgetId);
+        widgetMS.actionDispatcher.dispatch(new UpdateModelAction(widgetRoot)).then(
         () => {
             for (const del of deletions) {
                 const oldElem = context.root.index.getById(del);
                 if (oldElem) {
-                    const childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                    let childRight = null;
+                    if((this.action.comparison.threeWay === false) || (this.action.comparison.threeWay === true && this.action.widgetSide === "left")) {
+                        childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                    } else if(this.action.comparison.threeWay === true && this.action.widgetSide === "right") {
+                        childRight = document.getElementById(this.action.leftWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                    }
                     if (childRight) {
                         if (oldElem && oldElem instanceof TaskNode) {
                             const rect = childRight.childNodes[0] as HTMLElement;
@@ -484,15 +501,25 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     getDeletions(context: CommandExecutionContext, comparison: ComparisonDto): string[] {
         let deletions: string[] = [];
+        let leftSideDeletions: string[] = [];
+        let rightSideDeletions: string[] = [];
         if (comparison.matches != null) {
             for (const match of comparison.matches) {
-                deletions = deletions.concat(this.getSubMatchDeletions(context, match, comparison.threeWay));
+                deletions = deletions.concat(this.getSubMatchDeletions(context, match, comparison.threeWay, leftSideDeletions, rightSideDeletions));
             }
+        }
+        console.log("right side deletions", rightSideDeletions);
+        if(rightSideDeletions.length > 0) {
+            this.markDeletions(context, rightSideDeletions, this.action.rightWidgetRoot, this.action.rightWidgetMS);
+        }
+        console.log("left side deletions", leftSideDeletions);
+        if(leftSideDeletions.length > 0) {
+            this.markDeletions(context, leftSideDeletions, this.action.leftWidgetRoot, this.action.leftWidgetMS);
         }
         return deletions;
     }
 
-    getSubMatchDeletions(context: CommandExecutionContext, match: MatchDto, threeWay: boolean): string[] {
+    getSubMatchDeletions(context: CommandExecutionContext, match: MatchDto, threeWay: boolean, leftSideDeletions: string[], rightSideDeletions: string[]): string[] {
         let deletions: string[] = [];
         let source = undefined;
         let target = undefined;
@@ -521,13 +548,14 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    deletions = deletions.concat(this.getSubMatchDeletions(context, subMatch, threeWay));
+                    deletions = deletions.concat(this.getSubMatchDeletions(context, subMatch, threeWay, leftSideDeletions, rightSideDeletions));
                 }
             }
         } else {
             if ((match.right === null) && (match.origin != null) && (match.origin.id != null)) {
                 deletions.push(match.origin.id);
-                this.markThreewayDeletion(context, match.origin.id, "right");
+                rightSideDeletions.push(match.origin.id);
+                //this.markThreewayDeletion(context, match.origin.id, "right");
                 let name: string = "";
                 const modelElem = context.root.index.getById(match.origin.id);
                 if (modelElem && modelElem instanceof TaskNode) {
@@ -551,7 +579,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             if ((match.left === null) && (match.origin != null) && (match.origin.id != null)) {
                 deletions.push(match.origin.id);
-                this.markThreewayDeletion(context, match.origin.id, "left");
+                leftSideDeletions.push(match.origin.id);
+                //this.markThreewayDeletion(context, match.origin.id, "left");
                 let name: string = "";
                 const modelElem = context.root.index.getById(match.origin.id);
                 if (modelElem && modelElem instanceof TaskNode) {
@@ -575,11 +604,12 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
             if (match.subMatches != null) {
                 for (const subMatch of match.subMatches) {
-                    deletions = deletions.concat(this.getSubMatchDeletions(context, subMatch, threeWay));
+                    deletions = deletions.concat(this.getSubMatchDeletions(context, subMatch, threeWay, leftSideDeletions, rightSideDeletions));
                 }
             }
             // TODO threeway :)
         }
+
         return deletions;
     }
 

@@ -170,13 +170,13 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
         const rightWidget: DiffMergeDiagWidget = splitPanelManager.getRightWidget();
         if (MergeDiffMenuContribution.secondFilePath === "") {
             leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                const diffAction = new ApplyDiffAction(comparison, leftWidget.id);
+                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, "", "left", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms);
 
                 leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                     deletions = diffAction.deletionsTree as DiffTreeNode[];
                 }).then(() => {
                     rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                        const diffAction = new ApplyDiffAction(comparison, rightWidget.id);
+                        const diffAction = new ApplyDiffAction(comparison, rightWidget.id, "", "right", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms);
 
                         rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                             changes = diffAction.changesTree as DiffTreeNode[];
@@ -203,19 +203,19 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
             const rightWidget: DiffMergeDiagWidget = splitPanelManager.getRightWidget();
             const baseWidget: DiffMergeDiagWidget = splitPanelManager.getBaseWidget();
             leftWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, undefined, "left");
+                const diffAction = new ApplyDiffAction(comparison, leftWidget.id, undefined, "left", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms, baseWidget.widgetId);
                 leftWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                     additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
                     changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
                 }).then(() => {
                     baseWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                        const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base");
+                        const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms, baseWidget.widgetId);
                         baseWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                             changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);
                             deletions = diffAction.deletionsTree as DiffTreeNode[];
                         }).then(() => {
                             rightWidget.glspActionDispatcher.onceModelInitialized().then(function () {
-                                const diffAction = new ApplyDiffAction(comparison, rightWidget.id, undefined, "right");
+                                const diffAction = new ApplyDiffAction(comparison, rightWidget.id, undefined, "right", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms, baseWidget.widgetId);
                                 rightWidget.glspActionDispatcher.dispatch(diffAction).then(() => {
                                     additions = additions.concat(diffAction.additionsTree as DiffTreeNode[]);
                                     changes = changes.concat(diffAction.changesTree as DiffTreeNode[]);

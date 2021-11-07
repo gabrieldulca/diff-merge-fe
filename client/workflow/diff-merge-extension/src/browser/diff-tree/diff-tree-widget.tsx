@@ -29,6 +29,7 @@ import { DiffLabelProvider } from "./diff-label-provider";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
 import { DiffTreeModel } from "./diff-tree-model";
+import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 
 
 /**
@@ -67,13 +68,15 @@ export const DiffViewWidgetFactory = Symbol('DiffViewWidgetFactory');
 @injectable()
 export class DiffTreeWidget extends TreeWidget {
 
-    setDiagWidgets(baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
+    setDiagWidgets(comparison: ComparisonDto,baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
+        this.comparison = comparison;
         this.baseWidget = baseWidget;
         this.firstWidget = firstWidget;
         if (secondWidget) {
             this.secondWidget = secondWidget;
         }
     }
+    public comparison: ComparisonDto;
     private baseWidget: DiffMergeDiagWidget;
     private firstWidget: DiffMergeDiagWidget;
     private secondWidget: DiffMergeDiagWidget;
@@ -441,11 +444,17 @@ export class DiffTreeWidget extends TreeWidget {
         if (this.secondWidget) {
             await this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString())
                 .then((result) => {
+                    this.comparison = result;
+                    console.log("Canceled all changes, comparison is", result);
+                    MergeDiffMenuContribution.diffTreeWidget = this;
                     MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
                 });
         } else {
             await this.comparisonService.revertFiles(baseFilePath, firstFilePath)
                 .then((result) => {
+                    this.comparison = result;
+                    console.log("Canceled all changes, comparison is", result);
+                    MergeDiffMenuContribution.diffTreeWidget = this;
                     MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
                 });
         }

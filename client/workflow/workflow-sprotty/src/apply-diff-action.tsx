@@ -63,30 +63,30 @@ export class ApplyDiffAction implements Action {
             this.rightWidgetId = rightWidgetId;
         }
         if (rightWidgetMS != null) {
-            console.log("MODELSOURCE right widget", rightWidgetMS);
+            //console.log("MODELSOURCE right widget", rightWidgetMS);
             this.rightWidgetMS = rightWidgetMS;
             this.rightWidgetRoot = rightWidgetMS.commitModel({
                 type: 'NONE',
                 id: 'ROOT'
             }) as SModelRootSchema;
             rightWidgetMS.commitModel(this.rightWidgetRoot);
-            console.log("MODELSOURCE right widget promise", this.rightWidgetRoot);
+            //console.log("MODELSOURCE right widget promise", this.rightWidgetRoot);
         }
         if (leftWidgetMS != null) {
-            console.log("MODELSOURCE right widget", leftWidgetMS);
+            //console.log("MODELSOURCE right widget", leftWidgetMS);
             this.leftWidgetMS = leftWidgetMS;
             this.leftWidgetRoot = leftWidgetMS.commitModel({
                 type: 'NONE',
                 id: 'ROOT'
             }) as SModelRootSchema;
             leftWidgetMS.commitModel(this.leftWidgetRoot);
-            console.log("MODELSOURCE right widget promise", this.leftWidgetRoot);
+            //console.log("MODELSOURCE right widget promise", this.leftWidgetRoot);
         }
         if (baseWidgetId != null) {
             this.baseWidgetId = baseWidgetId;
         }
 
-        console.log("MODELSOURCE right", rightWidgetMS);
+        //console.log("MODELSOURCE right", rightWidgetMS);
 
     }
     readonly kind = ApplyDiffCommand.KIND;
@@ -223,9 +223,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 const child = document.getElementById(this.action.widgetId + oldElem!.id);
                 if (child) {
                     if (oldElem && oldElem instanceof TaskNode) {
-                        widgetRoot.children!.push(this.mapTNToSMESchema(oldElem));
+                        let mappedOldElem = this.mapTNToSMESchema(oldElem);
+                        widgetRoot.children = widgetRoot.children!.filter(obj => obj.id !== mappedOldElem.id);
+                        widgetRoot.children!.push(mappedOldElem);
                     } else if (oldElem && oldElem instanceof SEdge) {
-                        widgetRoot.children!.push(this.mapEdgeToSMESchema(oldElem, deletions));
+                        let mappedOldElem = this.mapEdgeToSMESchema(oldElem, deletions);
+                        widgetRoot.children = widgetRoot.children!.filter(obj => obj.id !== mappedOldElem.id);
+                        widgetRoot.children!.push(mappedOldElem);
                     }
                 }
             }
@@ -433,12 +437,19 @@ export class ApplyDiffCommand extends FeedbackCommand {
     }
 
     getDeletionsTree(context: CommandExecutionContext, deletions: string[]): void {
+        console.log("TREE FOR DELETIONS", this.action.widgetSide);
+        console.log("TREE FOR DELETIONS DELETIONS", deletions);
+        console.log("PREV TREE FOR DELETIONS", this.action.deletionsTree);
         for (const del of deletions) {
             const node: DiffTreeNode = new DiffTreeNode();
-            node.id = del + "_delete";
+            node.id = del + "_deleted";
             node.modelElementId = del;
             node.diffSource = this.changedElems.get(del)!.diffSource;
             const oldElem = context.root.index.getById(del);
+            console.log("TREE FOR DELETIONS DEL", del);
+            console.log("TREE FOR DELETIONS CONTEXT ROOT", context.root);
+            console.log("TREE FOR DELETIONS OLDELEM", oldElem);
+            console.log("TREE FOR DELETIONS INDEXOF", this.action.deletionsTree.indexOf(node));
             if (oldElem && oldElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(del)!.name;
                 node.elementType = "TaskNode";
@@ -454,6 +465,8 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 this.action.deletionsTree.push(node);
             }
         }
+        console.log("NEW TREE FOR DELETIONS", this.action.deletionsTree);
+
     }
 
     getChangesTree(context: CommandExecutionContext, changes: string[], widgetSide: string): void {

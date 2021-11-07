@@ -109,8 +109,8 @@ export class CustomUpdateModelCommand extends UpdateModelCommand {
         if ((this.action.animate === undefined || this.action.animate) && oldRoot.id === newRoot.id) {
 
             if (CustomUpdateModelCommand.deletedModelRoot) {
-                console.log("Changing model root for", newRoot);
-                console.log("Changing model root to", CustomUpdateModelCommand.deletedModelRoot);
+                //console.log("Changing model root for", newRoot);
+                //console.log("Changing model root to", CustomUpdateModelCommand.deletedModelRoot);
                 //oldRoot = CustomUpdateModelCommand.deletedModelRoot;
                 //newRoot = CustomUpdateModelCommand.deletedModelRoot;
             }

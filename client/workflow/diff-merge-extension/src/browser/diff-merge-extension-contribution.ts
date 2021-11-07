@@ -126,7 +126,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const diffUri: URI = DiffUris.encode(this.baseComparisonFile, firstComparisonFile!);
                     const title = "diff:[" + this.baseComparisonFile!.path.base + "," + firstComparisonFile!.path.base + "]";
                     const diffTreeWidget = await this.diffTreeService.createWidget();
-                    diffTreeWidget.setDiagWidgets(leftWidget, rightWidget);
+                    diffTreeWidget.setDiagWidgets(comparison, leftWidget, rightWidget);
                     console.log("Tree widget", diffTreeWidget);
                     await this.splitPanelManager.createWidgetSplitPanel(rightWidgetOptions).then(function (widgetSplitPanel: DiffSplitPanel) {
                         widgetSplitPanel.initWidgetSplitPanel(leftWidget, rightWidget, diffUri);
@@ -196,7 +196,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     const diffUri: URI = DiffUris.encode(DiffUris.encode(this.firstComparisonFile, this.baseComparisonFile), secondComparisonFile!);
                     const title = "diff:[" + this.firstComparisonFile!.path.base + "," + this.baseComparisonFile.path.base + "," + secondComparisonFile!.path.base + "]";
                     const diffTreeWidget = await this.diffTreeService.createWidget();
-                    diffTreeWidget.setDiagWidgets(baseWidget, firstWidget, secondWidget);//TODO
+                    diffTreeWidget.setDiagWidgets(comparison, baseWidget, firstWidget, secondWidget);//TODO
 
                     await this.splitPanelManager.createWidgetSplitPanel(options2).then(function (widgetSplitPanel: DiffSplitPanel) {
                         widgetSplitPanel.initThreewayDiffPanel(firstWidget, baseWidget, secondWidget, diffUri);

@@ -260,12 +260,22 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         }
                         if (childRight) {
                             if (oldElem && oldElem instanceof TaskNode) {
+                                if (oldElem.cssClasses) {
+                                    oldElem.cssClasses.concat(["newly-deleted-node"]);
+                                } else {
+                                    oldElem.cssClasses = ["newly-deleted-node"];
+                                }
                                 const rect = childRight.childNodes[0] as HTMLElement;
                                 if (rect!.classList) {
                                     rect!.classList.add("newly-deleted-node");
                                 }
                                 console.log("Colored node", childRight);
                             } else if (oldElem && oldElem instanceof SEdge) {
+                                if (oldElem.cssClasses) {
+                                    oldElem.cssClasses.concat(["newly-deleted-edge"]);
+                                } else {
+                                    oldElem.cssClasses = ["newly-deleted-edge"];
+                                }
                                 if (childRight.classList) {
                                     childRight.classList.add("newly-deleted-edge");
                                 }

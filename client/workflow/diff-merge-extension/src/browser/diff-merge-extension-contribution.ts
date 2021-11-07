@@ -161,7 +161,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                                 });
                                 console.log("deletions", deletions);
                                 leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
+                                leftWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base, true));
 
                             });
                         });
@@ -233,7 +233,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                                             });
                                         });
                                         baseWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                                        baseWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base));
+                                        baseWidget.glspActionDispatcher.dispatch(new EnableFileNameAction(_this.baseComparisonFile!.path.base, true));
                                     });
                                 });
                                 firstWidget.glspActionDispatcher.dispatch(new CenterAction([]));

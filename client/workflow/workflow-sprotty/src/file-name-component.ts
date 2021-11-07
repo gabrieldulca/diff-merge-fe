@@ -21,12 +21,16 @@ import { AbstractUIExtension, Action, IActionHandler, ICommand, SetUIExtensionVi
 export class EnableFileNameAction implements Action {
     static readonly KIND = "enableFileName";
     public fileName: string;
+    public isCurrent:boolean = false;
 
     /*
      * Action responsible for displaying the filenames in each widget
      */
-    constructor(fileName: string) {
+    constructor(fileName: string, isCurrent?: boolean) {
         this.fileName = fileName;
+        if(isCurrent) {
+            this.isCurrent = isCurrent;
+        }
     }
     readonly kind = EnableFileNameAction.KIND;
 }
@@ -37,7 +41,7 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
     @inject(TYPES.IActionDispatcher) protected readonly actionDispatcher: GLSPActionDispatcher;
     static readonly ID = "file-name-banner";
     private fileName: string;
-
+    public isCurrent:boolean = false;
 
     /*
      * Displaying the filenames in the diagram widgets
@@ -47,6 +51,7 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
         if (action.kind === EnableFileNameAction.KIND) {
             this.actionDispatcher.dispatch(new SetUIExtensionVisibilityAction(FileNameBanner.ID, true));
             this.fileName = (action as EnableFileNameAction).fileName;
+            this.isCurrent = (action as EnableFileNameAction).isCurrent;
         }
 
     }
@@ -66,7 +71,19 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
             const div = document.createElement("div");
             div.innerText = this.fileName;
             div.classList.add("filename-banner");
-            baseDiv.parentNode.insertBefore(div, baseDiv);
+
+            if(this.isCurrent) {
+                const parentDiv = document.createElement("parent-div");
+                const div2 = document.createElement("div");
+                div2.innerText = "current";
+                div2.classList.add("current-file-banner");
+                parentDiv.appendChild(div);
+                parentDiv.appendChild(div2);
+                baseDiv.parentNode.insertBefore(parentDiv, baseDiv);
+            } else {
+                baseDiv.parentNode.insertBefore(div, baseDiv);
+            }
+
         }
         containerElement.style.display = "none";
     }

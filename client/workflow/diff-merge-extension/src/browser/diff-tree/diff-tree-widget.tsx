@@ -410,7 +410,8 @@ export class DiffTreeWidget extends TreeWidget {
 
     }
 
-    public async saveChanges() {
+    public async saveChanges(event: React.MouseEvent<HTMLElement>) {
+        event.stopPropagation();
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
         if (this.secondWidget) {
@@ -431,7 +432,8 @@ export class DiffTreeWidget extends TreeWidget {
         this.messageService.info("Applied changes have been saved!");
     }
 
-    public async mergeNonConflicting() {
+    public async mergeNonConflicting(event: React.MouseEvent<HTMLElement>) {
+        event.stopPropagation();
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
 
@@ -449,7 +451,8 @@ export class DiffTreeWidget extends TreeWidget {
         this.messageService.info("File " + this.baseWidget.uri.path.base + " has been merged");
     }
 
-    public async revertChanges() {
+    public async revertChanges(event: React.MouseEvent<HTMLElement>) {
+        event.stopPropagation();
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
 

@@ -74,7 +74,6 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
 
     static readonly MERGE_DIFF = [...MAIN_MENU_BAR, 'merge-diff'];
     registerMenus(menus: MenuModelRegistry): void {
-        menus.registerSubmenu(MergeDiffMenuContribution.MERGE_DIFF, 'Resolve difference');
         menus.registerMenuAction(MergeDiffMenuContribution.MERGE_DIFF, {
             commandId: MERGE.id,
             order: '0'

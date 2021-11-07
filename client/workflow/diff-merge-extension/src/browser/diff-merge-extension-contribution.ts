@@ -289,16 +289,16 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
     }
 
     public static handleConflicts(changes: DiffTreeNode[]) {
-        changes.sort((n1,n2) => {
-            if (n1.id > n2.id) {return 1;}
-            if (n1.id < n2.id) {return -1;}
+        changes.sort((n1, n2) => {
+            if (n1.id > n2.id) { return 1; }
+            if (n1.id < n2.id) { return -1; }
             return 0;
         });
         const updatedChanges: DiffTreeNode[] = [];
-        changes.forEach(change=>{
-            const elemsWithId:DiffTreeNode[] = changes.filter(x => (x.id.split("_")[0] === change.id.split("_")[0]) && (!x.id.toUpperCase().endsWith("BASE")));
-            if(elemsWithId.length > 1) {
-                if(change.id.toUpperCase().endsWith("BASE")) {
+        changes.forEach(change => {
+            const elemsWithId: DiffTreeNode[] = changes.filter(x => (x.id.split("_")[0] === change.id.split("_")[0]) && (!x.id.toUpperCase().endsWith("BASE")));
+            if (elemsWithId.length > 1) {
+                if (change.id.toUpperCase().endsWith("BASE")) {
                     //let i = 1;
                     //elemsWithId.forEach(e => {e.id = e.id + "chld"+i; i++;});
                     console.log("CHANGE", change);
@@ -310,7 +310,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                         visible: change.visible,
                         selected: change.selected,
                         changeType: change.changeType,
-                        elementType: change.elementType,
+                        elementType: "Conflict",
                         source: change.source,
                         target: change.target,
                         children: elemsWithId,
@@ -320,7 +320,7 @@ export class DiffMergeExtensionCommandContribution extends AbstractViewContribut
                     updatedChanges.push(node);
                 }
             } else {
-                if(!change.id.toUpperCase().endsWith("BASE")) {
+                if (!change.id.toUpperCase().endsWith("BASE")) {
                     updatedChanges.push(change);
                 }
             }

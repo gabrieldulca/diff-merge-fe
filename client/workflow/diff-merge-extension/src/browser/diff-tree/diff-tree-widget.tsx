@@ -1,3 +1,4 @@
+import { ComparisonDto } from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 import { GLSPClientContribution } from "@eclipse-glsp/theia-integration/lib/browser";
 import {
     CommandRegistry,
@@ -26,10 +27,9 @@ import { MergeDiffMenuContribution } from "../merge-diff-menu/merge-diff-menu-co
 import { SplitPanelManager } from "../split-panel-manager";
 import { DiffTreeDecorator } from "./diff-decorator-service";
 import { DiffLabelProvider } from "./diff-label-provider";
+import { DiffTreeModel } from "./diff-tree-model";
 import { DiffTreeNode } from "./diff-tree-node";
 import { DiffTreeProps } from "./diff-tree-props";
-import { DiffTreeModel } from "./diff-tree-model";
-import {ComparisonDto} from "@eclipse-glsp-examples/workflow-sprotty/lib/diffmerge";
 
 
 /**
@@ -68,7 +68,7 @@ export const DiffViewWidgetFactory = Symbol('DiffViewWidgetFactory');
 @injectable()
 export class DiffTreeWidget extends TreeWidget {
 
-    setDiagWidgets(comparison: ComparisonDto,baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
+    setDiagWidgets(comparison: ComparisonDto, baseWidget: DiffMergeDiagWidget, firstWidget: DiffMergeDiagWidget, secondWidget?: DiffMergeDiagWidget) {
         this.comparison = comparison;
         this.baseWidget = baseWidget;
         this.firstWidget = firstWidget;
@@ -287,7 +287,7 @@ export class DiffTreeWidget extends TreeWidget {
                         this.firstWidget.actionDispatcher.request(GetViewportAction.create()).then(result => {
                             this.baseWidget.actionDispatcher.dispatch(new SetViewportAction(
                                 "sprotty", result.viewport, true));
-                    }));
+                        }));
 
                 }
             }
@@ -403,6 +403,8 @@ export class DiffTreeWidget extends TreeWidget {
             classNameIcon = "fas fa-arrows-alt-h";
         } else if (node.elementType === 'GLSPGraph') {
             classNameIcon = 'fas fa-project-diagram';
+        } else if (node.elementType === 'Conflict') {
+            classNameIcon = 'fas fa-exclamation-triangle';
         }
         return <div style={{ width: "20px" }} className={classNameIcon}></div>;
 
@@ -440,9 +442,9 @@ export class DiffTreeWidget extends TreeWidget {
                 });*/
         } else {
             await this.comparisonService.getMergeResult(baseFilePath, firstFilePath);
-                /*.then((result) => {
-                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
-                });*/
+            /*.then((result) => {
+                MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+            });*/
         }
         this.messageService.info("File " + this.baseWidget.uri.path.base + " has been merged");
     }

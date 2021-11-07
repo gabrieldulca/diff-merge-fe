@@ -13,4 +13,5 @@ export interface ComparisonService {
     revertFiles(file1Path: string, file2Path: string): Promise<ComparisonDto>
     revertFiles3w(file1Path: string, basePath: string, file2Path: string): Promise<ComparisonDto>
     saveFiles(file1Path: string, file2Path: string): Promise<ComparisonDto>
+    saveFiles3w(file1Path: string, basePath: string, file2Path: string): Promise<ComparisonDto>
 }

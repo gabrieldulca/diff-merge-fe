@@ -411,11 +411,21 @@ export class DiffTreeWidget extends TreeWidget {
     public async saveChanges() {
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
-        await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
-            console.log("Invocation result: ", result);
-        }, (reject) => {
-            console.log("Rejected promise ", reject);
-        });
+        if (this.secondWidget) {
+            console.log("saving manual merge result");
+            console.log("Comparison service", this.comparisonService);
+            await this.comparisonService.saveFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString()).then((result) => {
+                console.log("Invocation result: ", result);
+            }, (reject) => {
+                console.log("Rejected promise ", reject);
+            });
+        } else {
+            await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
+                console.log("Invocation result: ", result);
+            }, (reject) => {
+                console.log("Rejected promise ", reject);
+            });
+        }
         this.messageService.info("Applied changes have been saved!");
     }
 
@@ -424,7 +434,7 @@ export class DiffTreeWidget extends TreeWidget {
         const firstFilePath = this.firstWidget.uri.path.toString();
 
         if (this.secondWidget) {
-            await this.comparisonService.getThreeWayMergeResult(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString());
+            await this.comparisonService.getThreeWayMergeResult(baseFilePath, firstFilePath, this.secondWidget.uri.path.toString());
                 /*.then((result) => {
                     MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
                 });*/

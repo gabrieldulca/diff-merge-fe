@@ -32,6 +32,16 @@ export class ComparisonServiceImpl implements ComparisonService {
         return resp;
     }
 
+    async saveFiles3w(file1Path: string, basePath: string, file2Path: string): Promise<ComparisonDto> {
+        console.log("save link", 'http://localhost:8080/diff/save3w/diagram?file1=' + file1Path + '&base=' + basePath + '&file2=' + file2Path);
+        const resp = fetch('http://localhost:8080/diff/save3w/diagram?file1=' + file1Path + '&base=' + basePath + '&file2=' + file2Path)
+            .then((res: { json: () => void; }) => res.json())
+            .catch((error: any) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        return resp;
+    }
+
     async saveFiles(file1Path: string, file2Path: string): Promise<ComparisonDto> {
         console.log("revert link", 'http://localhost:8080/diff/save/diagram?file1=' + file1Path + '&file2=' + file2Path);
         const resp = fetch('http://localhost:8080/diff/save/diagram?file1=' + file1Path + '&file2=' + file2Path)

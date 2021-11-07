@@ -23,11 +23,20 @@ import {
     TYPES
 } from "@eclipse-glsp/client";
 import { inject, injectable } from "inversify";
+import {
+    ModelSource,
+    SChildElement,
+    SCompartment,
+    SLabel,
+    SModelElementSchema,
+    SModelRootSchema,
+    SShapeElement,
+    UpdateModelAction
+} from "sprotty";
 
+import { CustomUpdateModelCommand } from "./custom-update-model";
 import { ChangedElem, ComparisonDto, DiffTreeNode, MatchDto } from "./diffmerge";
 import { TaskNode } from "./model";
-import {ModelSource, SModelRootSchema, SModelElementSchema, SChildElement, UpdateModelAction, SCompartment, SShapeElement, SLabel} from "sprotty";
-import {CustomUpdateModelCommand} from "./custom-update-model";
 
 @injectable()
 export class ApplyDiffAction implements Action {
@@ -48,7 +57,7 @@ export class ApplyDiffAction implements Action {
 
 
     constructor(comparison: ComparisonDto, widgetId: string, requestId?: string, widgetSide?: string, leftWidgetId?: string,
-                rightWidgetId?: string, leftWidgetMS?: ModelSource, rightWidgetMS?: ModelSource, baseWidgetId?: string) {
+        rightWidgetId?: string, leftWidgetMS?: ModelSource, rightWidgetMS?: ModelSource, baseWidgetId?: string) {
         this.widgetId = widgetId.replace("widget", "");
         this.requestId = requestId;
         this.comparison = comparison;
@@ -181,35 +190,35 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     mapChildrenToSMESchema(children: SChildElement[]): SModelElementSchema[] {
         const childrenSchemas: SModelElementSchema[] = [];
-         for (const c of children) {
-             const schema: any = { id: c.id, type: c.type };
-             if (c.children.length > 0) {
-                 schema.children = this.mapChildrenToSMESchema(c.children as SChildElement[]);
-             }
-             if (c instanceof SShapeElement) {
-                 if ((c as SShapeElement).position) {
-                     schema.position = (c as SShapeElement).position;
-                 }
-                 if ((c as SShapeElement).size) {
-                     schema.size = (c as SShapeElement).size;
-                 }
-             }
-             if (c instanceof SCompartment) {
-                 if ((c as SCompartment).layout) {
-                     schema.layout = (c as SCompartment).layout;
-                 }
-             }
-             if (c instanceof SLabel) {
-                 if ((c as SLabel).text) {
-                     schema.text = (c as SLabel).text;
-                 }
-                 if ((c as SLabel).alignment) {
-                     schema.alignment = (c as SLabel).alignment;
-                 }
-             }
-             childrenSchemas.push(schema);
-         }
-         return childrenSchemas;
+        for (const c of children) {
+            const schema: any = { id: c.id, type: c.type };
+            if (c.children.length > 0) {
+                schema.children = this.mapChildrenToSMESchema(c.children as SChildElement[]);
+            }
+            if (c instanceof SShapeElement) {
+                if ((c as SShapeElement).position) {
+                    schema.position = (c as SShapeElement).position;
+                }
+                if ((c as SShapeElement).size) {
+                    schema.size = (c as SShapeElement).size;
+                }
+            }
+            if (c instanceof SCompartment) {
+                if ((c as SCompartment).layout) {
+                    schema.layout = (c as SCompartment).layout;
+                }
+            }
+            if (c instanceof SLabel) {
+                if ((c as SLabel).text) {
+                    schema.text = (c as SLabel).text;
+                }
+                if ((c as SLabel).alignment) {
+                    schema.alignment = (c as SLabel).alignment;
+                }
+            }
+            childrenSchemas.push(schema);
+        }
+        return childrenSchemas;
     }
 
     markDeletions(context: CommandExecutionContext, deletions: string[], widgetRoot: SModelRootSchema, widgetMS: ModelSource): void {
@@ -239,37 +248,37 @@ export class ApplyDiffCommand extends FeedbackCommand {
         CustomUpdateModelCommand.setModelRoot(context, widgetRoot);
         console.log("Starting to color elems", this.action.widgetId);
         widgetMS.actionDispatcher.dispatch(new UpdateModelAction(widgetRoot)).then(
-        () => {
-            for (const del of deletions) {
-                const oldElem = context.root.index.getById(del);
-                if (oldElem) {
-                    let childRight = null;
-                    if((this.action.comparison.threeWay === false) || (this.action.comparison.threeWay === true && this.action.widgetSide === "left")) {
-                        childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
-                    } else if(this.action.comparison.threeWay === true && this.action.widgetSide === "right") {
-                        childRight = document.getElementById(this.action.leftWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
-                    }
-                    if (childRight) {
-                        if (oldElem && oldElem instanceof TaskNode) {
-                            const rect = childRight.childNodes[0] as HTMLElement;
-                            if (rect!.classList) {
-                                rect!.classList.add("newly-deleted-node");
+            () => {
+                for (const del of deletions) {
+                    const oldElem = context.root.index.getById(del);
+                    if (oldElem) {
+                        let childRight = null;
+                        if ((this.action.comparison.threeWay === false) || (this.action.comparison.threeWay === true && this.action.widgetSide === "left")) {
+                            childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                        } else if (this.action.comparison.threeWay === true && this.action.widgetSide === "right") {
+                            childRight = document.getElementById(this.action.leftWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                        }
+                        if (childRight) {
+                            if (oldElem && oldElem instanceof TaskNode) {
+                                const rect = childRight.childNodes[0] as HTMLElement;
+                                if (rect!.classList) {
+                                    rect!.classList.add("newly-deleted-node");
+                                }
+                                console.log("Colored node", childRight);
+                            } else if (oldElem && oldElem instanceof SEdge) {
+                                if (childRight.classList) {
+                                    childRight.classList.add("newly-deleted-edge");
+                                }
+                                const arrow = childRight.childNodes[1] as HTMLElement;
+                                if (arrow!.classList) {
+                                    arrow!.classList.add("newly-deleted-arrow");
+                                }
+                                console.log("Colored edge", childRight);
                             }
-                            console.log("Colored node", childRight);
-                        } else if (oldElem && oldElem instanceof SEdge) {
-                            if (childRight.classList) {
-                                childRight.classList.add("newly-deleted-edge");
-                            }
-                            const arrow = childRight.childNodes[1] as HTMLElement;
-                            if (arrow!.classList) {
-                                arrow!.classList.add("newly-deleted-arrow");
-                            }
-                            console.log("Colored edge", childRight);
                         }
                     }
                 }
-            }
-        });
+            });
     }
 
     markThreewayDeletion(context: CommandExecutionContext, del: string, direction: string): void {
@@ -356,6 +365,9 @@ export class ApplyDiffCommand extends FeedbackCommand {
                     newElem.cssClasses = ["newly-added-edge"];
                     const child = document.getElementById(this.action.widgetId + newElem!.id);
                     if (child) {
+                        child.classList.add("newly-added-edge");
+                        const firtsChild = child!.childNodes[0] as HTMLElement;
+                        firtsChild.classList.add("newly-added-edge");
                         const arrow = child!.childNodes[1] as HTMLElement;
                         if (arrow!.classList) {
                             arrow!.classList.add("newly-added-arrow");
@@ -522,11 +534,11 @@ export class ApplyDiffCommand extends FeedbackCommand {
             }
         }
         console.log("right side deletions", rightSideDeletions);
-        if(rightSideDeletions.length > 0) {
+        if (rightSideDeletions.length > 0) {
             this.markDeletions(context, rightSideDeletions, this.action.rightWidgetRoot, this.action.rightWidgetMS);
         }
         console.log("left side deletions", leftSideDeletions);
-        if(leftSideDeletions.length > 0) {
+        if (leftSideDeletions.length > 0) {
             this.markDeletions(context, leftSideDeletions, this.action.leftWidgetRoot, this.action.leftWidgetMS);
         }
         return deletions;

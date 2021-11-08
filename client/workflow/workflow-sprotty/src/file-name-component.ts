@@ -73,7 +73,8 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
             div.classList.add("filename-banner");
 
             if(this.isCurrent) {
-                const parentDiv = document.createElement("parent-div");
+                const parentDiv = document.createElement("div");
+                parentDiv.classList.add("parentname-banner");
                 const div2 = document.createElement("div");
                 div2.innerText = "current";
                 div2.classList.add("current-file-banner");
@@ -81,9 +82,12 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
                 parentDiv.appendChild(div2);
                 baseDiv.parentNode.insertBefore(parentDiv, baseDiv);
             } else {
+                div.style.position="absolute";
                 baseDiv.parentNode.insertBefore(div, baseDiv);
             }
 
+        } else {
+            console.log("NO PARENT DIV");
         }
         containerElement.style.display = "none";
     }

@@ -260,29 +260,23 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         }
                         if (childRight) {
                             if (oldElem && oldElem instanceof TaskNode) {
-                                if (oldElem.cssClasses) {
-                                    oldElem.cssClasses.concat(["newly-deleted-node"]);
-                                } else {
-                                    oldElem.cssClasses = ["newly-deleted-node"];
-                                }
+                                //if (childRight.classList) {
+                                    childRight.classList.add("newly-deleted-node");
+                                //}
                                 const rect = childRight.childNodes[0] as HTMLElement;
                                 if (rect!.classList) {
                                     rect!.classList.add("newly-deleted-node");
                                 }
                                 console.log("Colored node", childRight);
                             } else if (oldElem && oldElem instanceof SEdge) {
-                                if (oldElem.cssClasses) {
-                                    oldElem.cssClasses.concat(["newly-deleted-edge"]);
-                                } else {
-                                    oldElem.cssClasses = ["newly-deleted-edge"];
-                                }
-                                if (childRight.classList) {
+                               
+                                //if (childRight.classList) {
                                     childRight.classList.add("newly-deleted-edge");
-                                }
+                                //}
                                 const arrow = childRight.childNodes[1] as HTMLElement;
-                                if (arrow!.classList) {
+                                //if (arrow!.classList) {
                                     arrow!.classList.add("newly-deleted-arrow");
-                                }
+                                //}
                                 console.log("Colored edge", childRight);
                             }
                         }

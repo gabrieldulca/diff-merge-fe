@@ -333,9 +333,20 @@ sprotty-node.task.manual.newly-changed-node {
     padding-top: 1%;
     padding-bottom: 1%;
     width: fit-content;
-    position: absolute;
     opacity: 0.7;
     background-color: rgb(49, 48, 48);
+    display: flex;
+}
+
+.parentname-banner {
+    padding-right: 3%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    width: fit-content;
+    position: absolute;
+    display:flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .current-file-banner {

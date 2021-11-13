@@ -1,0 +1,264 @@
+{
+  "id": "sprotty",
+  "children": [
+    {
+      "id": "task3",
+      "children": [
+        {
+          "id": "task3_header",
+          "children": [
+            {
+              "id": "task3_icon",
+              "children": [
+                {
+                  "id": "task3_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task3_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 75.953125,
+                "height": 22.0
+              },
+              "text": "PreHeat",
+              "alignment": {
+                "x": 37.8125,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 118.953125,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 919.0138549804688,
+        "y": 448.00694274902344
+      },
+      "size": {
+        "width": 128.953125,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "task4",
+      "children": [
+        {
+          "id": "task4_header",
+          "children": [
+            {
+              "id": "task4_icon",
+              "children": [
+                {
+                  "id": "task4_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 7.65625,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 16.6875,
+                    "height": 22.0
+                  },
+                  "text": "M",
+                  "alignment": {
+                    "x": 8.34375,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "resizeContainer": false,
+                "hAlign": "center"
+              }
+            },
+            {
+              "id": "task4_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 49.359375,
+                "height": 22.0
+              },
+              "text": "Brew",
+              "alignment": {
+                "x": 24.453125,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 92.359375,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:manual",
+      "position": {
+        "x": 1278.0138549804688,
+        "y": 256.00694274902344
+      },
+      "size": {
+        "width": 102.359375,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    },
+    {
+      "id": "12db11af-716e-4e37-8e88-692068ce6f33",
+      "type": "edge",
+      "sourceId": "task3",
+      "targetId": "task4"
+    },
+    {
+      "name": "AutomatedTask2",
+      "taskType": "automated",
+      "id": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c",
+      "children": [
+        {
+          "id": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c_header",
+          "children": [
+            {
+              "commandId": "simulate-command",
+              "id": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c_icon",
+              "children": [
+                {
+                  "id": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c_ticon",
+                  "type": "label:icon",
+                  "position": {
+                    "x": 8.9921875,
+                    "y": 5.0
+                  },
+                  "size": {
+                    "width": 14.015625,
+                    "height": 22.0
+                  },
+                  "text": "A",
+                  "alignment": {
+                    "x": 6.671875,
+                    "y": 18.0
+                  }
+                }
+              ],
+              "type": "icon",
+              "position": {
+                "x": 5.0,
+                "y": 5.0
+              },
+              "size": {
+                "width": 32.0,
+                "height": 32.0
+              },
+              "layout": "stack",
+              "layoutOptions": {
+                "hAlign": "center",
+                "resizeContainer": false
+              }
+            },
+            {
+              "id": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c_classname",
+              "type": "label:heading",
+              "position": {
+                "x": 38.0,
+                "y": 10.0
+              },
+              "size": {
+                "width": 159.6875,
+                "height": 22.0
+              },
+              "text": "AutomatedTask2",
+              "alignment": {
+                "x": 79.84375,
+                "y": 18.0
+              }
+            }
+          ],
+          "type": "comp:header",
+          "position": {
+            "x": 5.0,
+            "y": 5.0
+          },
+          "size": {
+            "width": 202.6875,
+            "height": 42.0
+          },
+          "layout": "hbox"
+        }
+      ],
+      "type": "task:automated",
+      "position": {
+        "x": 1090.0,
+        "y": 450.0
+      },
+      "size": {
+        "width": 212.6875,
+        "height": 52.0
+      },
+      "layout": "vbox"
+    }
+  ],
+  "type": "graph"
+}

@@ -405,6 +405,7 @@ export class DiffTreeWidget extends TreeWidget {
             classNameIcon = 'fas fa-project-diagram';
         } else if (node.elementType === 'Conflict') {
             classNameIcon = 'fas fa-exclamation-triangle';
+            return <div style={{ width: "20px", color: "tomato" }} className={classNameIcon}></div>;
         }
         return <div style={{ width: "20px" }} className={classNameIcon}></div>;
 
@@ -439,9 +440,9 @@ export class DiffTreeWidget extends TreeWidget {
 
         if (this.secondWidget) {
             await this.comparisonService.getThreeWayMergeResult(baseFilePath, firstFilePath, this.secondWidget.uri.path.toString());
-                /*.then((result) => {
-                    MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
-                });*/
+            /*.then((result) => {
+                MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
+            });*/
         } else {
             await this.comparisonService.getMergeResult(baseFilePath, firstFilePath);
             /*.then((result) => {

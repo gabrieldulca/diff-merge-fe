@@ -255,7 +255,7 @@ sprotty-node.task.manual.newly-added-node {
 
 .newly-deleted-edge {
     stroke: lightcoral !important;
-    opacity: 0.3!important;
+    opacity: 0.6!important;
 }
 
 .newly-deleted-edge.mouseover {
@@ -270,7 +270,7 @@ sprotty-node.task.manual.newly-added-node {
 .newly-deleted-arrow {
     fill: lightcoral !important;
     stroke: lightcoral !important;
-    opacity: 0.3!important;
+    opacity: 0.6!important;
 }
 
 .newly-deleted-arrow.mouseover {
@@ -339,9 +339,6 @@ sprotty-node.task.manual.newly-changed-node {
 }
 
 .parentname-banner {
-    padding-right: 3%;
-    padding-top: 1%;
-    padding-bottom: 1%;
     width: fit-content;
     position: absolute;
     display:flex;
@@ -356,7 +353,6 @@ sprotty-node.task.manual.newly-changed-node {
     padding-bottom: 1%;
     width: fit-content;
     margin-left: auto;
-    margin-right: 1%;
     opacity: 0.7;
     background-color: #115522;
     color: #1bcd67;

@@ -116,14 +116,16 @@ export class ApplyDiffCommand extends FeedbackCommand {
             .querySelectorAll('.newly-added-edge')).forEach((el) => el.classList.remove('newly-added-edge'));
         Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
             .querySelectorAll('.newly-added-arrow')).forEach((el) => el.classList.remove('newly-added-arrow'));
-        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+        /*Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
             .querySelectorAll('.newly-deleted-node')).forEach((el) => el.classList.remove('newly-deleted-node'));
         Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
-            .querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));
+            .querySelectorAll('.newly-deleted-edge')).forEach((el) => el.classList.remove('newly-deleted-edge'));*/
         Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
             .querySelectorAll('.newly-changed-node')).forEach((el) => el.classList.remove('newly-changed-node'));
         Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
             .querySelectorAll('.newly-changed-edge')).forEach((el) => el.classList.remove('newly-changed-edge'));
+        Array.from(document.getElementById(this.action.widgetId.substr(0, this.action.widgetId.length - 1))!
+            .querySelectorAll('.newly-changed-arrow')).forEach((el) => el.classList.remove('newly-changed-arrow'));
 
 
         this.changedElems = new Map();
@@ -131,10 +133,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
         const additions: string[] = this.getAdditions(context, this.action.comparison);
         console.log("Applying diff command: additions for " + this.action.widgetId, additions);
+
         const deletions: string[] = this.getDeletions(context, this.action.comparison);
         console.log("Applying diff command: deletions", deletions);
+
         const changes: string[] = this.getChanges(context, this.action.comparison);
         console.log("Applying diff command: changes", changes);
+
         console.log("Applying diff command: all diffs", this.changedElems);
 
         if (!(this.action.widgetSide === "base" && this.action.comparison.threeWay === true)) {
@@ -249,40 +254,52 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Starting to color elems", this.action.widgetId);
         widgetMS.actionDispatcher.dispatch(new UpdateModelAction(widgetRoot)).then(
             () => {
-                for (const del of deletions) {
-                    const oldElem = context.root.index.getById(del);
-                    if (oldElem) {
-                        let childRight = null;
-                        if ((this.action.comparison.threeWay === false) || (this.action.comparison.threeWay === true && this.action.widgetSide === "left")) {
-                            childRight = document.getElementById(this.action.rightWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
-                        } else if (this.action.comparison.threeWay === true && this.action.widgetSide === "right") {
-                            childRight = document.getElementById(this.action.leftWidgetId!.replace("widget", "") + oldElem!.id + "_deleted");
+                this.markAllDeletionsInContext(context);
+            });
+    }
+
+    private markAllDeletionsInContext(context: CommandExecutionContext) {
+        context.root.index.all().forEach(element => {
+            if(element.id.endsWith("_deleted")) {
+                const deletedElem = context.root.index.getById(element.id);
+                if (deletedElem && deletedElem instanceof TaskNode) {
+                    const child = document.getElementById(this.action.widgetId + deletedElem!.id);
+                    if (child) {
+                        const rect = child.childNodes[0] as HTMLElement;
+                        if (rect!.classList) {
+                            rect!.classList.add("newly-deleted-node");
                         }
-                        if (childRight) {
-                            if (oldElem && oldElem instanceof TaskNode) {
-                                //if (childRight.classList) {
-                                    childRight.classList.add("newly-deleted-node");
-                                //}
-                                const rect = childRight.childNodes[0] as HTMLElement;
-                                if (rect!.classList) {
-                                    rect!.classList.add("newly-deleted-node");
-                                }
-                                console.log("Colored node", childRight);
-                            } else if (oldElem && oldElem instanceof SEdge) {
-                               
-                                //if (childRight.classList) {
-                                    childRight.classList.add("newly-deleted-edge");
-                                //}
-                                const arrow = childRight.childNodes[1] as HTMLElement;
-                                //if (arrow!.classList) {
-                                    arrow!.classList.add("newly-deleted-arrow");
-                                //}
-                                console.log("Colored edge", childRight);
+                    }
+                } else if (deletedElem && deletedElem instanceof SEdge) {
+                    if (deletedElem.cssClasses) {
+                        deletedElem.cssClasses.concat(["newly-deleted-edge"]);
+                        const child = document.getElementById(this.action.widgetId + deletedElem!.id);
+                        if (child) {
+                            const arrow = child!.childNodes[1] as HTMLElement;
+                            if (arrow!.classList) {
+                                arrow!.classList.add("newly-deleted-arrow");
+                            }
+                        }
+                    } else {
+                        deletedElem.cssClasses = ["newly-deleted-edge"];
+                        const child = document.getElementById(this.action.widgetId + deletedElem!.id);
+                        if (child) {
+                            child.classList.add("newly-deleted-edge");
+                            const firtsChild = child!.childNodes[0] as HTMLElement;
+                            if(firtsChild && firtsChild.classList) {
+                                firtsChild.classList.add("newly-deleted-edge");
+                            }
+                            const arrow = child!.childNodes[1] as HTMLElement;
+                            if (arrow && arrow!.classList) {
+                                arrow!.classList.add("newly-deleted-arrow");
                             }
                         }
                     }
                 }
-            });
+            }
+        });
+
+
     }
 
     markThreewayDeletion(context: CommandExecutionContext, del: string, direction: string): void {
@@ -453,19 +470,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
     }
 
     getDeletionsTree(context: CommandExecutionContext, deletions: string[]): void {
-        console.log("TREE FOR DELETIONS", this.action.widgetSide);
-        console.log("TREE FOR DELETIONS DELETIONS", deletions);
-        console.log("PREV TREE FOR DELETIONS", this.action.deletionsTree);
+
         for (const del of deletions) {
             const node: DiffTreeNode = new DiffTreeNode();
             node.id = del + "_deleted";
             node.modelElementId = del;
             node.diffSource = this.changedElems.get(del)!.diffSource;
             const oldElem = context.root.index.getById(del);
-            console.log("TREE FOR DELETIONS DEL", del);
-            console.log("TREE FOR DELETIONS CONTEXT ROOT", context.root);
-            console.log("TREE FOR DELETIONS OLDELEM", oldElem);
-            console.log("TREE FOR DELETIONS INDEXOF", this.action.deletionsTree.indexOf(node));
             if (oldElem && oldElem instanceof TaskNode) {
                 node.name = "[TaskNode] " + this.changedElems.get(del)!.name;
                 node.elementType = "TaskNode";

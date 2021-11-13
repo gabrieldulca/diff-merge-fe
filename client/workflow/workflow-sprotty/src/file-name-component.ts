@@ -76,7 +76,7 @@ export class FileNameBanner extends AbstractUIExtension implements IActionHandle
                 const parentDiv = document.createElement("div");
                 parentDiv.classList.add("parentname-banner");
                 const div2 = document.createElement("div");
-                div2.innerText = "current";
+                div2.innerText = "Result";
                 div2.classList.add("current-file-banner");
                 parentDiv.appendChild(div);
                 parentDiv.appendChild(div2);

@@ -418,7 +418,7 @@ export class DiffTreeWidget extends TreeWidget {
         if (this.secondWidget) {
             console.log("saving manual merge result");
             console.log("Comparison service", this.comparisonService);
-            await this.comparisonService.saveFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString()).then((result) => {
+            this.comparisonService.saveFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString()).then((result) => {
                 console.log("Invocation result: ", result);
                 this.splitPanelManager.closeSplitPanel();
             }, (reject) => {
@@ -426,7 +426,7 @@ export class DiffTreeWidget extends TreeWidget {
                 this.splitPanelManager.closeSplitPanel();
             });
         } else {
-            await this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
+            this.comparisonService.saveFiles(baseFilePath, firstFilePath).then((result) => {
                 console.log("Invocation result: ", result);
                 this.splitPanelManager.closeSplitPanel();
             }, (reject) => {
@@ -443,17 +443,22 @@ export class DiffTreeWidget extends TreeWidget {
         const firstFilePath = this.firstWidget.uri.path.toString();
 
         if (this.secondWidget) {
-            await this.comparisonService.getThreeWayMergeResult(baseFilePath, firstFilePath, this.secondWidget.uri.path.toString());
-            this.splitPanelManager.closeSplitPanel();
+            this.comparisonService.getThreeWayMergeResult(baseFilePath, firstFilePath, this.secondWidget.uri.path.toString()).then(
+                () => {
+                    this.splitPanelManager.closeSplitPanel();
+                }
+            );
+
             /*.then((result) => {
                 MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
             });*/
         } else {
-            await this.comparisonService.getMergeResult(baseFilePath, firstFilePath);
-            this.splitPanelManager.closeSplitPanel();
-            /*.then((result) => {
-                MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
-            });*/
+            this.comparisonService.getMergeResult(baseFilePath, firstFilePath).then(
+                () => {
+                    this.splitPanelManager.closeSplitPanel();
+                }
+            );
+
         }
         this.messageService.info("File " + this.baseWidget.uri.path.base + " has been merged");
     }
@@ -464,7 +469,7 @@ export class DiffTreeWidget extends TreeWidget {
         const firstFilePath = this.firstWidget.uri.path.toString();
 
         if (this.secondWidget) {
-            await this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString())
+            this.comparisonService.revertFiles3w(firstFilePath, baseFilePath, this.secondWidget.uri.path.toString())
                 .then((result) => {
                     this.comparison = result;
                     console.log("Canceled all changes, comparison is", result);
@@ -472,7 +477,7 @@ export class DiffTreeWidget extends TreeWidget {
                     MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
                 });
         } else {
-            await this.comparisonService.revertFiles(baseFilePath, firstFilePath)
+            this.comparisonService.revertFiles(baseFilePath, firstFilePath)
                 .then((result) => {
                     this.comparison = result;
                     console.log("Canceled all changes, comparison is", result);

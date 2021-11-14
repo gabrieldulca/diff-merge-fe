@@ -227,15 +227,17 @@ export class ApplyDiffCommand extends FeedbackCommand {
     }
 
     markDeletions(context: CommandExecutionContext, deletions: string[], widgetRoot: SModelRootSchema, widgetMS: ModelSource): void {
-        if ((this.action.comparison.threeWay === false && this.action.widgetSide === "right") || this.action.widgetSide === "base") {
+        if ((this.action.comparison.threeWay === false && this.action.widgetSide === "right") || this.action.widgetSide !== "base") {
+            this.markAllDeletionsInContext(context);
             return;
         }
         console.log("Starting to draw deletions for", this.action.widgetId);
+        console.log("Starting to draw ", deletions);
         for (const del of deletions) {
             const oldElem = context.root.index.getById(del);
             if (oldElem) {
-                const child = document.getElementById(this.action.widgetId + oldElem!.id);
-                if (child) {
+                console.log("Adding deleted elem ", oldElem);
+                console.log("Adding deleted elem to ", widgetRoot);
                     if (oldElem && oldElem instanceof TaskNode) {
                         let mappedOldElem = this.mapTNToSMESchema(oldElem);
                         widgetRoot.children = widgetRoot.children!.filter(obj => obj.id !== mappedOldElem.id);
@@ -245,7 +247,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
                         widgetRoot.children = widgetRoot.children!.filter(obj => obj.id !== mappedOldElem.id);
                         widgetRoot.children!.push(mappedOldElem);
                     }
-                }
+
             }
         }
         console.log("Starting to commit model");
@@ -254,7 +256,7 @@ export class ApplyDiffCommand extends FeedbackCommand {
         console.log("Starting to color elems", this.action.widgetId);
         widgetMS.actionDispatcher.dispatch(new UpdateModelAction(widgetRoot)).then(
             () => {
-                this.markAllDeletionsInContext(context);
+                //this.markAllDeletionsInContext(context);
             });
     }
 
@@ -548,13 +550,17 @@ export class ApplyDiffCommand extends FeedbackCommand {
                 deletions = deletions.concat(this.getSubMatchDeletions(context, match, comparison.threeWay, leftSideDeletions, rightSideDeletions));
             }
         }
-        console.log("right side deletions", rightSideDeletions);
-        if (rightSideDeletions.length > 0) {
-            this.markDeletions(context, rightSideDeletions, this.action.rightWidgetRoot, this.action.rightWidgetMS);
-        }
-        console.log("left side deletions", leftSideDeletions);
-        if (leftSideDeletions.length > 0) {
-            this.markDeletions(context, leftSideDeletions, this.action.leftWidgetRoot, this.action.leftWidgetMS);
+        if(this.action.widgetSide === 'base') {
+            if (rightSideDeletions.length > 0) {
+                console.log("right side deletions", rightSideDeletions);
+                this.markDeletions(context, rightSideDeletions, this.action.rightWidgetRoot, this.action.rightWidgetMS);
+            }
+            if (leftSideDeletions.length > 0) {
+                console.log("left side deletions", leftSideDeletions);
+                this.markDeletions(context, leftSideDeletions, this.action.leftWidgetRoot, this.action.leftWidgetMS);
+            }
+        } else {
+            this.markAllDeletionsInContext(context);
         }
         return deletions;
     }

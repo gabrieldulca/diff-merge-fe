@@ -277,8 +277,8 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                 rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
                 baseWidget.actionDispatcher.dispatch(new RequestModelAction({
                     sourceUri: decodeURI(baseWidget.uri.path.toString()),
-                    needsClientLayout: 'false',
-                    needsServerLayout: 'false'
+                    needsClientLayout: 'true',
+                    needsServerLayout: 'true'
                 })).then((resolve: any) => {
                     rightWidget.glspActionDispatcher.onceModelInitialized().then( function () {
                      leftWidget.glspActionDispatcher.dispatch(new CenterAction([]));

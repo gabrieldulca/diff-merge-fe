@@ -273,9 +273,8 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                 sourceUri: decodeURI(rightWidget.uri.path.toString()),
                 needsClientLayout: 'false',
                 needsServerLayout: 'false'
-            })).then(async (resolve: any) => {
+            })).then((resolve: any) => {
                 rightWidget.glspActionDispatcher.dispatch(new CenterAction([]));
-                await new Promise(f => setTimeout(f, 500));
                 baseWidget.actionDispatcher.dispatch(new RequestModelAction({
                     sourceUri: decodeURI(baseWidget.uri.path.toString()),
                     needsClientLayout: 'false',
@@ -289,6 +288,7 @@ export class MergeDiffMenuContribution implements MenuContribution, CommandContr
                         needsServerLayout: 'false'
                     })).then(async (resolve: any) => {
                         baseWidget.glspActionDispatcher.dispatch(new CenterAction([]));
+                        await new Promise(f => setTimeout(f, 500));
                          baseWidget.glspActionDispatcher.onceModelInitialized().then( () => {
                             const diffAction = new ApplyDiffAction(comparison, baseWidget.id, undefined, "base", leftWidget.widgetId, rightWidget.widgetId, leftWidget.ms, rightWidget.ms, baseWidget.widgetId);
                              baseWidget.glspActionDispatcher.dispatch(diffAction).then(() => {

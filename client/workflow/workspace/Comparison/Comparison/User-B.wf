@@ -226,12 +226,12 @@
                 "y": 10.0
               },
               "size": {
-                "width": 159.6875,
+                "width": 83.34375,
                 "height": 22.0
               },
-              "text": "AutomatedTask2",
+              "text": "Added-B",
               "alignment": {
-                "x": 79.84375,
+                "x": 41.671875,
                 "y": 18.0
               }
             }
@@ -242,7 +242,7 @@
             "y": 5.0
           },
           "size": {
-            "width": 202.6875,
+            "width": 126.34375,
             "height": 42.0
           },
           "layout": "hbox"
@@ -254,10 +254,16 @@
         "y": 450.0
       },
       "size": {
-        "width": 212.6875,
+        "width": 136.34375,
         "height": 52.0
       },
       "layout": "vbox"
+    },
+    {
+      "id": "e7980455-add3-4739-95ef-4627284f0fcd",
+      "type": "edge",
+      "sourceId": "task3",
+      "targetId": "5961ad35-28b3-471b-a3f8-42c7ff0c8a7c"
     }
   ],
   "type": "graph"

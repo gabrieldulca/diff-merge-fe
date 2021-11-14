@@ -15,12 +15,15 @@
  ********************************************************************************/
 import { ApplicationShell, WidgetOpenerOptions, SplitPanel } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
-import { injectable } from "inversify";
+import {inject, injectable} from "inversify";
 import { DiagramManager, DiagramWidgetOptions } from "sprotty-theia";
 
 import { DiffSplitPanel } from "./diff-split-panel";
 import { DiffTreeWidget } from "./diff-tree/diff-tree-widget";
 import {DiffMergeDiagWidget} from "./diff-merge-diag-widget";
+import {WorkflowLanguage} from "@eclipse-glsp-examples/workflow-theia/lib/common/workflow-language";
+import {DiffMergeDiagManager} from "./diff-merge-diag-manager";
+import { GLSPDiagramManager } from "@eclipse-glsp/theia-integration/lib/browser";
 
 
 @injectable()
@@ -30,6 +33,10 @@ export class SplitPanelManager extends DiagramManager {
     readonly label = "Workflow diagram Editor";
     public prevOpts: DiagramWidgetOptions;
     public diffSplitPanel:DiffSplitPanel;
+
+    constructor(
+        @inject(DiffMergeDiagManager) protected readonly diagManager: GLSPDiagramManager)
+    {super();}
 
     /*
      * Create SplitPanel to which the DiagramWidgets shall be added
@@ -53,6 +60,17 @@ export class SplitPanelManager extends DiagramManager {
 
     public getBaseWidget(): DiffMergeDiagWidget {
         return this.diffSplitPanel.baseWidget;
+    }
+
+    public closeSplitPanel(): void {
+        console.log("close split panel");
+        this.shell.closeWidget("main-split-panel");
+        const pathToMergedFile = this.diffSplitPanel.rightWidget.uri.path.toString().replace(".wf", "_MERGED.wf");
+        console.log("PATH", pathToMergedFile);
+        const options2: DiagramWidgetOptions = { uri: pathToMergedFile, diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
+        this.diagManager.createWidget(options2).then((mergedWidget) => {
+            this.shell.addWidget(mergedWidget);
+        });
     }
 
     /*

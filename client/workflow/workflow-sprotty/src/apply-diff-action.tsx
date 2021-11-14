@@ -403,10 +403,15 @@ export class ApplyDiffCommand extends FeedbackCommand {
 
     markChanges(context: CommandExecutionContext, changes: string[], widgetSide: string): void {
         for (const c of changes) {
-            const change = c.split("-")[0];
+            const change = c.replace("-LEFT","").replace("-RIGHT","");
+            let changeSide = "";
             if (this.action.comparison.threeWay) {
-                const changeSide = c.split("-")[1];
-                if (changeSide.toUpperCase() !== widgetSide.toUpperCase()) {
+                if(c.indexOf("LEFT") != -1) {
+                    changeSide = "LEFT";
+                } else if(c.indexOf("RIGHT") != -1) {
+                    changeSide = "RIGHT";
+                }
+                if (changeSide.toUpperCase() !== widgetSide.toUpperCase() && widgetSide !== "base") {
                     continue;
                 }
             }
@@ -501,9 +506,13 @@ export class ApplyDiffCommand extends FeedbackCommand {
     getChangesTree(context: CommandExecutionContext, changes: string[], widgetSide: string): void {
         for (const c of changes) {
             let changeSide = "";
-            const change = c.split("-")[0];
+            const change = c.replace("-LEFT","").replace("-RIGHT","");
             if (this.action.comparison.threeWay) {
-                changeSide = c.split("-")[1];
+                if(c.indexOf("LEFT") != -1) {
+                    changeSide = "LEFT";
+                } else if(c.indexOf("RIGHT") != -1) {
+                    changeSide = "RIGHT";
+                }
                 if (changeSide.toUpperCase() !== widgetSide.toUpperCase() && widgetSide !== "base") {
                     continue;
                 }

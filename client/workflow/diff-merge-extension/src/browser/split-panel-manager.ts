@@ -69,6 +69,7 @@ export class SplitPanelManager extends DiagramManager {
         console.log("PATH", pathToMergedFile);
         const options2: DiagramWidgetOptions = { uri: pathToMergedFile, diagramType: WorkflowLanguage.DiagramType, iconClass: "fa fa-project-diagram", label: WorkflowLanguage.Label + " Editor" };
         this.diagManager.createWidget(options2).then((mergedWidget) => {
+            mergedWidget.title.label = this.diffSplitPanel.rightWidget.uri.path.name.toString() + "_MERGED.wf";
             this.shell.addWidget(mergedWidget);
         });
     }

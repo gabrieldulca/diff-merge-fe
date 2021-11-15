@@ -434,7 +434,11 @@ export class DiffTreeWidget extends TreeWidget {
                 this.splitPanelManager.closeSplitPanel();
             });
         }
-        this.messageService.info("Applied changes have been saved!");
+        if(this.secondWidget) {
+            this.messageService.info("Applied changes have been saved to " + this.secondWidget.uri.path.name + "_MERGED.wf");
+        } else {
+            this.messageService.info("Applied changes have been saved!");
+        }
     }
 
     public async mergeNonConflicting(event: React.MouseEvent<HTMLElement>) {
@@ -442,12 +446,49 @@ export class DiffTreeWidget extends TreeWidget {
         const baseFilePath = this.baseWidget.uri.path.toString();
         const firstFilePath = this.firstWidget.uri.path.toString();
 
+        console.log("ADDITIONS", this.additions);
+        console.log("DELETIONS", this.deletions);
+        console.log("CHANGES", this.changes);
+
+        const conflicts: DiffTreeNode[] = this.changes.filter((c) => c.elementType === "Conflict");
+        console.log("CONFLICTS", conflicts);
+
+        let toBeMergedLeft: string[] = this.additions.filter((c) => c.diffSource === "LEFT").map((x) => x.modelElementId);
+        toBeMergedLeft = toBeMergedLeft.concat(this.deletions.filter((c) => c.diffSource === "LEFT").map((x) => x.modelElementId));
+        toBeMergedLeft = toBeMergedLeft.concat(this.changes.filter((c) => c.diffSource === "LEFT").filter((c) => c.elementType !== "Conflict").map((x) => x.modelElementId));
+        console.log("toBeMergedLeft", toBeMergedLeft);
+
+        let toBeMergedRight: string[] = this.additions.filter((c) => c.diffSource === "RIGHT").map((x) => x.modelElementId);
+        toBeMergedRight = toBeMergedRight.concat(this.deletions.filter((c) =>c.diffSource === "RIGHT").map((x) => x.modelElementId));
+        toBeMergedRight = toBeMergedRight.concat(this.changes.filter((c) => c.diffSource === "RIGHT").filter((c) => c.elementType !== "Conflict").map((x) => x.modelElementId));
+        console.log("toBeMergedRight", toBeMergedRight);
+
+        for(let c of toBeMergedLeft) {
+            this.comparison = MergeDiffMenuContribution.removeFromComparison(this.comparison, c);
+        }
+        for(let c of toBeMergedRight) {
+            this.comparison = MergeDiffMenuContribution.removeFromComparison(this.comparison, c);
+        }
+
+
         if (this.secondWidget) {
-            this.comparisonService.getThreeWayMergeResult(baseFilePath, firstFilePath, this.secondWidget.uri.path.toString()).then(
+            this.comparisonService.getThreeWayMergeNoConflicts(firstFilePath, baseFilePath, toBeMergedLeft).then(
                 () => {
-                    this.splitPanelManager.closeSplitPanel();
+                    this.comparisonService.getThreeWayMergeNoConflicts(this.secondWidget.uri.path.toString(), baseFilePath, toBeMergedRight).then(
+                        () => {
+
+                            if (conflicts && conflicts.length === 0) {
+                                this.splitPanelManager.closeSplitPanel();
+                            } else {
+                                MergeDiffMenuContribution.diffTreeWidget = this;
+                                MergeDiffMenuContribution.refreshComparison(this.comparison, this.splitPanelManager);
+                            }
+
+                        });
                 }
             );
+
+
 
             /*.then((result) => {
                 MergeDiffMenuContribution.refreshComparison(result, this.splitPanelManager);
@@ -460,7 +501,7 @@ export class DiffTreeWidget extends TreeWidget {
             );
 
         }
-        this.messageService.info("File " + this.baseWidget.uri.path.base + " has been merged");
+        this.messageService.info("Non-conflicting changes have been merged");
     }
 
     public async revertChanges(event: React.MouseEvent<HTMLElement>) {
